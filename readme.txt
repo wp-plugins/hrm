@@ -40,9 +40,9 @@ Browser Compatibility
 
 == Screenshots ==
 
-    1. Admin panel
-    2. Employee profile
-    3. Leave management
+1. Admin panel
+2. Employee profile
+3. Leave management
 
 == Changelog ==
 	Nothing
