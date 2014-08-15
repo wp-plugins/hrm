@@ -8,7 +8,7 @@
 
 
             $('.hrm-add-button').on( 'click', this.getInsertDataForm );
-            $('body').on( 'click', '.hrm-form-cancle', this.formshowHide );
+            $('body').on( 'click', '.hrm-form-cancel', this.formshowHide );
             $('body').on( 'submit', '#hrm-hidden-form', this.add );
             $('a.hrm-editable').on( 'click', this.edit );
             $('.hrm-delete-button').on( 'click', this.delete );

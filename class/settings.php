@@ -473,7 +473,7 @@ class Hrm_Settings {
                 </div>
                 <div class="hrm-action-wrap">
                     <input type="submit" class="button hrm-submit-button button-primary" name="requst" value="Submit">
-                    <a href="#" class="button hrm-form-cancle"><?php _e( 'Cancle', 'hrm' ); ?></a>
+                    <a href="#" class="button hrm-form-cancel"><?php _e( 'Cancel', 'hrm' ); ?></a>
                     <div class="hrm-spinner" style="display: none;"><?php _e( 'Saving....', 'hrm' ); ?></div>
                 </div>
             </form>
