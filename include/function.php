@@ -3,9 +3,9 @@ function hrm_user_can_access( $tab = null, $subtab = null, $access_point = null,
 
 
     $user_id = get_current_user_id();
-    $supper_admin = get_option( 'hrm_admin', true );
+    $super_admin = get_option( 'hrm_admin', true );
 
-    if ( $user_id == $supper_admin ) {
+    if ( $user_id == $super_admin ) {
         return true;
     }
 

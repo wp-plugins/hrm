@@ -510,9 +510,9 @@ class Hrm_Ajax {
         ) );
 
         $data = array();
-        $supper_admin = get_option( 'hrm_admin');
+        $super_admin = get_option( 'hrm_admin');
         foreach( $users as $user) {
-            if ( $user->ID == $supper_admin ) continue;
+            if ( $user->ID == $super_admin ) continue;
             $data[] = array(
                 'label' => $user->display_name,
                 '_user_meta' => hrm_Admin::getInstance()->create_user_meta( $user->display_name, $user->ID ),
