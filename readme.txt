@@ -7,8 +7,6 @@ Tested up to: 3.9
 Stable tag: 0.1
 License: GPLv2 or later
 
-Instant switching between user accounts in WordPress.
-
 == Description ==
 	Manage your organization, industry, office, task and assign task with the help of this plugin.
 
