@@ -54,27 +54,6 @@ echo Hrm_settings::getInstance()->get_serarch_form( $search, __( 'Location', 'hr
         $total = 0;
     };
 
-    $field['name'] = array(
-        'label' => __( 'Location Name', 'hrm' ),
-        'type' => 'text',
-        'desc' => 'please insert location name',
-    );
-    $field['city'] = array(
-        'label' => __( 'City Name', 'hrm' ),
-        'type' => 'text',
-        'desc' => 'please insert city',
-    );
-    $field['phone'] = array(
-        'label' => __( 'Phone Number', 'hrm' ),
-        'type' => 'text',
-        'desc' => 'please insert phone number',
-    );
-
-    $field['action'] = 'hrm_search';
-    $field['table_option'] = 'hrm_location_option';
-    $field['pagination_limit'] = $limit;
-
-    Hrm_Settings::getInstance()->get_serarch_form( $field, 'hrm_Location');
 ?>
 <div class="hrm-location">
 
@@ -122,7 +101,7 @@ echo Hrm_settings::getInstance()->get_serarch_form( $search, __( 'Location', 'hr
 
         $table['table_attr'] = array( 'class' => 'widefat' );
 
-        $table['table_option'] = 'hrm_location_option';
+        $table['table'] = 'hrm_location_option';
         $table['action'] = 'hrm_delete';
         $table['table_attr'] = array( 'class' => 'widefat' );
         $table['tab'] = $tab;
