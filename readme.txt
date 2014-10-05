@@ -12,11 +12,20 @@ License: GPLv2 or later
 
 = Features:  =
 
-From admin panel you can create
-*Organization
-    1. General Information
-    2. Location
-    3. Notice
+*From admin panel you can manage
+    1. Organization Information.
+    2. Create employer role, employer and employer access permission against the role.
+    3. Employee job information.
+    4. Employee qualification.
+    5. Create project, task and assign the task to the employee.
+    6. Personal information management (pim). Where you create employee and manage there information and access each employee profile.
+    7. leave management system.
+
+*Each employee has there personal account where employee can manage
+    1. Personal information, work experiance, education, skill and language.
+    2. Get organization informtion which information include from admin panel.
+    3. Employee can monitoring there current task, outstanding task and completed task.
+    4. Leave Apply.
 
 
 == Installation ==
