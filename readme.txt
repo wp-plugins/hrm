@@ -12,8 +12,8 @@ License: GPLv2 or later
 
 = Features:  =
 
-* From admin panel you can create
-  Organization
+From admin panel you can create
+*Organization
     1. General Information
     2. Location
     3. Notice
