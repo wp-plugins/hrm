@@ -8,7 +8,11 @@ Stable tag: 0.1
 License: GPLv2 or later
 
 == Description ==
-	Manage your organization, industry, office, task and assign task with the help of this plugin.
+	Manage your human resource, project, task and assign task with the help of this plugin.
+
+= Features:  =
+
+*
 
 == Installation ==
 
