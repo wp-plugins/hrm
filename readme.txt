@@ -7,6 +7,8 @@ Tested up to: 3.9
 Stable tag: 0.1
 License: GPLv2 or later
 
+Organization, Industries and Office management
+
 == Description ==
    Manage your human resource, project, task and assign task with the help of this plugin.
 
