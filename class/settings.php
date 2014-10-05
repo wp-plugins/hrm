@@ -96,78 +96,88 @@ class Hrm_Settings {
 
 	function select_field( $name, $element ) {
 
-        $extra                  = '';
-        $element['id']          = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
-        $element['class']       = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
-        $element['disabled']    = isset( $element['disabled'] ) ? esc_attr( $element['disabled'] ) : '';
-        $element['extra']       = isset( $element['extra'] ) ? $element['extra'] : array();
-        $element['label']       = isset( $element['label'] ) ? $element['label'] : '';
-        $element['option']      = isset( $element['option'] ) ? $element['option'] : array();
-        $element['selected']    = isset( $element['selected'] ) ? $element['selected'] : '';
-        $element['desc']        = isset( $element['desc'] ) ? $element['desc'] : '';
-        $element['action_hook'] = isset( $element['action_hook'] ) ? $element['action_hook'] : '';
-        $element['required']    = ( isset( $element['extra']['data-hrm_required'] ) &&  ( $element['extra']['data-hrm_required'] === true ) ) ? '*' : '';
+        $extra_field = '';
+        $id          = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
+        $class       = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
+        $disabled    = isset( $element['disabled'] ) ? esc_attr( $element['disabled'] ) : '';
+        $extra       = isset( $element['extra'] ) ? $element['extra'] : array();
+        $label       = isset( $element['label'] ) ? $element['label'] : '';
+        $option      = isset( $element['option'] ) ? $element['option'] : array();
+        $selected    = isset( $element['selected'] ) ? $element['selected'] : '';
+        $desc        = isset( $element['desc'] ) ? $element['desc'] : '';
+        $required    = ( isset( $extra['data-hrm_required'] ) &&  ( $extra['data-hrm_required'] === true ) ) ? '*' : '';
+        $wrap_class  = isset( $element['wrap_class'] ) ? $element['wrap_class'] : '';
+        $wrap_tag    = isset( $element['wrap_tag'] ) ? $element['wrap_tag'] : 'div';
 
-        if( is_array( $element['extra'] ) && count( $element['extra'] ) ) {
-            foreach( $element['extra'] as $key => $action ) {
-                $extra .= esc_attr( $key ) .'="'. esc_attr( $action ).'" ';
+        if( is_array( $extra ) && count( $extra ) ) {
+            foreach( $extra as $key => $action ) {
+                $extra_field .= esc_attr( $key ) .'="'. esc_attr( $action ).'" ';
             }
         }
 
-        $html = sprintf( '<label for="%1s">%2s<em>%3s</em></label>', $element['id'], $element['label'], $element['required'] );
-        $html .= sprintf( '<select class="%1$s" name="%2$s" id="%3$s" %4$s %5$s>', $element['class'], $name, $element['id'], $element['disabled'], $extra );
-        foreach ( $element['option'] as $key => $label ) {
-            $html .= sprintf( '<option value="%1$s" %2$s >%3$s</option>', esc_attr( $key ), selected( $element['selected'], $key, false ), esc_attr( $label ) );
+        $html = sprintf( '<label for="%1s">%2s<em>%3s</em></label>', $id, $label, $required );
+        $html .= sprintf( '<select class="%1$s" name="%2$s" id="%3$s" %4$s %5$s>', $class, $name, $id, $disabled, $extra_field );
+
+        foreach ( $option as $key => $label ) {
+            $html .= sprintf( '<option value="%1$s" %2$s >%3$s</option>', esc_attr( $key ), selected( $selected, $key, false ), esc_attr( $label ) );
         }
 
         $html .= sprintf( '</select>' );
-        $html .= sprintf( '<span class="hrm-clear"></span><span class="description"> %s</span>', $element['desc'] );
+        $html .= sprintf( '<span class="hrm-clear"></span><span class="description"> %s</span>', $desc );
+
+        $wrap       = sprintf( '<%1$s class="hrm-form-field %2$s">', $wrap_tag, $wrap_class );
+        $wrap_close = sprintf('</%1$s>', $wrap_tag);
 
         ob_start();
-       	echo '<div id="hrm-select" class="hrm-form-field">';
-        echo $html;
-
-        //do_action( 'hrm_select_' . $element['action_hook'] );
-        echo '</div>';
+           	echo $this->multiple_field_inside_this_wrap( $element );
+                echo $wrap;
+                echo $html;
+                echo $wrap_close;
+            echo $this->multiple_field_inside_this_wrap_close( $element );
 
         return ob_get_clean();
     }
 
     function multiple_select_field( $name, $element ) {
 
-        $extra                  = '';
-        $element['id']          = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
-        $element['class']       = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
-        $element['disabled']    = isset( $element['disabled'] ) ? esc_attr( $element['disabled'] ) : '';
-        $element['extra']       = isset( $element['extra'] ) ? $element['extra'] : array();
-        $element['label']       = isset( $element['label'] ) ? $element['label'] : '';
-        $element['option']      = isset( $element['option'] ) ? $element['option'] : array();
-        $element['selected']    = isset( $element['selected'] ) ? $element['selected'] : '';
-        $element['desc']        = isset( $element['desc'] ) ? $element['desc'] : '';
-        $element['action_hook'] = isset( $element['action_hook'] ) ? $element['action_hook'] : '';
-        $element['required']    = ( isset( $element['extra']['data-hrm_required'] ) &&  ( $element['extra']['data-hrm_required'] === true ) ) ? '*' : '';
+        $extra_field = '';
+        $id          = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
+        $class       = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
+        $disabled    = isset( $element['disabled'] ) ? esc_attr( $element['disabled'] ) : '';
+        $extra       = isset( $element['extra'] ) ? $element['extra'] : array();
+        $label       = isset( $element['label'] ) ? $element['label'] : '';
+        $option      = isset( $element['option'] ) ? $element['option'] : array();
+        $selected    = isset( $element['selected'] ) ? $element['selected'] : '';
+        $desc        = isset( $element['desc'] ) ? $element['desc'] : '';
+        $required    = ( isset( $extra['data-hrm_required'] ) &&  ( $extra['data-hrm_required'] === true ) ) ? '*' : '';
+        $wrap_class  = isset( $element['wrap_class'] ) ? $element['wrap_class'] : '';
+        $wrap_tag    = isset( $element['wrap_tag'] ) ? $element['wrap_tag'] : 'div';
 
-        if( is_array( $element['extra'] ) && count( $element['extra'] ) ) {
-            foreach( $element['extra'] as $key => $action ) {
-                $extra .= esc_attr( $key ) .'="'. esc_attr( $action ).'" ';
+        if( is_array( $extra ) && count( $extra ) ) {
+            foreach( $extra as $key => $action ) {
+                $extra_field .= esc_attr( $key ) .'="'. esc_attr( $action ).'" ';
             }
         }
 
-        $html = sprintf( '<label for="%1s">%2s<em>%3s</em></label>', $element['id'], $element['label'], $element['required'] );
-        $html .= sprintf( '<select multiple class="%1$s" name="%2$s" id="%3$s" %4$s %5$s>', $element['class'], $name, $element['id'], $element['disabled'], $extra );
-        foreach ( $element['option'] as $key => $label ) {
-            $html .= sprintf( '<option value="%1$s" %2$s >%3$s</option>', esc_attr( $key ), selected( $element['selected'], $key, false ), esc_attr( $label ) );
+        $html = sprintf( '<label for="%1s">%2s<em>%3s</em></label>', $id, $label, $required );
+        $html .= sprintf( '<select multiple class="%1$s" name="%2$s" id="%3$s" %4$s %5$s>', $class, $name, $id, $disabled, $extra_field );
+
+        foreach ( $option as $key => $label ) {
+            $html .= sprintf( '<option value="%1$s" %2$s >%3$s</option>', esc_attr( $key ), selected( $selected, $key, false ), esc_attr( $label ) );
         }
 
         $html .= sprintf( '</select>' );
-        $html .= sprintf( '<span class="hrm-clear"></span><span class="description"> %s</span>', $element['desc'] );
+        $html .= sprintf( '<span class="hrm-clear"></span><span class="description"> %s</span>', $desc );
+
+        $wrap       = sprintf( '<%1$s class="hrm-form-field %2$s">', $wrap_tag, $wrap_class );
+        $wrap_close = sprintf('</%1$s>', $wrap_tag);
 
         ob_start();
-        echo '<div id="hrm-multi-select" class="hrm-form-field">';
-        echo $html;
-
-        //do_action( 'hrm_select_' . $element['action_hook'] );
-        echo '</div>';
+            echo $this->multiple_field_inside_this_wrap( $element );
+                echo $wrap;
+                echo $html;
+                echo $wrap_close;
+            echo $this->multiple_field_inside_this_wrap_close( $element );
 
         return ob_get_clean();
     }
@@ -177,34 +187,39 @@ class Hrm_Settings {
             return;
         }
 
-        $extra                  = '';
-        $element['id']          = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
-        $element['class']       = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
-        $element['disabled']    = isset( $element['disabled'] ) ? esc_attr( $element['disabled'] ) : '';
-        $element['extra']       = isset( $element['extra'] ) ? $element['extra'] : array();
-        $element['label']       = isset( $element['label'] ) ? esc_attr( $element['label'] ) : '';
-        $element['desc']        = isset( $element['desc'] ) ? esc_attr( $element['desc'] ) : '';
-        $element['value']       = isset( $element['value'] ) ? esc_attr( $element['value'] ) : '';
-        $element['placeholder'] = isset( $element['placeholder'] ) ? esc_attr( $element['placeholder'] ) : '';
-        $element['type']        = isset( $element['type'] ) ? esc_attr( $element['type'] ) : 'text';
-        $element['required']    = ( isset( $element['extra']['data-hrm_required'] ) &&  ( $element['extra']['data-hrm_required'] === true ) ) ? '*' : '';
+        $extra_field = '';
+        $id          = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
+        $class       = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
+        $disabled    = isset( $element['disabled'] ) ? esc_attr( $element['disabled'] ) : '';
+        $extra       = isset( $element['extra'] ) ? $element['extra'] : array();
+        $label       = isset( $element['label'] ) ? esc_attr( $element['label'] ) : '';
+        $desc        = isset( $element['desc'] ) ? esc_attr( $element['desc'] ) : '';
+        $value       = isset( $element['value'] ) ? esc_attr( $element['value'] ) : '';
+        $placeholder = isset( $element['placeholder'] ) ? esc_attr( $element['placeholder'] ) : '';
+        $required    = ( isset( $extra['data-hrm_required'] ) &&  ( $extra['data-hrm_required'] === true ) ) ? '*' : '';
+        $wrap_class  = isset( $element['wrap_class'] ) ? $element['wrap_class'] : '';
+        $wrap_tag    = isset( $element['wrap_tag'] ) ? $element['wrap_tag'] : 'div';
 
-        if( is_array( $element['extra'] ) && count( $element['extra'] ) ) {
-            foreach( $element['extra'] as $key => $action ) {
-                $extra .= esc_attr( $key ) .'="'. esc_attr( $action ) . '" ';
+        if( is_array( $extra ) && count( $extra ) ) {
+            foreach( $extra as $key => $action ) {
+                $extra_field .= esc_attr( $key ) .'="'. esc_attr( $action ) . '" ';
             }
         }
 
-        $html = sprintf( '<label for="%1s">%2s<em>%3s</em></label>', $element['id'], $element['label'], $element['required'] );
-        $html .= sprintf( '<input type="%1$s" name="%2$s" value="%3$s" placeholder="%4$s" class="%5$s" id="%6$s" %7$s %8$s />', $element['type'], $name,
-            $element['value'], $element['placeholder'], $element['class'], $element['id'], $element['disabled'], $extra );
-        $html .= sprintf( '<span class="hrm-clear"></span><span class="description">%s</span>', $element['desc'] );
+        $html = sprintf( '<label for="%1s">%2s<em>%3s</em></label>', $id, $label, $required );
+        $html .= sprintf( '<input type="text" name="%1$s" value="%2$s" placeholder="%3$s" class="%4$s" id="%5$s" %6$s %7$s />', $name,
+            $value, $placeholder, $class, $id, $disabled, $extra_field );
+        $html .= sprintf( '<span class="hrm-clear"></span><span class="description">%s</span>', $desc );
+
+        $wrap       = sprintf( '<%1$s class="hrm-form-field %2$s">', $wrap_tag, $wrap_class );
+        $wrap_close = sprintf('</%1$s>', $wrap_tag);
 
         ob_start();
-        echo '<div id="hrm-text" class="hrm-form-field">';
-        echo $html;
-
-        echo '</div>';
+            echo $this->multiple_field_inside_this_wrap( $element );
+                echo $wrap;
+                echo $html;
+                echo $wrap_close;
+            echo $this->multiple_field_inside_this_wrap_close( $element );
         return ob_get_clean();
     }
 
@@ -213,28 +228,26 @@ class Hrm_Settings {
             return;
         }
 
-        $extra            = '';
-        $element['id']    = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
-        $element['class'] = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
-        $element['extra'] = isset( $element['extra'] ) ? $element['extra'] : array();
-        $element['value'] = isset( $element['value'] ) ? esc_attr( $element['value'] ) : '';
+        $extra = '';
+        $id    = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
+        $class = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
+        $extra = isset( $element['extra'] ) ? $element['extra'] : array();
+        $value = isset( $element['value'] ) ? esc_attr( $element['value'] ) : '';
 
-        if( is_array( $element['extra'] ) && count( $element['extra'] ) ) {
-            foreach( $element['extra'] as $key => $action ) {
+        if( is_array( $extra ) && count( $extra ) ) {
+            foreach( $extra as $key => $action ) {
                 $extra .= esc_attr( $key ) .'='. esc_attr( $action ) . ' ';
             }
         }
 
 
         $html = sprintf( '<input type="hidden" name="%1$s" value="%2$s" class="%3$s" id="%4$s" %5$s />', $name,
-            $element['value'], $element['class'], $element['id'], $extra );
+            $value, $class, $id, $extra );
 
         ob_start();
-
-        echo '<div id="hrm-hidden">';
-        echo $html;
-
-        echo '</div>';
+            echo '<div>';
+            echo $html;
+            echo '</div>';
         return ob_get_clean();
     }
 
@@ -243,9 +256,11 @@ class Hrm_Settings {
             return;
         }
 
-        $element['required'] = ( isset( $element['required'] ) &&  ( $element['required'] == 'required' ) ) ? '*' : '';
-        $label = isset( $element['label'] ) ? esc_attr( $element['label'] ) : '';
-        $html = sprintf( '<label for="">%1$s<em>%2$s</em></label>', $label, $element['required'] );
+        $required   = ( isset( $element['required'] ) &&  ( $element['required'] == 'required' ) ) ? '*' : '';
+        $label      = isset( $element['label'] ) ? esc_attr( $element['label'] ) : '';
+        $html       = sprintf( '<label for="">%1$s<em>%2$s</em></label>', $label, $required );
+        $wrap_class = isset( $element['wrap_class'] ) ? $element['wrap_class'] : '';
+        $wrap_tag   = isset( $element['wrap_tag'] ) ? $element['wrap_tag'] : 'div';
 
         $fields = isset( $element['fields'] ) ? $element['fields'] : array();
 
@@ -272,10 +287,16 @@ class Hrm_Settings {
 
         $desc = isset( $element['desc'] ) ? esc_attr( $element['desc'] ) : '';
         $html .= sprintf( '<span class="hrm-clear"></span><span class="description">%s</span>', $desc );
+        $wrap       = sprintf( '<%1$s class="hrm-form-field %2$s">', $wrap_tag, $wrap_class );
+        $wrap_close = sprintf('</%1$s>', $wrap_tag);
+
         ob_start();
-        echo '<div id="hrm-radio" class="hrm-form-field">';
-        echo $html;
-        echo '</div>';
+            echo $this->multiple_field_inside_this_wrap( $element );
+                echo $wrap;
+                echo $html;
+                echo $wrap_close;
+            echo $this->multiple_field_inside_this_wrap_close( $element );
+
         return ob_get_clean();
     }
 
@@ -284,11 +305,13 @@ class Hrm_Settings {
             return;
         }
 
-        $element['required'] = ( isset( $element['required'] ) &&  ( $element['required'] == 'required' ) ) ? '*' : '';
-        $label = isset( $element['label'] ) ? esc_attr( $element['label'] ) : '';
-        $html = sprintf( '<label for="">%1$s<em>%2$s</em></label>', $label, $element['required'] );
+        $required   = ( isset( $element['required'] ) &&  ( $element['required'] == 'required' ) ) ? '*' : '';
+        $wrap_class = isset( $element['wrap_class'] ) ? $element['wrap_class'] : '';
+        $wrap_tag   = isset( $element['wrap_tag'] ) ? $element['wrap_tag'] : 'div';
+        $label      = isset( $element['label'] ) ? esc_attr( $element['label'] ) : '';
+        $html       = sprintf( '<label for="">%1$s<em>%2$s</em></label>', $label, $required );
+        $fields     = isset( $element['fields'] ) ? $element['fields'] : array();
 
-        $fields = isset( $element['fields'] ) ? $element['fields'] : array();
 
         foreach( $fields as $field ) {
             $extra_attr = '';
@@ -311,12 +334,17 @@ class Hrm_Settings {
 
         }
 
-        $desc = isset( $element['desc'] ) ? esc_attr( $element['desc'] ) : '';
-        $html .= sprintf( '<span class="hrm-clear"></span><span class="description">%s</span>', $desc );
+        $desc       = isset( $element['desc'] ) ? esc_attr( $element['desc'] ) : '';
+        $html       .= sprintf( '<span class="hrm-clear"></span><span class="description">%s</span>', $desc );
+        $wrap       = sprintf( '<%1$s class="hrm-form-field %2$s">', $wrap_tag, $wrap_class );
+        $wrap_close = sprintf('</%1$s>', $wrap_tag);
+
         ob_start();
-        echo '<div id="hrm-checkbox" class="hrm-form-field">';
-        echo $html;
-        echo '</div>';
+            echo $this->multiple_field_inside_this_wrap( $element );
+                echo $wrap;
+                echo $html;
+                echo $wrap_close;
+            echo $this->multiple_field_inside_this_wrap_close( $element );
         return ob_get_clean();
     }
 
@@ -325,30 +353,63 @@ class Hrm_Settings {
             return;
         }
 
-        $extra               = '';
-        $element['id']       = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
-        $element['class']    = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
-        $element['disabled'] = isset( $element['disabled'] ) ? esc_attr( $element['disabled'] ) : '';
-        $element['extra']    = isset( $element['extra'] ) ? $element['extra'] : array();
-        $element['label']    = isset( $element['label'] ) ? esc_attr( $element['label'] ) : '';
-        $element['desc']     = isset( $element['desc'] ) ? esc_attr( $element['desc'] ) : '';
-        $element['value']    = isset( $element['value'] ) ? esc_attr( $element['value'] ) : '';
-        $element['required']    = ( isset( $element['extra']['data-hrm_required'] ) &&  ( $element['extra']['data-hrm_required'] === true ) ) ? '*' : '';
+        $extra_field      = '';
+        $wrap_class = isset( $element['wrap_class'] ) ? $element['wrap_class'] : '';
+        $wrap_tag   = isset( $element['wrap_tag'] ) ? $element['wrap_tag'] : 'div';
+        $id         = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
+        $class      = isset( $element['class'] ) ? esc_attr( $element['class'] ) : esc_attr( $name );
+        $disabled   = isset( $element['disabled'] ) ? esc_attr( $element['disabled'] ) : '';
+        $extra      = isset( $element['extra'] ) ? $element['extra'] : array();
+        $label      = isset( $element['label'] ) ? esc_attr( $element['label'] ) : '';
+        $desc       = isset( $element['desc'] ) ? esc_attr( $element['desc'] ) : '';
+        $value      = isset( $element['value'] ) ? esc_attr( $element['value'] ) : '';
+        $required   = ( isset( $extra['data-hrm_required'] ) &&  ( $extra['data-hrm_required'] === true ) ) ? '*' : '';
 
-        if( is_array( $element['extra'] ) && count( $element['extra'] ) ) {
-            foreach( $element['extra'] as $key => $action ) {
-                $extra .= esc_attr( $key ) .'='. esc_attr( $action ).' ';
+        if( is_array( $extra ) && count( $extra ) ) {
+            foreach( $extra as $key => $action ) {
+                $extra_field .= esc_attr( $key ) .'='. esc_attr( $action ).' ';
             }
         }
 
-        $html = sprintf( '<label for="%1s">%2s<em>%3s</em></label>', $element['id'], $element['label'], $element['required'] );
+        $html = sprintf( '<label for="%1s">%2s<em>%3s</em></label>', $id, $label, $required );
         $html .= sprintf( '<textarea name="%1$s" class="%2$s" id="%3$s" %4$s %5$s >%6$s</textarea>', $name,
-                $element['class'], $element['id'], $element['disabled'], $extra, $element['value'] );
-        $html .= sprintf( '<span class="hrm-clear"></span><span class="description">%s</span>', $element['desc'] );
+                $class, $id, $disabled, $extra_field, $value );
+        $html .= sprintf( '<span class="hrm-clear"></span><span class="description">%s</span>', $desc );
+
+        $wrap       = sprintf( '<%1$s class="hrm-form-field %2$s">', $wrap_tag, $wrap_class );
+        $wrap_close = sprintf('</%s>', $wrap_tag);
+
         ob_start();
-        echo '<div id="hrm-textare" class="hrm-form-field">';
-        echo $html;
-        echo '</div>';
+            echo $this->multiple_field_inside_this_wrap( $element );
+                echo $wrap;
+                echo $html;
+                echo $wrap_close;
+            echo $this->multiple_field_inside_this_wrap_close( $element );
+
+        return ob_get_clean();
+    }
+
+    function multiple_field_inside_this_wrap( $element ) {
+        $parent_wrap_attr = ( isset( $element['parent_wrap_attr'] ) && is_array( $element['parent_wrap_attr'] ) ) ? $element['parent_wrap_attr'] : array();
+        $parent_wrap_start_tag = isset( $element['parent_wrap_start_tag'] ) ? $element['parent_wrap_start_tag'] : 'div';
+        $attr = '';
+        ob_start();
+            if( isset( $element['parent_wrap_start'] ) && $element['parent_wrap_start'] ) {
+                foreach ( $parent_wrap_attr as $id => $value) {
+                    $attr .= esc_attr( $id ) .'="'. esc_attr( $value ).'" ';
+                }
+
+                echo '<' . $parent_wrap_start_tag .' '. $attr .'>';
+            }
+        return ob_get_clean();
+    }
+
+    function multiple_field_inside_this_wrap_close( $element ) {
+        $parent_wrap_start_tag = isset( $element['parent_wrap_start_tag'] ) ? $element['parent_wrap_start_tag'] : 'div';
+        ob_start();
+            if( isset( $element['parent_wrap_close'] ) && $element['parent_wrap_close'] ) {
+                echo '</' . $parent_wrap_start_tag .'>';
+            }
         return ob_get_clean();
     }
 
@@ -398,6 +459,12 @@ class Hrm_Settings {
                                 break;
                             case 'multiple':
                                 echo $this->multiple_select_field( $name, $field_obj );
+                                break;
+                            case 'paretn_wrap':
+                                echo $this->multiple_field_inside_this_wrap( $field_obj );
+                                break;
+                            case 'paretn_wrap_close':
+                                echo $this->multiple_field_inside_this_wrap_close( $field_obj );
                                 break;
                         }
                         echo '</div>';
@@ -466,6 +533,12 @@ class Hrm_Settings {
                                 case 'multiple':
                                     echo $this->multiple_select_field( $name, $field_obj );
                                     break;
+                                case 'paretn_wrap':
+                                    echo $this->multiple_field_inside_this_wrap( $field_obj );
+                                    break;
+                                case 'paretn_wrap_close':
+                                    echo $this->multiple_field_inside_this_wrap_close( $field_obj );
+                                    break;
                             }
 
                         }
@@ -532,6 +605,12 @@ class Hrm_Settings {
                                 break;
                             case 'multiple':
                                 echo $this->multiple_select_field( $name, $field_obj );
+                                break;
+                            case 'paretn_wrap':
+                                echo $this->multiple_field_inside_this_wrap( $field_obj );
+                                break;
+                            case 'paretn_wrap_close':
+                                echo $this->multiple_field_inside_this_wrap_close( $field_obj );
                                 break;
                         }
 
