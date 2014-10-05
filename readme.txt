@@ -8,11 +8,16 @@ Stable tag: 0.1
 License: GPLv2 or later
 
 == Description ==
-	Manage your human resource, project, task and assign task with the help of this plugin.
+   Manage your human resource, project, task and assign task with the help of this plugin.
 
 = Features:  =
 
-*
+* From admin panel you can create
+  Organization
+    1. General Information
+    2. Location
+    3. Notice
+
 
 == Installation ==
 
