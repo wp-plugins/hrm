@@ -39,8 +39,12 @@ $total = $search_query->get_total();
 
 $add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
 $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$user = wp_get_current_user();
 
 foreach ( $results as $id => $user_obj) {
+    if ( $user->user_login ==  $user_obj->user_login ) {
+        continue;
+    }
 	$flag = get_user_meta( $user_obj->ID, '_status', true );
 
 	$status = ( $flag == 'yes' ) ? 'Enable' : 'Disable';
@@ -58,7 +62,7 @@ foreach ( $results as $id => $user_obj) {
         $del_checkbox = '';
     }
 
-    $employer_status = hrm_user_can_access( $tab, $subtab, 'admin_employer_status', true );
+    $employer_status = hrm_user_can_access( $tab, $subtab, 'admin_list_employer_status', true );
     
     if ( $employer_status ) {
         $admin_status_dropdown = array(

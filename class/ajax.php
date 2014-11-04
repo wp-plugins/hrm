@@ -496,6 +496,7 @@ class Hrm_Ajax {
 
     function user_delete() {
         check_ajax_referer('hrm_nonce');
+
         if ( isset( $_POST['hrm_check'] ) && is_array( $_POST['hrm_check'] ) && count( $_POST['hrm_check'] ) ) {
 
             foreach( $_POST['hrm_check'] as $user_id => $value ) {
@@ -503,9 +504,9 @@ class Hrm_Ajax {
                 $delete_user = wp_delete_user( $user_id );
             }
         }
-
+        $url = $_POST['redirect'] .'&tab='. $_POST['tab'] . '&sub_tab='. $_POST['sub_tab'];
         if( $delete_user ) {
-            wp_send_json_success( array( 'success_msg' => __( 'Delete user successfull', 'hrm' ) ) );
+            wp_send_json_success( array( 'msg' => __( 'Delete user successfully', 'hrm' ), 'redirect' => $url ) );
         } else {
             wp_send_json_error( __( 'Delete Failed', 'hrm' ) );
         }

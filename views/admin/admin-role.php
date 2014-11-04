@@ -16,11 +16,17 @@ $wp_built_in_role = array( 'administrator', 'editor', 'author', 'contributor', '
 
 $add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
 $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$current_user_role = hrm_current_user_role();
 
 foreach ( $role_names as $name => $display_name) {
     if ( in_array( $name, $wp_built_in_role ) ) {
         continue;
     }
+
+    if ( $current_user_role == $name ) {
+        continue;
+    }
+    
     if ( $delete_permission ) {
         $del_checkbox = '<input name="hrm_check['.$name.']" value="" type="checkbox">';
     } else {

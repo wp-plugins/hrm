@@ -32,9 +32,7 @@ function hrm_page() {
         'id'        => 'hrm-admin',
         'title'     => __( 'Employer', 'hrm' ),
         'file_path' => $path . '/admin/admin.php',
-        'role' => array(
-            'employer_status' => __( 'Can manage employer status', 'hrm' ),
-        ),
+        
         'submenu' => array(
             'admin_role' => array(
                 'title'     => __( 'Employer Role', 'hrm' ),
@@ -43,6 +41,9 @@ function hrm_page() {
             'admin_list' => array(
                 'title'     => __( 'Employer lists', 'hrm' ),
                 'file_path' => $path . '/admin/admin-lists.php',
+                'role' => array(
+                    'employer_status' => __( 'Can manage employer status', 'hrm' ),
+                ),
             ),
         ),
 
