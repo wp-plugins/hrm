@@ -63,7 +63,12 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
-	Nothing
+
+= 0.1 =
+* redirect problem 
+* table create 
+* employer create
+* page handelar
 
 == Frequently Asked Questions ==
 
