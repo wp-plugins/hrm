@@ -280,16 +280,13 @@ class Hrm_Ajax {
         }
 
         if( $task_id ) {
-
             $post = get_post($task_id);
             $project_id = $post->post_parent;
-
-            if ( !isset( $_POST['assigned'] ) ) {
+            if ( !isset($_POST['assigned']) ) {
                 $assign_to = $post->post_author;
             } else {
                 $assign_to = $_POST['assigned'];
             }
-
             update_post_meta( $task_id, '_start_date', $start_date );
             update_post_meta( $task_id, '_end_date', $end_date );
             update_post_meta( $task_id, '_assigned', $assign_to );
