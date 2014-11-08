@@ -66,6 +66,7 @@ class Wp_Hrm {
         add_action( 'plugins_loaded', array($this, 'load_textdomain') );
         add_action( 'admin_menu', array($this, 'admin_menu') );
         register_activation_hook( __FILE__, array($this, 'install') );
+        add_action( 'init', array( $this, 'register_post_type' ) );
     }
 
     /**
@@ -75,6 +76,74 @@ class Wp_Hrm {
      */
     function load_textdomain() {
         load_plugin_textdomain( 'hrm', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+    }
+
+    function register_post_type() {
+        register_post_type( 'hrm_project', array(
+            'label' => __( 'Project', 'hrm' ),
+            'description' => __( 'project manager post type', 'hrm' ),
+            'public' => false,
+            'show_in_admin_bar' => false,
+            'exclude_from_search' => true,
+            'publicly_queryable' => false,
+            'show_in_admin_bar' => false,
+            'show_ui' => false,
+            'show_in_menu' => false,
+            'capability_type' => 'post',
+            'hierarchical' => false,
+            'rewrite' => array('slug' => ''),
+            'query_var' => true,
+            'supports' => array('title', 'editor'),
+            'labels' => array(
+                'name' => __( 'Project', 'hrm' ),
+                'singular_name' => __( 'Project', 'hrm' ),
+                'menu_name' => __( 'Project', 'hrm' ),
+                'add_new' => __( 'Add Project', 'hrm' ),
+                'add_new_item' => __( 'Add New Project', 'hrm' ),
+                'edit' => __( 'Edit', 'hrm' ),
+                'edit_item' => __( 'Edit Project', 'hrm' ),
+                'new_item' => __( 'New Project', 'hrm' ),
+                'view' => __( 'View Project', 'hrm' ),
+                'view_item' => __( 'View Project', 'hrm' ),
+                'search_items' => __( 'Search Project', 'hrm' ),
+                'not_found' => __( 'No Project Found', 'hrm' ),
+                'not_found_in_trash' => __( 'No Project Found in Trash', 'hrm' ),
+                'parent' => __( 'Parent Project', 'hrm' ),
+            ),
+        ) );
+
+        register_post_type( 'hrm_task', array(
+            'label' => __( 'Task', 'hrm' ),
+            'description' => __( 'project manager post type', 'hrm' ),
+            'public' => false,
+            'show_in_admin_bar' => false,
+            'exclude_from_search' => true,
+            'publicly_queryable' => false,
+            'show_in_admin_bar' => false,
+            'show_ui' => false,
+            'show_in_menu' => false,
+            'capability_type' => 'post',
+            'hierarchical' => false,
+            'rewrite' => array('slug' => ''),
+            'query_var' => true,
+            'supports' => array('title', 'editor'),
+            'labels' => array(
+                'name' => __( 'Project', 'hrm' ),
+                'singular_name' => __( 'Project', 'hrm' ),
+                'menu_name' => __( 'Project', 'hrm' ),
+                'add_new' => __( 'Add Project', 'hrm' ),
+                'add_new_item' => __( 'Add New Project', 'hrm' ),
+                'edit' => __( 'Edit', 'hrm' ),
+                'edit_item' => __( 'Edit Project', 'hrm' ),
+                'new_item' => __( 'New Project', 'hrm' ),
+                'view' => __( 'View Project', 'hrm' ),
+                'view_item' => __( 'View Project', 'hrm' ),
+                'search_items' => __( 'Search Project', 'hrm' ),
+                'not_found' => __( 'No Project Found', 'hrm' ),
+                'not_found_in_trash' => __( 'No Project Found in Trash', 'hrm' ),
+                'parent' => __( 'Parent Project', 'hrm' ),
+            ),
+        ) );
     }
 
 
@@ -111,7 +180,7 @@ class Wp_Hrm {
 
     function install() {
         $logged_in_user_id = get_current_user_id();
-        
+
         new Hrm_Db();
         new Hrm_Update();
 
@@ -154,12 +223,12 @@ class Wp_Hrm {
     function admin_page_handler() {
         $current_user_id = get_current_user_id();
         $user_status = get_user_meta( $current_user_id, '_status', true );
-        
+
         if ( $user_status == 'no' ) {
             _e( '<div class="wrap"><h1>This account temporary disabled!</h1></div>', 'hrm' );
             return;
         }
-        
+
         $page = isset( $_GET['page'] ) ? $_GET['page'] : '';
 
         if ( $page == 'hrm_management' ) {
@@ -170,13 +239,13 @@ class Wp_Hrm {
 
         } else if ( ( $page == 'hrm_pim' )  && isset( $_GET['employee_id'] ) ) {
             require_once dirname (__FILE__) . '/views/employee/header.php';
-        
+
         } else if ( $page == 'hrm_leave' ) {
             require_once dirname (__FILE__) . '/views/leave/header.php';
-        
+
         } else if ( $page == 'hrm_recruitment' ) {
             require_once dirname (__FILE__) . '/views/recruitment/header.php';
-        
+
         } else if ( $page == 'hrm_employee' ) {
             require_once dirname (__FILE__) . '/views/employee/header.php';
         }
