@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/asaquzzaman/hrm
  * Description: Organization, Industries and Office management
  * Author: asaquzzaman
- * Version: 0.2
+ * Version: 0.1
  * Author URI: http://mishubd.com
  * License: GPL2
  * TextDomain: hrm

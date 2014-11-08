@@ -64,7 +64,18 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
-	Nothing
+
+= 0.2 =
+* project budget
+* assign task
+* task user avater
+
+= 0.1 =
+* redirect problem 
+* table create 
+* employer create
+* page handelar 
+
 
 == Frequently Asked Questions ==
 
