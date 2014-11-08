@@ -2,8 +2,8 @@
 
 Contributors: asaquzzaman
 Tags: hrm, human resource, human resource management, office management, industries management, organization management, population management, worker catalog, employee catalog, employer catalog, labour catalog.
-Requires at least: 3.1
-Tested up to: 3.9
+Requires at least: 3.3
+Tested up to: 3.9.1
 Stable tag: trunk
 License: GPLv2 or later
 
@@ -64,7 +64,18 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
-	Nothing
+
+= 0.2 =
+* project budget
+* assign task
+* task user avater
+
+= 0.1 =
+* redirect problem 
+* table create 
+* employer create
+* page handelar 
+
 
 == Frequently Asked Questions ==
 
