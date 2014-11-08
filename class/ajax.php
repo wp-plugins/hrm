@@ -281,12 +281,20 @@ class Hrm_Ajax {
 
         if( $task_id ) {
 
-            update_post_meta( $task_id, '_start_date', $start_date );
-            update_post_meta( $task_id, '_end_date', $end_date );
-            update_post_meta( $task_id, '_assigned', $_POST['assigned'] );
-            update_post_meta( $task_id, '_completed', $_POST['status'] );
             $post = get_post($task_id);
             $project_id = $post->post_parent;
+
+            if ( !isset( $_POST['assigned'] ) ) {
+                $assign_to = $post->post_author;
+            } else {
+                $assign_to = $_POST['assigned'];
+            }
+
+            update_post_meta( $task_id, '_start_date', $start_date );
+            update_post_meta( $task_id, '_end_date', $end_date );
+            update_post_meta( $task_id, '_assigned', $assign_to );
+            update_post_meta( $task_id, '_completed', $_POST['status'] );
+            
             $project_budget = get_post_meta( $project_id, '_budget', true );
             
             if ( $project_budget ) {
