@@ -4,13 +4,12 @@ Contributors: asaquzzaman
 Tags: hrm, human resource, human resource management, office management, industries management, organization management, population management, worker catalog, employee catalog, employer catalog, labour catalog.
 Requires at least: 3.1
 Tested up to: 3.9
-Stable tag: 0.1
+Stable tag: trunk
 License: GPLv2 or later
 
 Organization, Industries and Office management
 
 == Description ==
-[youtube https://www.youtube.com/watch?v=Y6_8IWWy2n4&feature=youtu.be]
    Manage your human resource, project, task and assign task with the help of this plugin.
 
 = Features:  =
