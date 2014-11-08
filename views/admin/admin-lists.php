@@ -15,7 +15,7 @@ echo Hrm_settings::getInstance()->get_serarch_form( $search, 'Admin');
 <?php
 //hidden form
 
-$limit = isset( $_GET['pagination'] ) ? $_GET['pagination'] : 2;
+$limit = isset( $_GET['pagination'] ) ? $_GET['pagination'] : 10;
 if( isset($_GET['search_field']) && ! empty($_GET['search_field']) ) {
     $search = $_GET['search_field'];
 } else {

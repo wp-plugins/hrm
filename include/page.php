@@ -240,7 +240,7 @@ function hrm_page() {
         ),
     );
 
-    $page = apply_filters( 'hrm_employer_memu', $page );
+    $page = apply_filters( 'hrm_employee_memu', $page );
 
     $page['hrm_leave']['configure'] = array(
             'id' => 'hrm-employee-configure',

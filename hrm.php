@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/asaquzzaman/hrm
  * Description: Organization, Industries and Office management
  * Author: asaquzzaman
- * Version: 0.1
+ * Version: 0.2
  * Author URI: http://mishubd.com
  * License: GPL2
  * TextDomain: hrm
@@ -59,7 +59,7 @@ class Wp_Hrm {
     private $is_admin;
 
     function __construct() {
-        $this->version = '0.1';
+        $this->version = '0.2';
         $this->db_version = '0.1';
         $this->is_admin = ( is_admin() ) ? 'yes' : 'no';
         $this->instantiate();
@@ -111,11 +111,13 @@ class Wp_Hrm {
 
     function install() {
         $logged_in_user_id = get_current_user_id();
+        
+        new Hrm_Db();
+        new Hrm_Update();
+
         update_option( 'hrm_admin', $logged_in_user_id );
         update_option( 'hrm_version', $this->version );
         update_option( 'hrm_db_version', $this->db_version );
-
-        new Hrm_Db();
     }
 
     function pim_scripts() {
@@ -132,7 +134,7 @@ class Wp_Hrm {
 
     function admin_menu() {
         $capability = 'read'; //minimum level: subscriber
-        if ( hrm_current_user_role() != 'hrm_employer' ) {
+        if ( hrm_current_user_role() != 'hrm_employee' ) {
             $menu           = add_menu_page( __( 'HRM', 'hrm' ), __( 'HRM', 'hrm' ), $capability, 'hrm_management', array($this, 'admin_page_handler'), ''  );
             $admin_sub_menu = add_submenu_page( 'hrm_management', __( 'Admin', 'hrm' ), __( 'Admin', 'hrm' ), $capability, 'hrm_management', array($this, 'admin_page_handler') );
             $pim            = add_submenu_page( 'hrm_management', __( 'Pim', 'hrm' ), __( 'Pim', 'hrm' ), $capability, 'hrm_pim', array( $this, 'admin_page_handler' ) );
@@ -143,7 +145,7 @@ class Wp_Hrm {
             add_action( 'admin_print_styles-' . $leave, array( $this, 'leave_scripts' ) );
         } else {
             $user_id = get_current_user_id();
-            $menu           = add_menu_page( __( 'HRM', 'hrm' ), __( 'Hrm My Info', 'hrm' ), $capability, 'hrm_employer', array($this, 'admin_page_handler') );
+            $menu           = add_menu_page( __( 'HRM', 'hrm' ), __( 'Hrm My Info', 'hrm' ), $capability, 'hrm_employee', array($this, 'admin_page_handler') );
             $this->admin_scripts();
         }
     }
@@ -175,7 +177,7 @@ class Wp_Hrm {
         } else if ( $page == 'hrm_recruitment' ) {
             require_once dirname (__FILE__) . '/views/recruitment/header.php';
         
-        } else if ( $page == 'hrm_employer' ) {
+        } else if ( $page == 'hrm_employee' ) {
             require_once dirname (__FILE__) . '/views/employee/header.php';
         }
     }
