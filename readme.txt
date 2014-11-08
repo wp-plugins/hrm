@@ -4,7 +4,7 @@ Contributors: asaquzzaman
 Tags: hrm, human resource, human resource management, office management, industries management, organization management, population management, worker catalog, employee catalog, employer catalog, labour catalog.
 Requires at least: 3.1
 Tested up to: 3.9
-Stable tag: 0.1
+Stable tag: 0.2
 License: GPLv2 or later
 
 Organization, Industries and Office management
