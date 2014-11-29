@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/asaquzzaman/hrm
  * Description: Organization, Industries and Office management
  * Author: asaquzzaman
- * Version: 0.2
+ * Version: 0.3
  * Author URI: http://mishubd.com
  * License: GPL2
  * TextDomain: hrm
@@ -59,7 +59,7 @@ class Wp_Hrm {
     private $is_admin;
 
     function __construct() {
-        $this->version = '0.2';
+        $this->version = '0.3';
         $this->db_version = '0.1';
         $this->is_admin = ( is_admin() ) ? 'yes' : 'no';
         $this->instantiate();
