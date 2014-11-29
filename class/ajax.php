@@ -50,7 +50,27 @@ class Hrm_Ajax {
         add_action( 'wp_ajax_edit_attendance', array( $this, 'time_editable' ) );
         add_action( 'wp_ajax_edit_attendance_save', array( $this, 'edit_attendance_save' ) );
         add_action( 'wp_ajax_single_tab_user_role', array( $this, 'single_tab_user_role' ) );
+        add_action( 'wp_ajax_hrm_post_delete', array( $this, 'hrm_post_delete' ) );
 
+
+    }
+
+    function hrm_post_delete() {
+        check_ajax_referer('hrm_nonce');
+
+        $posts_id = isset( $_POST['hrm_check'] ) ? $_POST['hrm_check'] : array();
+        foreach ( $posts_id as $post_id => $value ) {
+            wp_delete_post( $post_id, true );
+        }
+
+        $tab = isset( $_POST['tab'] ) ? $_POST['tab'] : '';
+        $subtab = isset( $_POST['sub_tab'] ) ? $_POST['sub_tab'] : '';
+        $url = $_POST['redirect'] .'&tab=' . $tab .'&sub_tab=' . $subtab;
+        if ( count( $posts_id ) ) {
+            wp_send_json_success( array( 'msg' => __( 'delete successfull', 'hrm' ), 'redirect' => $url ) );
+        } else {
+            wp_send_json_error( array( 'msg' => __( 'Faild to deleted', 'hrm' ) ) );
+        }
 
     }
 
@@ -97,6 +117,7 @@ class Hrm_Ajax {
         check_ajax_referer('hrm_nonce');
         $post = $_POST;
         $punch = Hrm_Time::getInstance()->new_punch_in($post);
+
         $url = $post['url'];
         if ( $punch ) {
              wp_send_json_success( array(
@@ -870,11 +891,13 @@ class Hrm_Ajax {
         global $wpdb;
         $table = $wpdb->prefix . $table_option['table_name'];
 
-        foreach( $_POST['hrm_check'] as $id => $value ) {
+        $users_id = isset( $_POST['hrm_check'] ) ? $_POST['hrm_check'] : array();
+
+        foreach( $users_id as $id => $value ) {
             $delete = $wpdb->delete( $table, array( 'id' => $id ), array( '%d' ) );
         }
 
-        if ( $delete ) {
+        if ( count( $users_id ) ) {
             $tab = isset( $_POST['tab'] ) ? $_POST['tab'] : '';
             $subtab = isset( $_POST['sub_tab'] ) ? $_POST['sub_tab'] : '';
             $url = $_POST['redirect'] .'&tab=' . $tab .'&sub_tab=' . $subtab;
