@@ -1,6 +1,6 @@
 <?php
 class Hrm_Time {
-	private static $_instance;
+    private static $_instance;
 
     public static function getInstance() {
         if ( !self::$_instance ) {
@@ -107,9 +107,21 @@ class Hrm_Time {
         );
         $user_id = get_current_user_id();
 
-        $get_usert_punch_status = get_user_meta( $user_id, '_puch_in_status', '1' );
+        $arg = array(
+            'post_type' => 'hrm_punch',
+            'post_status'=> 'publish',
+            'author' => get_current_user_id(),
+            'meta_query' => array(
+                array(
+                    'key' => '_puch_in_status',
+                    'value' => '1',
+                    'compear' => '='
+                ),
+            )
+        );
+        $query = new WP_Query( $arg );
 
-        if ( $get_usert_punch_status === '1' ) {
+        if ( isset( $query->posts[0] ) ) {
             return false;
         }
 
@@ -186,7 +198,7 @@ class Hrm_Time {
     }
 
     function punch_out_form() {
-         $redirect = ( isset( $_POST['hrm_dataAttr']['redirect'] ) && !empty( $_POST['hrm_dataAttr']['redirect'] ) ) ? $_POST['hrm_dataAttr']['redirect'] : '';
+        $redirect = ( isset( $_POST['hrm_dataAttr']['redirect'] ) && !empty( $_POST['hrm_dataAttr']['redirect'] ) ) ? $_POST['hrm_dataAttr']['redirect'] : '';
         $arg = array(
             'post_type' => 'hrm_punch',
             'post_status'=> 'publish',
@@ -200,6 +212,10 @@ class Hrm_Time {
             )
         );
         $query = new WP_Query( $arg );
+
+        if ( !isset( $query->posts[0] ) ) {
+            return $this->punch_in_form();
+        }
 
         $post = $query->posts[0];
 

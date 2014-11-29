@@ -46,11 +46,11 @@ $total_pagination = $query->found_posts;
 
 	$add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
     $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
-    $puch_status = get_user_meta( $user_id, '_puch_in_status', true );
+   // $puch_status = get_user_meta( $user_id, '_puch_in_status', true );
 
     $total_duration = 0;
     foreach ( $posts as $key => $post ) {
-        if ( $add_permission && ( hrm_user_can_access( $tab, $subtab, 'punch_edit', true ) === 'punch_edit' ) ) {
+        if ( $add_permission && hrm_user_can_access( $tab, $subtab, 'punch_edit', true )  ) {
             $name_id = '<a href="#" class="hrm-time-editable"  data-post_id='.$post->ID.'>'.hrm_get_punch_in_time($post->post_date).'<a>';
         } else {
             $name_id = hrm_get_punch_in_time($post->post_date);
@@ -116,15 +116,33 @@ $total_pagination = $query->found_posts;
     );
     $table['body']       = isset( $body ) ? $body : array();
 
+     $arg = array(
+            'post_type' => 'hrm_punch',
+            'post_status'=> 'publish',
+            'author' => get_current_user_id(),
+            'meta_query' => array(
+                array(
+                    'key' => '_puch_in_status',
+                    'value' => '1',
+                    'compear' => '='
+                ),
+            )
+        );
+        $query = new WP_Query( $arg );
+    if ( !isset( $query->posts[0] ) ) {
+        $punch_status = __( 'Punch In', 'hrm' );
+    } else {
+        $punch_status = __( 'Punch Out', 'hrm' );
+    }
 
     $table['td_attr']    = isset( $td_attr ) ? $td_attr : array();
     $table['th_attr']    = array( 'class="check-column"' );
     $table['table_attr'] = array( 'class' => 'widefat' );
 
     $table['table']      = '';
-    $table['action']     = 'hrm_create_punch_in';
+    $table['action']     = 'hrm_post_delete';
     $table['table_attr'] = array( 'class' => 'widefat' );
-    $table['add_btn_name'] = ( $puch_status === '1' ) ? __( 'Punch Out', 'hrm' ) : __( 'Punch In', 'hrm' );
+    $table['add_btn_name'] = $punch_status;
     $table['tab']        = $tab;
     $table['subtab']     = $subtab;
 
