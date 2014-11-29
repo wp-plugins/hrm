@@ -31,7 +31,7 @@ class Hrm_Admin {
             'search'       => $search,
             'count_total'  => true,
             'offset'       => $offset,
-            'number'       => $limit,
+            'posts_per_page'       => $limit,
         );
 
         return new WP_User_Query( $arg );
