@@ -10,7 +10,7 @@ License: GPLv2 or later
 Organization, Industries and Office management
 
 == Description ==
-[youtube https://www.youtube.com/watch?v=vyJHSDkAlso&feature=youtu.be]
+[youtube https://www.youtube.com/watch?v=Y6_8IWWy2n4&feature=youtu.be]
    Manage your human resource, project, task and assign task with the help of this plugin.
 
 = Features:  =
@@ -64,6 +64,12 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
+
+= 0.3 =
+* Attendence
+* Attendence configuration
+* Punch in/out
+* Attendence record
 
 = 0.2 =
 * project budget
