@@ -40,7 +40,7 @@ class Hrm_Time {
             'type' => 'text',
             'class' => 'hrm-timepicker',
             'label'=> __( 'Punch In Time', 'hrm' ),
-            'value' => date( 'H:i', strtotime( $post->post_date ) )
+            'value' => date( 'h:i a', strtotime( $post->post_date ) )
         );
 
 
@@ -60,7 +60,7 @@ class Hrm_Time {
             'type' => 'text',
             'class' => 'hrm-timepicker',
             'label'=> __( 'Punch Out Time', 'hrm' ),
-            'value' => !empty( $punch_out_time ) ? date( 'H:i', $punch_out_time ) : ''
+            'value' => !empty( $punch_out_time ) ? date( 'h:i a', $punch_out_time ) : ''
         );
 
 
@@ -127,9 +127,9 @@ class Hrm_Time {
     function new_punch_out($post) {
         $post_id = isset( $post['post_id'] ) ? intval( $post['post_id'] ) : false;
         $user_id = get_current_user_id();
-
+        $punch_out_time = strtotime( current_time('mysql') );
         if ( $post_id ) {
-            update_post_meta( $post_id, '_puch_out_time', time() );
+            update_post_meta( $post_id, '_puch_out_time', $punch_out_time );
             update_post_meta( $post_id, '_puch_out_note', $post['note'] );
             update_post_meta( $post_id, '_puch_in_status', '0' );
             update_user_meta( $user_id, '_puch_in_status', '0' );
@@ -138,8 +138,6 @@ class Hrm_Time {
         } else {
             return false;
         }
-
-
     }
 
     function punch_in_out_form() {
@@ -158,12 +156,12 @@ class Hrm_Time {
         $form[] = array(
             'type' => 'descriptive',
             'label'=> __( 'Date', 'hrm' ),
-            'value' => get_date2mysql( time() )
+            'value' => get_date2mysql( current_time('mysql') )
         );
         $form[] = array(
             'type' => 'descriptive',
             'label'=> __( 'Time', 'hrm' ),
-            'value' => hrm_get_time( time(), false )
+            'value' => hrm_get_time( current_time('mysql'), true )
         );
 
 
@@ -225,12 +223,12 @@ class Hrm_Time {
         $form[] = array(
             'type' => 'descriptive',
             'label'=> __( 'Date', 'hrm' ),
-            'value' => get_date2mysql( time() )
+            'value' => get_date2mysql( current_time('mysql') )
         );
         $form[] = array(
             'type' => 'descriptive',
             'label'=> __( 'Time', 'hrm' ),
-            'value' => hrm_get_time( time(), false )
+            'value' => hrm_get_time( current_time('mysql'), true )
         );
 
 
