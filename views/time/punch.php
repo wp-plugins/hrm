@@ -1,11 +1,5 @@
 <?php
 
-    $table_option['table_option'] = array(
-        'date'       => 'date',
-    );
-    $table_option_name = 'hrm_attendance';
-
-    hrm_Settings::getInstance()->update_table_option( $table_option_name, $table_option );
 	//search form
 	$search['date'] = array(
 		'label' => __( 'Date', 'hrm' ),

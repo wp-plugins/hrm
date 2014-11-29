@@ -1,16 +1,8 @@
 <?php
-$table_option['table_option'] = array(
-    'from_date' => 'from_date',
-    'to_date' => 'to_date',
-    'user_id' => 'user_id'
-);
-$table_option_name = 'hrm_attendance_record_both';
 
-hrm_Settings::getInstance()->update_table_option( $table_option_name, $table_option );
+$employers = Hrm_Admin::getInstance()->get_employer( '-1' );
+$employees = hrm_Employeelist::getInstance()->get_employee( '-1' );
 
-
-$employers = Hrm_Admin::getInstance()->get_employer( '10' );
-$employees = hrm_Employeelist::getInstance()->get_employee( '10' );
 $employers = $employers->get_results();
 $employees = $employees->get_results();
 $users = array_merge($employers, $employees);
