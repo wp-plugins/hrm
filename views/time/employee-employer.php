@@ -1,11 +1,11 @@
 <?php
-
+/*
 $employers = Hrm_Admin::getInstance()->get_employer( '-1' );
 $employees = hrm_Employeelist::getInstance()->get_employee( '-1' );
 
 $employers = $employers->get_results();
-$employees = $employees->get_results();
-$users = array_merge($employers, $employees);
+$employees = $employees->get_results();*/
+$users = get_users();
 
 $option_value = array();
 foreach( $users as $user ) {
