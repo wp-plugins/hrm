@@ -628,7 +628,6 @@
                 },
 
                 select: function( el, val ) {
-
                     var id = val.item.id,
                         self = $(this);
                     if( val.item.value == 'hrm_create_user') {
