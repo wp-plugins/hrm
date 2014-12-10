@@ -147,6 +147,10 @@ class Wp_Hrm {
         $this->admin_scripts();
     }
 
+    function author_scripts() {
+        $this->admin_scripts();
+    }
+
     function admin_menu() {
         $capability = 'read'; //minimum level: subscriber
         if ( hrm_current_user_role() != 'hrm_employee' ) {
@@ -155,13 +159,15 @@ class Wp_Hrm {
             $pim            = add_submenu_page( 'hrm_management', __( 'Pim', 'hrm' ), __( 'Pim', 'hrm' ), $capability, 'hrm_pim', array( $this, 'admin_page_handler' ) );
             $leave          = add_submenu_page( 'hrm_management', __( 'Leave', 'hrm' ), __( 'Leave', 'hrm' ), $capability, 'hrm_leave', array( $this, 'admin_page_handler' ) );
             $attendance     = add_submenu_page( 'hrm_management', __( 'Time', 'hrm' ), __( 'Time', 'hrm' ), $capability, 'hrm_time', array( $this, 'admin_page_handler' ) );
-            //$evaluation     = add_submenu_page( 'hrm_management', __( 'Worker Evaluation', 'hrm' ), __( 'Worker Evaluation', 'hrm' ), $capability, 'hrm_evaluation', array( $this, 'admin_page_handler' ) );
+            //$evaluation   = add_submenu_page( 'hrm_management', __( 'Worker Evaluation', 'hrm' ), __( 'Worker Evaluation', 'hrm' ), $capability, 'hrm_evaluation', array( $this, 'admin_page_handler' ) );
+            $author         = add_submenu_page( 'hrm_management', __( 'Contct With Author', 'hrm' ), __( 'Contct With Author', 'hrm' ), $capability, 'hrm_author', array( $this, 'admin_page_handler' ) );
 
             add_action( 'admin_print_styles-' . $admin_sub_menu, array($this, 'admin_scripts') );
             add_action( 'admin_print_styles-' . $pim, array( $this, 'pim_scripts') );
             add_action( 'admin_print_styles-' . $leave, array( $this, 'leave_scripts' ) );
             add_action( 'admin_print_styles-' . $attendance, array($this, 'attendance_scripts') );
             //add_action( 'admin_print_styles-' . $evaluation, array($this, 'evaluation_scripts') );
+            add_action( 'admin_print_styles-' . $author, array($this, 'author_scripts') );
 
         } else {
             $user_id = get_current_user_id();
@@ -187,25 +193,22 @@ class Wp_Hrm {
 
         if ( $page == 'hrm_management' ) {
             require_once dirname (__FILE__) . '/views/admin/header.php';
-
         } else if ( $page == 'hrm_pim' && ! isset( $_GET['employee_id'] ) ) {
             require_once dirname (__FILE__) . '/views/pim/header.php';
-
         } else if ( ( $page == 'hrm_pim' )  && isset( $_GET['employee_id'] ) ) {
             require_once dirname (__FILE__) . '/views/employee/header.php';
-
         } else if ( $page == 'hrm_leave' ) {
             require_once dirname (__FILE__) . '/views/leave/header.php';
-
         } else if ( $page == 'hrm_recruitment' ) {
             require_once dirname (__FILE__) . '/views/recruitment/header.php';
-
         } else if ( $page == 'hrm_employee' ) {
             require_once dirname (__FILE__) . '/views/employee/header.php';
         } else if ( $page == 'hrm_time' ) {
             require_once dirname (__FILE__) . '/views/time/header.php';
         } else if ( $page == 'hrm_evaluation' ) {
             require_once dirname (__FILE__) . '/views/evaluation/header.php';
+        } else if ( $page == 'hrm_author' ) {
+            require_once dirname (__FILE__) . '/views/author/header.php';
         }
     }
 }
