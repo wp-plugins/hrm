@@ -102,6 +102,7 @@ class Hrm_Ajax {
 
     function new_punch_out() {
         check_ajax_referer('hrm_nonce');
+        $post = array();
         $post = $_POST;
         $punch = Hrm_Time::getInstance()->new_punch_out($post);
         $url = $post['url'];
@@ -115,10 +116,11 @@ class Hrm_Ajax {
 
     function new_punch_in() {
         check_ajax_referer('hrm_nonce');
+        $post = array();
         $post = $_POST;
         $punch = Hrm_Time::getInstance()->new_punch_in($post);
-
         $url = $post['url'];
+
         if ( $punch ) {
              wp_send_json_success( array(
                 'success_msg' => __( 'Successfully update puch', 'hrm' ),

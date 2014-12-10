@@ -653,7 +653,7 @@
 
         timePicker: function() {
             $(".hrm-timepicker").timepicker({
-                timeFormat: "hh:mm tt"
+                timeFormat: "hh:mm:ss tt"
             });
 
         },

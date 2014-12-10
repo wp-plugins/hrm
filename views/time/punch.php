@@ -35,6 +35,7 @@ if ( $post_date ) {
         'day' => date( 'd', strtotime($post_date) ),
     );
 }
+
 $query = new WP_Query($args);
 
 $posts = $query->posts;
@@ -94,15 +95,24 @@ $total_pagination = $query->found_posts;
     $total = hrm_second_to_time($total_duration);
     $total_time = $total['hour'] .':'. $total['minute'] .':'. $total['second'];
 
-
-    $body[] = array(
-
-        '',
-        '',
-        '',
-        '<strong>' . __( 'Total', 'hrm' ) . '</strong>',
-        $total_time
-    );
+    if ( $delete_permission ) {
+        $body[] = array(
+            '',
+            '',
+            '',
+            '',
+            '<strong>' . __( 'Total', 'hrm' ) . '</strong>',
+            $total_time
+        );
+    } else {
+        $body[] = array(
+            '',
+            '',
+            '',
+            '<strong>' . __( 'Total', 'hrm' ) . '</strong>',
+            $total_time
+        );
+    }
 
 	$del_checkbox = ( $delete_permission ) ? '<input type="checkbox">' : '';
 
@@ -128,7 +138,8 @@ $total_pagination = $query->found_posts;
                 ),
             )
         );
-        $query = new WP_Query( $arg );
+    $query = new WP_Query( $arg );
+
     if ( !isset( $query->posts[0] ) ) {
         $punch_status = __( 'Punch In', 'hrm' );
     } else {

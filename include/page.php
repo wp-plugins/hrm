@@ -1,5 +1,5 @@
 <?php
-
+https://www.youtube.com/watch?v=jRlJy6fUPwg
 function hrm_page() {
     $path = dirname(__FILE__) . '/../views';
 
@@ -191,23 +191,23 @@ function hrm_page() {
     $page['hrm_pim']['my_task'] = array(
         //'follow_access_role' => false,
         'nested_tab' => true,
-        'id'        => 'hrm-employee-my-task',
-        'title'     => __( 'My task', 'hrm' ),
-        'file_path' => $path . '/employee/my-task.php',
+        'id'         => 'hrm-employee-my-task',
+        'title'      => __( 'My task', 'hrm' ),
+        'file_path'  => $path . '/employee/my-task.php',
         'submenu' => array(
             'current_task' => array(
-                'id' => 'hrm-current-task',
-                'title' => __( 'Current Task', 'hrm' ),
+                'id'        => 'hrm-current-task',
+                'title'     => __( 'Current Task', 'hrm' ),
                 'file_path' => $path . '/employee/current-task.php',
             ),
             'outstanding_task' => array(
-                'id' => 'hrm-outstanding-task',
-                'title' => __( 'Outstanding Task', 'hrm' ),
+                'id'        => 'hrm-outstanding-task',
+                'title'     => __( 'Outstanding Task', 'hrm' ),
                 'file_path' => $path . '/employee/outstanding-task.php',
             ),
             'completed_task' => array(
-                'id' => 'hrm-completed-task',
-                'title' => __( 'Completed Task', 'hrm' ),
+                'id'        => 'hrm-completed-task',
+                'title'     => __( 'Completed Task', 'hrm' ),
                 'file_path' => $path . '/employee/completed-task.php',
             ),
         ),
@@ -216,54 +216,54 @@ function hrm_page() {
     $page['hrm_pim']['leave'] = array(
         //'follow_access_role' => false,
         'nested_tab' => true,
-        'id'        => 'hrm-employee-leave',
-        'title'     => __( 'Leave', 'hrm' ),
-        'file_path' => $path . '/employee/leave.php',
+        'id'         => 'hrm-employee-leave',
+        'title'      => __( 'Leave', 'hrm' ),
+        'file_path'  => $path . '/employee/leave.php',
         'submenu' => array(
             'assign' => array(
-                'id' => 'hrm-leave-assign',
-                'title' => __( 'Assigin', 'hrm' ),
+                'id'        => 'hrm-leave-assign',
+                'title'     => __( 'Assigin', 'hrm' ),
                 'file_path' => $path . '/employee/assign.php',
             ),
             'work_in_week' => array(
-                'id' => 'hrm-work-in-week',
-                'title' => __( 'Work Week', 'hrm' ),
+                'id'        => 'hrm-work-in-week',
+                'title'     => __( 'Work Week', 'hrm' ),
                 'file_path' => $path . '/employee/work-week.php',
             ),
             'holiday' => array(
-                'id' => 'hrm-holiday',
-                'title' => __( 'Holiday', 'hrm' ),
+                'id'        => 'hrm-holiday',
+                'title'     => __( 'Holiday', 'hrm' ),
                 'file_path' => $path . '/employee/holiday.php',
             ),
         ),
     );
 
     $page['hrm_leave']['configure'] = array(
-        'id' => 'hrm-employee-configure',
-        'title' => __( 'Configure', 'hrm' ),
+        'id'        => 'hrm-employee-configure',
+        'title'     => __( 'Configure', 'hrm' ),
         'file_path' => $path . '/leave/configure.php',
         'submenu' => array(
             'leave_type' => array(
-                'id' => 'hrm-leave-type',
-                'title' => __( 'Leave Type', 'hrm' ),
+                'id'        => 'hrm-leave-type',
+                'title'     => __( 'Leave Type', 'hrm' ),
                 'file_path' => $path . '/leave/leave-type.php',
             ),
             'leave_week' => array(
-                'id' => 'hrm-leave-week',
-                'title' => __( 'Work Week', 'hrm' ),
+                'id'        => 'hrm-leave-week',
+                'title'     => __( 'Work Week', 'hrm' ),
                 'file_path' => $path . '/leave/leave-week.php',
             ),
             'leave_holidays' => array(
-                'id' => 'hrm-leave-holidays',
-                'title' => __( 'Holidays', 'hrm' ),
+                'id'        => 'hrm-leave-holidays',
+                'title'     => __( 'Holidays', 'hrm' ),
                 'file_path' => $path . '/leave/leave-holidays.php',
             ),
         ),
     );
 
     $page['hrm_leave']['leave_summary'] = array(
-        'id' => 'hrm-employee-leave_summary',
-        'title' => __( 'Leave Summary', 'hrm' ),
+        'id'        => 'hrm-employee-leave_summary',
+        'title'     => __( 'Leave Summary', 'hrm' ),
         'file_path' => $path . '/leave/leave-summary.php',
         'role' => array(
             'action' => __( 'Can manage leave action', 'hrm' ),
@@ -271,18 +271,18 @@ function hrm_page() {
     );
 
     $page['hrm_time']['attendance'] = array(
-        'id' => 'hrm-employee-attendance',
-        'title' => __( 'Attendance', 'hrm' ),
+        'id'        => 'hrm-employee-attendance',
+        'title'     => __( 'Attendance', 'hrm' ),
         'file_path' => $path . '/time/attendance.php',
         'submenu' => array(
             'employee_employer_records' => array(
-                'id' => 'hrm-time-my-records',
-                'title' => __( 'Employee/Employer', 'hrm' ),
+                'id'        => 'hrm-time-my-records',
+                'title'     => __( 'Employee/Employer', 'hrm' ),
                 'file_path' => $path . '/time/employee-employer.php',
             ),
             'punch' => array(
-                'id' => 'hrm-time-punch',
-                'title' => __( 'Punch In/Out', 'hrm' ),
+                'id'        => 'hrm-time-punch',
+                'title'     => __( 'Punch In/Out', 'hrm' ),
                 'file_path' => $path . '/time/punch.php',
                 'role' => array(
                     'edit' => __( 'Edit', 'hrm' ),
@@ -290,9 +290,34 @@ function hrm_page() {
             ),
 
             'config' => array(
-                'id' => 'hrm-time-config',
-                'title' => __( 'Configuration', 'hrm' ),
+                'id'        => 'hrm-time-config',
+                'title'     => __( 'Configuration', 'hrm' ),
                 'file_path' => $path . '/time/config.php',
+            ),
+        ),
+    );
+
+
+    $page['hrm_evaluation']['evaluation'] = array(
+        'id' => 'hrm-workier-evaluation',
+        'title' => __( 'Evaluation', 'hrm' ),
+        'file_path' => $path . '/evaluation/evaluation.php',
+        'submenu' => array(
+            'rating_task' => array(
+                'id'        => 'hrm-evaluation-records',
+                'title'     => __( 'Rating For Task', 'hrm' ),
+                'file_path' => $path . '/evaluation/rating-task.php',
+            ),
+            'rating_action' => array(
+                'id'        => 'hrm-evaluation-action',
+                'title'     => __( 'Employee/Employer Rating', 'hrm' ),
+                'file_path' => $path . '/evaluation/rating-action.php',
+            ),
+
+            'config' => array(
+                'id'        => 'hrm-evaluation-config',
+                'title'     => __( 'Configuration', 'hrm' ),
+                'file_path' => $path . '/evaluation/config.php',
             ),
         ),
     );

@@ -6,7 +6,7 @@ $employees = hrm_Employeelist::getInstance()->get_employee( '-1' );
 $employers = $employers->get_results();
 $employees = $employees->get_results();*/
 $users = get_users();
-
+$user_id = isset( $_GET['user_id'] ) ? $_GET['user_id'] : false;
 $option_value = array();
 foreach( $users as $user ) {
 	$option_value[$user->ID] = $user->display_name;
@@ -17,7 +17,7 @@ $search['user_id'] = array(
 	'class'    => 'hrm-chosen',
 	'type'     => 'select',
 	'option'   => $option_value,
-	'selected' => '',
+	'selected' => $user_id,
 	'desc'     => __( 'Type employer/employee name', 'hrm' ),
 	'extra' => array(
 		'data-placeholder' => __( "Choose employer/employee name", 'hrm' ),
@@ -117,9 +117,8 @@ if ( isset( $_GET['from_date'] ) && isset( $_GET['to_date'] ) ) {
     }
 }
 
-
-
 $query = new WP_Query($args);
+
 $total_pagination = $query->found_posts;
 $posts = $query->posts;
 
@@ -159,6 +158,7 @@ $posts = $query->posts;
         }
 
         $body[] = array(
+            $del_checkbox,
             $name_id,
             $post->post_content,
             !empty( $punch_out_time ) ? hrm_get_punch_in_time( $punch_out_time, false ) : '',
@@ -173,19 +173,29 @@ $posts = $query->posts;
     $total = hrm_second_to_time($total_duration);
     $total_time = $total['hour'] .':'. $total['minute'] .':'. $total['second'];
 
+    $del_checkbox = ( $delete_permission ) ? '<input type="checkbox">' : '';
 
-    $body[] = array(
-        '',
-        '',
-        '',
-        '<strong>' . __( 'Total', 'hrm' ) . '</strong>',
-        $total_time
-    );
-
-	$del_checkbox = ( $delete_permission ) ? '<input type="checkbox">' : '';
+    if ( $delete_permission ) {
+        $body[] = array(
+            '',
+            '',
+            '',
+            '',
+            '<strong>' . __( 'Total', 'hrm' ) . '</strong>',
+            $total_time
+        );
+    } else {
+        $body[] = array(
+            '',
+            '',
+            '',
+            '<strong>' . __( 'Total', 'hrm' ) . '</strong>',
+            $total_time
+        );
+    }
 
     $table['head'] = array(
-
+        $del_checkbox,
     	__( 'Punch In', 'hrm' ),
     	__( 'Punch In Note', 'hrm' ),
     	__( 'Punch Out', 'hrm' ),
@@ -194,7 +204,6 @@ $posts = $query->posts;
     );
     $table['body']       = isset( $body ) ? $body : array();
 
-
     $table['td_attr']    = isset( $td_attr ) ? $td_attr : array();
     $table['th_attr']    = array( 'class="check-column"' );
     $table['table_attr'] = array( 'class' => 'widefat' );
@@ -202,15 +211,39 @@ $posts = $query->posts;
     $table['table']      = '';
     $table['action']     = 'hrm_create_punch_in';
     $table['table_attr'] = array( 'class' => 'widefat' );
-    $table['add_btn_name'] = ( $puch_status === '1' ) ? __( 'Punch Out', 'hrm' ) : __( 'Punch In', 'hrm' );
+
     $table['tab']        = $tab;
     $table['subtab']     = $subtab;
+
+    $arg = array(
+            'post_type' => 'hrm_punch',
+            'post_status'=> 'publish',
+            'author' => $user_id,
+            'meta_query' => array(
+                array(
+                    'key' => '_puch_in_status',
+                    'value' => '1',
+                    'compear' => '='
+                ),
+            )
+        );
+    $query = new WP_Query( $arg );
+
+    $table['add_btn_name'] = ( !isset( $query->posts[0] ) ) ? __( 'Punch In', 'hrm' ) : __( 'Punch Out', 'hrm' );
 
     echo Hrm_Settings::getInstance()->table( $table );
 
     echo Hrm_Settings::getInstance()->pagination( $total_pagination, $limit );
 ?>
-<?php $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab ); ?>
+
+<?php
+$url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
+$url = add_query_arg( array( 'user_id' => $user_id ), $url );
+
+?>
+<?php $user_id = isset( $_GET['user_id'] ) ? intval( $_GET['user_id'] ) : false; ?>
+
+
 <script type="text/javascript">
     jQuery(function($) {
         hrm_dataAttr = {
@@ -219,6 +252,7 @@ $posts = $query->posts;
            class_name : 'Hrm_Time',
            redirect : '<?php echo $url; ?>',
            function_name : 'punch_in_out_form',
+           user_id : '<?php echo $user_id; ?>'
         };
     });
 </script>
