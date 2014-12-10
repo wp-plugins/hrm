@@ -209,7 +209,7 @@ $posts = $query->posts;
     $table['table_attr'] = array( 'class' => 'widefat' );
 
     $table['table']      = '';
-    $table['action']     = 'hrm_create_punch_in';
+    $table['action']     = 'hrm_post_delete';
     $table['table_attr'] = array( 'class' => 'widefat' );
 
     $table['tab']        = $tab;
