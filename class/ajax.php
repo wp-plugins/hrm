@@ -282,7 +282,7 @@ class Hrm_Ajax {
         foreach( $users as $user) {
             $data[] = array(
                 'label' => $user->display_name,
-                '_user_meta' => hrm_Admin::getInstance()->project_user_meta( $user->display_name, $user->ID ),
+                '_user_meta' => hrm_Admin::getInstance()->project_user_meta( $user->display_name, $user->ID, $user ),
             );
         }
         if( count($data) ) {

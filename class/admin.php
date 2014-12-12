@@ -1288,8 +1288,6 @@ class Hrm_Admin {
             );
         }
 
-
-
         $hidden_form['action'] = 'update_user_role';
 
         $hidden_form['header'] = 'Create Admin';
@@ -1307,35 +1305,43 @@ class Hrm_Admin {
 
     function get_co_worker_field( $display_name, $user_id, $value = null ) {
         $name = str_replace(' ', '_', $display_name );
+        $user = get_user_by( 'id', $user_id );
+
+        $fields = array();
+        if ( reset( $user->roles ) != 'hrm_employee' ) {
+            $fields[] = array(
+                'label'   => __( 'Manager', 'hrm' ),
+                'id'      => 'hrm-manager-'.$name,
+                'value'   => 'manager',
+                'checked' => isset( $value ) ? $value : '',
+            );
+
+            $fields[] = array(
+                'label'   => __( 'Client', 'hrm' ),
+                'id'      => 'hrm-client-'.$name,
+                'value'   => 'client',
+                'checked' => isset( $value ) ? $value : '',
+            );
+        }
+
+        $fields[] = array(
+            'label'   => __( 'Co-worker', 'hrm' ),
+            'id'      => 'hrm-co-worker-'.$name,
+            'value'   => 'co_worker',
+            'checked' => isset( $value ) ? $value : 'co_worker',
+        );
+
         return $hidden_form = array(
-            'label' => $display_name,
-            'type' => 'radio',
-            'desc' => 'Choose access permission',
-            'fields' => array(
-                array(
-                    'label' => __( 'Manager', 'hrm' ),
-                    'id' => 'hrm-manager-'.$name,
-                    'value' => 'manager',
-                    'checked' => isset( $value ) ? $value : '',
-                ),
-                array(
-                    'label' => __( 'Co-worker', 'hrm' ),
-                    'id' => 'hrm-co-worker-'.$name,
-                    'value' => 'co_worker',
-                    'checked' => isset( $value ) ? $value : 'co_worker',
-                ),
-                array(
-                    'label' => __( 'Client', 'hrm' ),
-                    'id' => 'hrm-client-'.$name,
-                    'value' => 'client',
-                    'checked' => isset( $value ) ? $value : '',
-                ),
-            ),
+            'label'  => $display_name,
+            'type'   => 'radio',
+            'desc'   => 'Choose access permission',
+            'fields' => $fields,
         );
     }
 
-    function project_user_meta( $display_name, $user_id ) {
+    function project_user_meta( $display_name, $user_id, $user ) {
         $form = $this->get_co_worker_field( $display_name, $user_id );
+
         ob_start();
             echo hrm_settings::getInstance()->radio_field( 'role['.$user_id.']', $form );
 
