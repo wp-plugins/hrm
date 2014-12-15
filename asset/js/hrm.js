@@ -7,6 +7,7 @@
             this.datePicker();
             this.timePicker();
             this.datePickerRestricted();
+            //this.slider();
 
 
             $('.hrm-add-button').on( 'click', this.getInsertDataForm );
@@ -24,6 +25,7 @@
             $('.hrm-task-desc').on( 'click', this.showTaskDesc );
             $('.hrm-admin-status').on( 'change', this.changeAdminStatus );
             $('.hrm-time-editable').on( 'click', this.editAttendance );
+            $('#hrm-search-form').on( 'change', '#hrm-rank-task-user', this.userTaskRating );
 
 
             $('body').on( 'before_send_edit', function( e, self, data ) {
@@ -132,6 +134,23 @@
                     hrmGeneral.chosen();
                 }
             } )
+        },
+
+        userTaskRating: function() {
+            var self = $(this),
+                data = {
+                    action: 'user_task_rating_content',
+                    _wpnonce: hrm_ajax_data._wpnonce,
+                    project_id: self.data('project_id'),
+                    user_id : self.val(),
+                }
+            $.post( hrm_ajax_data.ajax_url, data, function( res ) {
+                if ( res.success ) {
+                    $('.hrm-evaluation-task-wrap').html(res.data.append_data);
+                    hrmGeneral.slider(res.data.max);
+                    hrmGeneral.datePicker();
+                }
+            });
         },
 
         editAttendance: function(e) {
@@ -601,7 +620,32 @@
 
         chosen: function() {
 
-            $('.hrm-chosen').chosen();
+            $('.hrm-chosen').chosen().change(function(e, value) {
+                hrmGeneral.getRatingTaskUser(value);
+            });
+
+        },
+
+        getRatingTaskUser: function(value) {
+            if ( ! $('.hrm-evaluation-task-wrap').length ) {
+                return;
+            }
+            var data = {
+                action: 'rating_task',
+                _wpnonce : hrm_ajax_data._wpnonce,
+                project_id : value.selected,
+            };
+
+            $.post( hrm_ajax_data.ajax_url, data, function( res ) {
+                if ( res.success ) {
+                    var form = $('#hrm-search-form'),
+                        user_exist = form.find('.hrm-task-rating-user');
+                    if ( user_exist.length ) {
+                        user_exist.remove();
+                    }
+                    form.find('.hrm-text-wrap').last().after(res.data.append_data);
+                }
+            });
         },
 
         autocomplete : function() {
@@ -683,6 +727,19 @@
                     $( ".hrm-datepicker-from" ).datepicker( "option", "maxDate", selectedDate );
                 }
             });
+        },
+
+        slider: function( max=100 ) {
+
+            $( ".hrm-slider-range-max" ).slider({
+                min: 0,
+                max: parseFloat(max),
+                step: parseFloat('0.1'),
+                slide: function( event, ui ) {
+                    var self = $(this);
+                    self.closest('li').find(".hrm-slider-field").val( ui.value );
+                }
+            });
         }
     }
 
@@ -715,7 +772,7 @@
             var id = val.item.id,
                 self = $(this);
             self.closest('form').find( 'input#hrm-hidden-field-id').val(id);
-        }
+        },
     });
 
 

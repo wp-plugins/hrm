@@ -1,5 +1,4 @@
 <?php
-https://www.youtube.com/watch?v=jRlJy6fUPwg
 function hrm_page() {
     $path = dirname(__FILE__) . '/../views';
 

@@ -52,7 +52,27 @@ class Hrm_Ajax {
         add_action( 'wp_ajax_single_tab_user_role', array( $this, 'single_tab_user_role' ) );
         add_action( 'wp_ajax_hrm_post_delete', array( $this, 'hrm_post_delete' ) );
 
+        add_action( 'wp_ajax_rating_task', array( $this, 'rating_task' ) );
+        add_action( 'wp_ajax_user_task_rating_content', array( $this, 'user_task_rating_content' ) );
 
+
+    }
+
+    function user_task_rating_content() {
+        check_ajax_referer('hrm_nonce');
+        $project_id = intval( $_POST['project_id'] );
+        $user_id = intval( $_POST['user_id'] );
+        $content = Hrm_Evaluation::getInstance()->user_task_content( $project_id, $user_id );
+
+        wp_send_json_success( array( 'max' => $content['max'], 'append_data' => $content['content'] ) );
+    }
+
+    function rating_task() {
+        check_ajax_referer('hrm_nonce');
+        $project_id = intval( $_POST['project_id'] );
+        ob_start();
+        Hrm_Evaluation::getInstance()->get_user_by_project_id( $project_id );
+        wp_send_json_success( array( 'append_data' => ob_get_clean() ) );
     }
 
     function hrm_post_delete() {
