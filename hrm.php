@@ -157,7 +157,7 @@ class Wp_Hrm {
         if ( hrm_current_user_role() != 'hrm_employee' ) {
             $menu           = add_menu_page( __( 'HRM', 'hrm' ), __( 'HRM', 'hrm' ), $capability, 'hrm_management', array($this, 'admin_page_handler'), ''  );
             $admin_sub_menu = add_submenu_page( 'hrm_management', __( 'Admin', 'hrm' ), __( 'Admin', 'hrm' ), $capability, 'hrm_management', array($this, 'admin_page_handler') );
-            $pim            = add_submenu_page( 'hrm_management', __( 'PIM', 'hrm' ), __( 'Pim', 'hrm' ), $capability, 'hrm_pim', array( $this, 'admin_page_handler' ) );
+            $pim            = add_submenu_page( 'hrm_management', __( 'PIM', 'hrm' ), __( 'PIM', 'hrm' ), $capability, 'hrm_pim', array( $this, 'admin_page_handler' ) );
             $leave          = add_submenu_page( 'hrm_management', __( 'Leave', 'hrm' ), __( 'Leave', 'hrm' ), $capability, 'hrm_leave', array( $this, 'admin_page_handler' ) );
             $attendance     = add_submenu_page( 'hrm_management', __( 'Time', 'hrm' ), __( 'Time', 'hrm' ), $capability, 'hrm_time', array( $this, 'admin_page_handler' ) );
             //$evaluation   = add_submenu_page( 'hrm_management', __( 'Worker Evaluation', 'hrm' ), __( 'Worker Evaluation', 'hrm' ), $capability, 'hrm_evaluation', array( $this, 'admin_page_handler' ) );
