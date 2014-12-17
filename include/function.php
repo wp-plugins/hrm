@@ -130,10 +130,3 @@ function hrm_second_to_time( $seconds ) {
     return $obj;
 }
 
-function hrm_single_tab_user_role_change( $post ) {
-    var_dump( $post ); die();
-}
-
-/*function pri( $data ) {
-    echo '<pre>'; print_r( $data ); echo '</pre>';
-}*/

@@ -26,7 +26,7 @@
             $('.hrm-admin-status').on( 'change', this.changeAdminStatus );
             $('.hrm-time-editable').on( 'click', this.editAttendance );
             $('#hrm-search-form').on( 'change', '#hrm-rank-task-user', this.userTaskRating );
-
+            $('.hrm-evaluation-task-wrap').on( 'click', '.hrm-task-raing-submit', this.taskRatingSubmission );
 
             $('body').on( 'before_send_edit', function( e, self, data ) {
                 if ( self.data('action') == 'get_role' ) {
@@ -136,6 +136,29 @@
             } )
         },
 
+        taskRatingSubmission: function() {
+            var self = $(this),
+                wrap = self.closest('.hrm-task-wrap'),
+                data = {
+                    category: self.data('action'),
+                    rating: wrap.find('.hrm-task-rating').val(),
+                    date: wrap.find('.hrm-datepicker-field').val(),
+                    action: 'task_rating',
+                    user_id: $('#hrm-user-id').val(),
+                    project_id: $('#hrm-project-id').val(),
+                    task_id: self.data('task_id'),
+                    post_id: wrap.find('.hrm-post_id').val(),
+                    _wpnonce: hrm_ajax_data._wpnonce,
+                }
+            $.post( hrm_ajax_data.ajax_url, data, function( res ) {
+                if( res.success ) {
+                    //self.attr( 'data-post_id', res.data.post_id );
+                    self.attr( 'value', res.data.btn_text );
+                    wrap.find('.hrm-post_id').val(res.data.post_id);
+                }
+            });
+        },
+
         userTaskRating: function() {
             var self = $(this),
                 data = {
@@ -148,7 +171,9 @@
                 if ( res.success ) {
                     $('.hrm-evaluation-task-wrap').html(res.data.append_data);
                     hrmGeneral.slider(res.data.max);
-                    hrmGeneral.datePicker();
+                    $.each( res.data.tasks_id, function( key, id ) {
+                        hrmGeneral.datePickerMultiple( 'hrm-datepicker-' + id );
+                    });
                 }
             });
         },
@@ -395,7 +420,6 @@
         },
 
         openDialog: function(selector ) {
-
             selector.dialog( "open" );
         },
 
@@ -704,6 +728,10 @@
 
         datePicker: function() {
             $(".hrm-datepicker").datepicker({ dateFormat: "yy-mm-dd" });
+        },
+
+        datePickerMultiple: function(selector) {
+            $("#"+selector).datepicker({ dateFormat: "yy-mm-dd" });
         },
 
         datePickerRestricted: function() {

@@ -92,6 +92,22 @@ class Hrm_Init{
             'rewrite' => array('slug' => ''),
             'query_var' => true,
             'supports' => array('title', 'editor'),
-        ) );
+        ));
+
+        register_post_type( 'hrm_rating', array(
+            'label' => __( 'Rating', 'hrm' ),
+            'public' => false,
+            'show_in_admin_bar' => false,
+            'exclude_from_search' => true,
+            'publicly_queryable' => false,
+            'show_in_admin_bar' => false,
+            'show_ui' => false,
+            'show_in_menu' => false,
+            'capability_type' => 'post',
+            'hierarchical' => false,
+            'rewrite' => array('slug' => ''),
+            'query_var' => true,
+            'supports' => array('title', 'editor'),
+        ));
     }
 }

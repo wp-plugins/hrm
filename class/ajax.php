@@ -54,8 +54,16 @@ class Hrm_Ajax {
 
         add_action( 'wp_ajax_rating_task', array( $this, 'rating_task' ) );
         add_action( 'wp_ajax_user_task_rating_content', array( $this, 'user_task_rating_content' ) );
+        add_action( 'wp_ajax_task_rating', array( $this, 'task_rating' ) );
 
 
+    }
+
+    function task_rating() {
+        check_ajax_referer('hrm_nonce');
+        $post = $_POST;
+        $post_id = Hrm_Evaluation::getInstance()->new_task_rating( $post );
+        wp_send_json_success( array( 'post_id' => $post_id, 'btn_text' => __( 'Edit', 'hrm' ) ) );
     }
 
     function user_task_rating_content() {
@@ -64,7 +72,7 @@ class Hrm_Ajax {
         $user_id = intval( $_POST['user_id'] );
         $content = Hrm_Evaluation::getInstance()->user_task_content( $project_id, $user_id );
 
-        wp_send_json_success( array( 'max' => $content['max'], 'append_data' => $content['content'] ) );
+        wp_send_json_success( array( 'max' => $content['max'], 'append_data' => $content['content'], 'tasks_id' => $content['tasks_id'] ) );
     }
 
     function rating_task() {
