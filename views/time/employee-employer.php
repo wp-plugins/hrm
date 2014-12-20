@@ -110,9 +110,9 @@ if ( isset( $_GET['from_date'] ) && isset( $_GET['to_date'] ) ) {
 
     if ( $post_date ) {
         $args['date_query'] = array(
-            'year' => date( 'Y', strtotime($post_date) ),
+            'year'  => date( 'Y', strtotime($post_date) ),
             'month' => date( 'm', strtotime($post_date) ),
-            'day' => date( 'd', strtotime($post_date) ),
+            'day'   => date( 'd', strtotime($post_date) ),
         );
     }
 }

@@ -159,7 +159,7 @@ jQuery(function($) {
        add_form_generator_action : 'add_form',
        add_form_apppend_wrap : 'hrm-admin-list',
        redirect : '<?php echo $url; ?>',
-       class_name : 'hrm_Admin',
+       class_name : 'Hrm_Admin',
        function_name : 'admin_list',
     };
 });

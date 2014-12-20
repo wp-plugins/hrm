@@ -72,7 +72,7 @@ class Hrm_Ajax {
         $user_id = intval( $_POST['user_id'] );
         $content = Hrm_Evaluation::getInstance()->user_task_content( $project_id, $user_id );
 
-        wp_send_json_success( array( 'max' => $content['max'], 'append_data' => $content['content'], 'tasks_id' => $content['tasks_id'] ) );
+        wp_send_json_success( array( 'slider_value' => $content['slider_value'], 'max' => $content['max'], 'append_data' => $content['content'], 'tasks_id' => $content['tasks_id'] ) );
     }
 
     function rating_task() {
@@ -177,7 +177,7 @@ class Hrm_Ajax {
         $url = $postdata['redirect'] . '&tab=' . $postdata['tab'];
 
         foreach ( $postdata['hrm_check'] as $key => $porject_id ) {
-            $project_delete = hrm_Admin::getInstance()->project_delete( $porject_id );
+            $project_delete = Hrm_Admin::getInstance()->project_delete( $porject_id );
         }
 
         if ( $project_delete ) {
@@ -226,7 +226,7 @@ class Hrm_Ajax {
     function complete_task() {
         check_ajax_referer('hrm_nonce');
         $postdata = $_POST;
-        $update = hrm_Admin::getInstance()->task_complete( $postdata['task_id'] );
+        $update = Hrm_Admin::getInstance()->task_complete( $postdata['task_id'] );
         if ( $update ) {
             wp_send_json_success( array( 'success_msg' => __( 'Update successfull', 'hrm' ) ) );
         } else {
@@ -237,7 +237,7 @@ class Hrm_Ajax {
     function incomplete_task() {
         check_ajax_referer('hrm_nonce');
         $postdata = $_POST;
-        $update = hrm_Admin::getInstance()->task_incomplete( $postdata['task_id'] );
+        $update = Hrm_Admin::getInstance()->task_incomplete( $postdata['task_id'] );
         if ( $update ) {
             wp_send_json_success( array( 'success_msg' => __( 'Update successfull', 'hrm' ) ) );
         } else {
@@ -310,7 +310,7 @@ class Hrm_Ajax {
         foreach( $users as $user) {
             $data[] = array(
                 'label' => $user->display_name,
-                '_user_meta' => hrm_Admin::getInstance()->project_user_meta( $user->display_name, $user->ID, $user ),
+                '_user_meta' => Hrm_Admin::getInstance()->project_user_meta( $user->display_name, $user->ID, $user ),
             );
         }
         if( count($data) ) {
@@ -385,6 +385,7 @@ class Hrm_Ajax {
             $data['post_parent'] = $_POST['project_id'];
             $task_id = wp_insert_post( $data );
             $status = false;
+            Hrm_Evaluation::getInstance()->new_inserted_task_rating( $_POST['project_id'], $_POST['assigned'] );
         }
 
         if( $task_id ) {
@@ -424,7 +425,7 @@ class Hrm_Ajax {
         check_ajax_referer('hrm_nonce');
         $post_id = $_POST['id'];
         $post = get_post( $post_id );
-        $data = hrm_Admin::getInstance()->project_insert_form( $post );
+        $data = Hrm_Admin::getInstance()->project_insert_form( $post );
         wp_send_json_success( array( 'append_data' => $data ) );
 
     }
@@ -433,7 +434,7 @@ class Hrm_Ajax {
         check_ajax_referer('hrm_nonce');
         $post_id = $_POST['id'];
         $post = get_post( $post_id );
-        $data = hrm_Admin::getInstance()->task_form( $post );
+        $data = Hrm_Admin::getInstance()->task_form( $post );
         wp_send_json_success( array( 'append_data' => $data ) );
 
     }
@@ -442,7 +443,7 @@ class Hrm_Ajax {
         check_ajax_referer('hrm_nonce');
         $post_id = $_POST['id'];
         $post = get_post( $post_id );
-        $data = hrm_Admin::getInstance()->sub_task_form( $post );
+        $data = Hrm_Admin::getInstance()->sub_task_form( $post );
         wp_send_json_success( array( 'append_data' => $data ) );
 
     }
@@ -575,7 +576,7 @@ class Hrm_Ajax {
                     'label' => $value->$search_field,
                     'value' => $value->$search_field,
                     'id' => $value->id,
-                    '_user_meta'=> hrm_Admin::getInstance()->skill_user_meta( $value->id, $value->emp_firstname, $value->emp_lastname  ),
+                    '_user_meta'=> Hrm_Admin::getInstance()->skill_user_meta( $value->id, $value->emp_firstname, $value->emp_lastname  ),
                 );
             }
         } else {
@@ -663,7 +664,7 @@ class Hrm_Ajax {
             if ( $user->ID == $super_admin ) continue;
             $data[] = array(
                 'label' => $user->display_name,
-                '_user_meta' => hrm_Admin::getInstance()->create_user_meta( $user->display_name, $user->ID ),
+                '_user_meta' => Hrm_Admin::getInstance()->create_user_meta( $user->display_name, $user->ID ),
             );
         }
         if( count($data) ) {
@@ -716,7 +717,7 @@ class Hrm_Ajax {
 
             wp_new_user_notification( $user_id, $random_password );
 
-            $user_meta = hrm_Admin::getInstance()->create_user_meta( $display_name, $user_id );
+            $user_meta = Hrm_Admin::getInstance()->create_user_meta( $display_name, $user_id );
             wp_send_json_success( array(
                 'success_msg' => __('Create admin successfull', 'hrm'),
                  '_user_meta' => $user_meta,

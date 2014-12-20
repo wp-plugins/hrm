@@ -69,7 +69,7 @@
                     hrm_dataAttr = {
                         add_form_generator_action : 'add_form',
                         add_form_apppend_wrap : 'hrm-projects',
-                        class_name : 'hrm_Admin',
+                        class_name : 'Hrm_Admin',
                         function_name : 'task_form',
                         project_id : res.data.project_id,
                         redirect: hrm_dataAttr.redirect,
@@ -84,7 +84,7 @@
                     hrm_dataAttr = {
                         add_form_generator_action : 'add_form',
                         add_form_apppend_wrap : 'hrm-projects',
-                        class_name : 'hrm_Admin',
+                        class_name : 'Hrm_Admin',
                         function_name : 'sub_task_form',
                         task_id : res.data.task_id,
                     };
@@ -170,10 +170,40 @@
             $.post( hrm_ajax_data.ajax_url, data, function( res ) {
                 if ( res.success ) {
                     $('.hrm-evaluation-task-wrap').html(res.data.append_data);
-                    hrmGeneral.slider(res.data.max);
+                    $.each( res.data.slider_value, function( key, slider_obj ) {
+                        hrmGeneral.sliderWithInitialValue( slider_obj.id, slider_obj.value, res.data.max );
+                    });
+                    //hrmGeneral.slider(res.data.max);
                     $.each( res.data.tasks_id, function( key, id ) {
                         hrmGeneral.datePickerMultiple( 'hrm-datepicker-' + id );
                     });
+                }
+            });
+        },
+
+        sliderWithInitialValue: function( id, val=0, max=100  ) {
+
+            $('#hrm-rating-slider-'+id).slider({
+                value: parseFloat(val),
+                min: 0,
+                max: parseFloat(max),
+                step: parseFloat('0.1'),
+                slide: function( event, ui ) {
+                    var self = $(this);
+                    self.closest('li').find(".hrm-slider-field").val( ui.value );
+                }
+            });
+        },
+
+        slider: function( max=100 ) {
+
+            $( ".hrm-slider-range-max" ).slider({
+                min: 0,
+                max: parseFloat(max),
+                step: parseFloat('0.1'),
+                slide: function( event, ui ) {
+                    var self = $(this);
+                    self.closest('li').find(".hrm-slider-field").val( ui.value );
                 }
             });
         },
@@ -756,19 +786,6 @@
                 }
             });
         },
-
-        slider: function( max=100 ) {
-
-            $( ".hrm-slider-range-max" ).slider({
-                min: 0,
-                max: parseFloat(max),
-                step: parseFloat('0.1'),
-                slide: function( event, ui ) {
-                    var self = $(this);
-                    self.closest('li').find(".hrm-slider-field").val( ui.value );
-                }
-            });
-        }
     }
 
     hrmGeneral.init();

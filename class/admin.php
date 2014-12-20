@@ -6,7 +6,7 @@ class Hrm_Admin {
 
     public static function getInstance() {
         if ( !self::$_instance ) {
-            self::$_instance = new hrm_Admin();
+            self::$_instance = new Hrm_Admin();
         }
 
         return self::$_instance;
