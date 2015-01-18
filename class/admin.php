@@ -15,7 +15,7 @@ class Hrm_Admin {
 
     function __construct() {
 
-        add_action( 'admin_init', array($this, 'admin_init_action') );
+        add_action( 'init', array($this, 'admin_init_action') );
         add_filter( 'hrm_search_parm', array( $this, 'project_search_parm' ), 10, 1 );
         add_action( 'text_field_before_input', array($this, 'task_budget_crrency_symbol'), 10, 2 );
     }
@@ -25,13 +25,13 @@ class Hrm_Admin {
         $offset  = ( $pagenum - 1 ) * $limit;
 
         $arg = array(
-            'meta_key'     => 'hrm_admin_level',
-            'meta_value'   => 'admin',
-            'meta_compare' => '=',
-            'search'       => $search,
-            'count_total'  => true,
-            'offset'       => $offset,
-            'posts_per_page'       => $limit,
+            'meta_key'       => 'hrm_admin_level',
+            'meta_value'     => 'admin',
+            'meta_compare'   => '=',
+            'search'         => $search,
+            'count_total'    => true,
+            'offset'         => $offset,
+            'number' => $limit,
         );
 
         return new WP_User_Query( $arg );
@@ -391,11 +391,11 @@ class Hrm_Admin {
             $task_budget = empty( $task_budget ) ? '0' : $task_budget;
             $assign_to = get_post_meta($result->ID, '_assigned', true);
             $user = get_user_by( 'id', $assign_to );
-            $url = admin_url( 'admin.php?' ) . 'page=hrm_pim&employee_id='.$assign_to.'&tab=my_task';
+            $url = hrm_task_assing_user_url( 'hrm_pim', 'my_task', $assign_to );
             ?>
             <div class="hrm-task-wrap">
                 <div class="hrm-task-title-wrap">
-                    <div style="float: left;">
+                    <div class="hrm-task-content">
                         <a href="#" class="hrm-editable hrm-task-title" data-task="task" data-action="task_edit"  data-id="<?php echo $result->ID; ?>"><strong><?php echo $result->post_title; ?></strong></a>
                         <div>
                             <strong><?php _e( 'Task Budget: ' ); ?></strong><?php echo $currency_symbol . $task_budget; ?>
@@ -405,13 +405,14 @@ class Hrm_Admin {
                             <a href="<?php echo $url; ?>"><?php echo $user->display_name; ?></a>
                         </div>
                     </div>
-                    <div style="float: right;">
+                    <div class="hrm-task-avatar">
                         <a href="<?php echo $url; ?>"><?php echo get_avatar( $user->ID, '32' ); ?></a>
                     </div>
                     <div style="clear: both;"></div>
                 </div>
 
                 <div class="hrm-task-status-desc">
+                    <div data-task_assign="<?php echo $assign_to; ?>" data-task_id="<?php echo $result->ID; ?>" data-project_id="<?php echo $project_id; ?>" class="hrm-delete-task"><?php _e( 'Delete', 'cpm' ); ?></div>
                     <div class="hrm-task-desc" data-task_id="<?php echo $result->ID; ?>"><a href="#"><?php _e( 'Description', 'hrm' ); ?></a></div>
                     <?php echo $this->get_task_status( $result->ID ); ?>
 

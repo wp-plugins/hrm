@@ -50,12 +50,20 @@ label em {
     width: 16px;
 
 }
-#hrm-visible-form-warp, #hrm-hidden-form-warp {
+#hrm-visible-form-warp, .hrm-visible-form-warp, #hrm-hidden-form-warp {
     border: 1px solid #FAD163;
     margin-top: 2%;
 
     background: #fff;
-
+    .hrm-inside-padding-wrap {
+        padding: 10px;
+    }
+    .hrm-slider-width {
+        width: 50%;
+    }
+    .hrm-task-wrap {
+        line-height: 30px;
+    }
 }
 #hrm-visible-form-warp {
     .hrm-text-wrap {
@@ -131,6 +139,14 @@ label em {
     }
     .hrm-task-wrap {
         width: 300px;
+        position: relative;
+        margin-bottom: 16px;
+        .hrm-task-content {
+            float: left;
+        }
+        .hrm-task-avatar {
+            float: right;
+        }
     }
     .hrm-task-title-wrap {
         border: 1px solid #fad163;
@@ -160,6 +176,15 @@ label em {
     }
     .hrm-task-status-desc {
         margin: 0 0 5px 44.5%;
+        .hrm-delete-task {
+            background: #ef4646;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 400;
+            left: 0;
+            padding: 0 5px;
+            position: absolute;
+        }
     }
 
 }
@@ -342,5 +367,11 @@ label em {
             margin-left: 3%;
         }
     }
+}
+
+.ui-slider .ui-slider-handle {
+    height: 15px;
+    width: 5px;
+    padding-left: 5px; //add this
 }
 

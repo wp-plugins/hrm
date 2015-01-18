@@ -8,8 +8,6 @@
             this.timePicker();
             this.datePickerRestricted();
             //this.slider();
-
-
             $('.hrm-add-button').on( 'click', this.getInsertDataForm );
             $('body').on( 'click', '.hrm-form-cancel', this.formshowHide );
             $('body').on( 'submit', '#hrm-hidden-form', this.add );
@@ -26,7 +24,8 @@
             $('.hrm-admin-status').on( 'change', this.changeAdminStatus );
             $('.hrm-time-editable').on( 'click', this.editAttendance );
             $('#hrm-search-form').on( 'change', '#hrm-rank-task-user', this.userTaskRating );
-            $('.hrm-evaluation-task-wrap').on( 'click', '.hrm-task-raing-submit', this.taskRatingSubmission );
+            $('.hrm-evaluation-task-wrap').on( 'submit', '#hrm-task-rating-form', this.taskRatingSubmission );
+            $('.hrm-task-wrap').on( 'click', '.hrm-delete-task', this.deleteTask );
 
             $('body').on( 'before_send_edit', function( e, self, data ) {
                 if ( self.data('action') == 'get_role' ) {
@@ -136,25 +135,39 @@
             } )
         },
 
-        taskRatingSubmission: function() {
+        taskRatingSubmission: function(e) {
+            e.preventDefault();
+            if ( $('.hrm-datepicker').val() == '' ) {
+                alert('Date field required');
+                return;
+            }
             var self = $(this),
                 wrap = self.closest('.hrm-task-wrap'),
-                data = {
-                    category: self.data('action'),
-                    rating: wrap.find('.hrm-task-rating').val(),
-                    date: wrap.find('.hrm-datepicker-field').val(),
-                    action: 'task_rating',
-                    user_id: $('#hrm-user-id').val(),
-                    project_id: $('#hrm-project-id').val(),
-                    task_id: self.data('task_id'),
-                    post_id: wrap.find('.hrm-post_id').val(),
-                    _wpnonce: hrm_ajax_data._wpnonce,
-                }
+                data = self.serialize();
             $.post( hrm_ajax_data.ajax_url, data, function( res ) {
                 if( res.success ) {
-                    //self.attr( 'data-post_id', res.data.post_id );
                     self.attr( 'value', res.data.btn_text );
                     wrap.find('.hrm-post_id').val(res.data.post_id);
+                    alert( hrm_ajax_data.success_msg );
+                }
+            });
+        },
+
+        deleteTask: function() {
+            if( !confirm( hrm_ajax_data.confirm_msg) ) {
+                return;
+            }
+            var self = $(this),
+                data = {
+                    action: 'delete_task',
+                    _wpnonce: hrm_ajax_data._wpnonce,
+                    project_id: self.data('project_id'),
+                    task_id : self.data('task_id'),
+                    assing_to: self.data('task_assign')
+                };
+            $.post( hrm_ajax_data.ajax_url, data, function( res ) {
+                if ( res.success ) {
+                    self.closest('.hrm-task-wrap').fadeOut(1000);
                 }
             });
         },
@@ -177,6 +190,8 @@
                     $.each( res.data.tasks_id, function( key, id ) {
                         hrmGeneral.datePickerMultiple( 'hrm-datepicker-' + id );
                     });
+
+                    hrmGeneral.datePicker();
                 }
             });
         },
@@ -187,10 +202,11 @@
                 value: parseFloat(val),
                 min: 0,
                 max: parseFloat(max),
-                step: parseFloat('0.1'),
+                step: parseFloat('1'),
                 slide: function( event, ui ) {
                     var self = $(this);
                     self.closest('li').find(".hrm-slider-field").val( ui.value );
+                    self.closest('li').find(".hrm-task-rating-value").text( ui.value )
                 }
             });
         },
@@ -200,7 +216,7 @@
             $( ".hrm-slider-range-max" ).slider({
                 min: 0,
                 max: parseFloat(max),
-                step: parseFloat('0.1'),
+                step: parseFloat('1'),
                 slide: function( event, ui ) {
                     var self = $(this);
                     self.closest('li').find(".hrm-slider-field").val( ui.value );
@@ -558,7 +574,7 @@
         delete: function(e) {
             e.preventDefault();
             var form = $('#hrm-list-form');
-            data = form.serialize() + '&redirect=' + hrm_dataAttr.redirect;
+            data = form.serialize();
 
             $.post( hrm_ajax_data.ajax_url, data, function( res ) {
                 hrmGeneral.scrollTop();
@@ -568,7 +584,7 @@
                         .addClass('updated')
                         .html( '<p><strong>'+ res.data.msg+'</strong></p>' );
                     setTimeout(function() {
-                        location.href = res.data.redirect;
+                        location.href = hrm_dataAttr.redirect;
                     }, 3000 );
                 } else {
                     $('.hrm-error-notification')
@@ -598,8 +614,7 @@
             var form = $(this),
             spinner = form.find('.hrm-spinner'),
             submit = form.find('.hrm-submit-button'),
-            data = form.serialize(),
-            redirect = form.find('input[name=url]').val();
+            data = form.serialize();
 
             var validate = hrmGeneral.formValidation( form );
             if( ! validate ) {
@@ -626,10 +641,7 @@
                     $('body').trigger('after_add', [form, res] );
 
                     setTimeout(function() {
-                        if ( redirect.length > 0 ) {
-                            location.href = redirect;
-                        }
-
+                        location.href = hrm_dataAttr.redirect;
                     }, 3000 );
 
 
