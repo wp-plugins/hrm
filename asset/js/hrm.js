@@ -196,8 +196,9 @@
             });
         },
 
-        sliderWithInitialValue: function( id, val=0, max=100  ) {
-
+        sliderWithInitialValue: function( id, val, max  ) {
+            val = typeof val !== 'undefined' ? val : 0;
+            max = typeof max !== 'undefined' ? max : '100';
             $('#hrm-rating-slider-'+id).slider({
                 value: parseFloat(val),
                 min: 0,
@@ -211,8 +212,8 @@
             });
         },
 
-        slider: function( max=100 ) {
-
+        slider: function( max ) {
+            max = typeof max !== 'undefined' ? max : 100;
             $( ".hrm-slider-range-max" ).slider({
                 min: 0,
                 max: parseFloat(max),
