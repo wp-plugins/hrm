@@ -212,7 +212,8 @@ function hrm_get_query_args() {
     if ( isset( $_GET['tab'] ) && !empty( $_GET['tab'] ) ) {
         $tab = $_GET['tab'];
     } else if ( isset( $menu[$page] ) && count( $menu[$page] ) ) {
-        $tab = array_keys( $menu[$page] )[0];
+        $tab = array_keys( $menu[$page] );
+        $tab = reset( $tab );
     } else {
         $tab = false;
     }
@@ -230,7 +231,8 @@ function hrm_get_query_args() {
     if ( isset( $_GET['sub_tab'] ) && !empty( $_GET['sub_tab'] ) ) {
         $subtab = $_GET['sub_tab'];
     } else if ( isset( $menu[$page][$tab]['submenu'] ) && count( $menu[$page][$tab]['submenu'] ) ) {
-        $subtab = array_keys( $menu[$page][$tab]['submenu'] )[0];
+        $subtab = array_keys( $menu[$page][$tab]['submenu'] );
+        $subtab = reset( $subtab );
     } else {
         $subtab = false;
     }
