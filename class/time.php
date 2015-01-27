@@ -22,6 +22,7 @@ class Hrm_Time {
         $post = get_post( $post_id );
         $punch_out_time = get_post_meta( $post_id, '_puch_out_time', true );
         $puch_out_note = get_post_meta( $post_id, '_puch_out_note', true );
+        $puch_in_status = get_post_meta( $post_id, '_puch_in_status', true );
 
         $redirect = ( isset( $_POST['hrm_dataAttr']['redirect'] ) && !empty( $_POST['hrm_dataAttr']['redirect'] ) ) ? $_POST['hrm_dataAttr']['redirect'] : '';
 
@@ -50,25 +51,29 @@ class Hrm_Time {
             'value' => isset( $post->post_content ) ? $post->post_content : '',
         );
 
-        $form['punch_out_date'] = array(
-            'type' => 'text',
-            'label'=> __( 'Punch Out Date', 'hrm' ),
-            'class' => 'hrm-datepicker',
-            'value' => !empty( $punch_out_time ) ? date( 'Y-m-d', $punch_out_time ) : '',
-        );
-        $form['punch_out_time'] = array(
-            'type' => 'text',
-            'class' => 'hrm-timepicker',
-            'label'=> __( 'Punch Out Time', 'hrm' ),
-            'value' => !empty( $punch_out_time ) ? date( 'h:i:s a', $punch_out_time ) : ''
-        );
+        if ( !$puch_in_status ) {
+
+            $form['punch_out_date'] = array(
+                'type' => 'text',
+                'label'=> __( 'Punch Out Date', 'hrm' ),
+                'class' => 'hrm-datepicker',
+                'value' => !empty( $punch_out_time ) ? date( 'Y-m-d', $punch_out_time ) : '',
+            );
+            $form['punch_out_time'] = array(
+                'type' => 'text',
+                'class' => 'hrm-timepicker',
+                'label'=> __( 'Punch Out Time', 'hrm' ),
+                'value' => !empty( $punch_out_time ) ? date( 'h:i:s a', $punch_out_time ) : ''
+            );
 
 
-        $form['punch_out_note'] = array(
-            'label' => __( 'Punch Out Note', 'hrm' ),
-            'type' => 'textarea',
-            'value' => isset( $puch_out_note ) ? $puch_out_note : '',
-        );
+            $form['punch_out_note'] = array(
+                'label' => __( 'Punch Out Note', 'hrm' ),
+                'type' => 'textarea',
+                'value' => isset( $puch_out_note ) ? $puch_out_note : '',
+            );
+
+        }
 
         $form['header'] = __( 'Attendance', 'hrm' );
         $form['action'] = 'edit_attendance_save';
@@ -163,7 +168,7 @@ class Hrm_Time {
 
         $form['user_id'] = array(
             'type' => 'hidden',
-            'value' => ( isset( $_POST['user_id'] ) && $_POST['user_id'] ) ? intval( $_POST['hrm_dataAttr']['user_id'] ) : '0',
+            'value' => ( isset( $_POST['hrm_dataAttr']['user_id'] ) && $_POST['hrm_dataAttr']['user_id'] ) ? intval( $_POST['hrm_dataAttr']['user_id'] ) : '0',
         );
         $form[] = array(
             'type' => 'descriptive',
@@ -199,7 +204,8 @@ class Hrm_Time {
 
     function punch_out_form() {
         $redirect = ( isset( $_POST['hrm_dataAttr']['redirect'] ) && !empty( $_POST['hrm_dataAttr']['redirect'] ) ) ? $_POST['hrm_dataAttr']['redirect'] : '';
-        $user_id = ( isset( $_POST['user_id'] ) && $_POST['user_id'] ) ? intval( $_POST['hrm_dataAttr']['user_id'] ) : false;
+        $user_id = ( isset( $_POST['hrm_dataAttr']['user_id'] ) && $_POST['hrm_dataAttr']['user_id'] ) ? intval( $_POST['hrm_dataAttr']['user_id'] ) : false;
+
         $form['user_id'] = array(
             'type' => 'hidden',
             'value' => $user_id,
