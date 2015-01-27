@@ -95,7 +95,7 @@ echo Hrm_Settings::getInstance()->get_serarch_form( $search, 'Leave');
     echo $this->table( $table );
     //table
 
-
+    $leave_cat = isset( $leave_cat ) && is_array( $leave_cat ) ? $leave_cat : array();
 
 ?>
 <?php $url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab ) . '&employee_id='. $employer_id; ?>
