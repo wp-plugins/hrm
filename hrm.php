@@ -67,7 +67,7 @@ class Wp_Hrm {
         $this->instantiate();
         add_action( 'plugins_loaded', array($this, 'load_textdomain') );
         add_action( 'admin_menu', array($this, 'admin_menu') );
-        add_action( 'admin_notices', array($this, 'fornt_end') );
+        //add_action( 'admin_notices', array($this, 'fornt_end') );
         register_activation_hook( __FILE__, array($this, 'install') );
         add_action( 'init', array( $this, 'init' ) );
     }
