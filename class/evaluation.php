@@ -187,23 +187,8 @@ class Hrm_Evaluation {
                     foreach ( $running_task as $key => $task ) {
                         $task_id = $task['tID'];
                         $all_task_id[] = $task_id;
-                        $ratings = get_posts( array(
-                            'post_type'   => 'hrm_rating',
-                            'post_status' => array( 'publish, future' ),
-                            'post_parent' => $post_id,
-                            'meta_key'    =>  '_rating_task_id',
-                            'meta_value'  => $task_id
-                        ));
 
-                        if ( count( $ratings ) ) {
-                            $rating = reset( $ratings );
-                            $rating_value = get_post_meta( $rating->ID, '_rating_value', true );
-                        } else {
-                            $rating = 0;
-                            $rating_value = 0;
-                        }
-
-                        $rating_post_id = isset($rating->ID) ? $rating->ID : 0;
+                        $rating_value = get_post_meta( $task_id, '_rating_value', true );
 
                         $slider_value[] = array(
                             'id'    => $task['tID'],
@@ -223,7 +208,7 @@ class Hrm_Evaluation {
                                     <div class="hrm-slider-field hrm-task-rating">
                                         <strong><?php _e( 'Rating ', 'hrm' ); ?></strong><span class="hrm-task-rating-value"><?php echo intval( $rating_value ); ?></span>
                                     </div>
-                                    <?php echo Hrm_Settings::getInstance()->hidden_field( 'task_rating['.$task_id.']['.$rating_post_id.']', $slider ) ;?>
+                                    <?php echo Hrm_Settings::getInstance()->hidden_field( 'task_rating['.$task_id.']', $slider ) ;?>
                                     <div class="hrm-slider-width" id="hrm-rating-slider-<?php echo $task['tID']; ?>"></div>
                                 </div>
                             </li>
@@ -256,21 +241,7 @@ class Hrm_Evaluation {
                     foreach ( $running_task as $key => $task ) {
                         $task_id = $task['tID'];
                         $all_task_id[] = $task_id;
-                        $ratings = get_posts( array(
-                            'post_type'   => 'hrm_rating',
-                            'post_status' => array( 'publish, future' ),
-                            'post_parent' => $post_id,
-                            'meta_key'    =>  '_rating_task_id',
-                            'meta_value'  => $task_id
-                        ));
-
-                        if ( count( $ratings ) ) {
-                            $rating = reset( $ratings );
-                            $rating_value = get_post_meta( $rating->ID, '_rating_value', true );
-                        } else {
-                            $rating = 0;
-                            $rating_value = 0;
-                        }
+                        $rating_value = get_post_meta( $task_id, '_rating_value', true );
 
                         $rating_post_id = isset( $rating->ID ) ? $rating->ID : 0;
 
@@ -292,7 +263,7 @@ class Hrm_Evaluation {
                                     <div class="hrm-slider-field hrm-task-rating">
                                         <strong><?php _e( 'Rating ', 'hrm' ); ?></strong><span class="hrm-task-rating-value"><?php echo intval( $rating_value ); ?></span>
                                     </div>
-                                    <?php echo Hrm_Settings::getInstance()->hidden_field( 'task_rating['.$task_id.']['.$rating_post_id.']', $slider ) ;?>
+                                    <?php echo Hrm_Settings::getInstance()->hidden_field( 'task_rating['.$task_id.']', $slider ) ;?>
                                     <div class="hrm-slider-width" id="hrm-rating-slider-<?php echo $task['tID']; ?>"></div>
                                 </div>
                             </li>
