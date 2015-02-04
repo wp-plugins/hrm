@@ -3,7 +3,7 @@
 Contributors: asaquzzaman
 Tags: hrm, human resource, human resource management, office management, industries management, organization management, population management, worker catalog, employee catalog, employer catalog, labour catalog.
 Requires at least: 3.3
-Tested up to: 3.9.1
+Tested up to: 4.1
 Stable tag: trunk
 License: GPLv2 or later
 
@@ -42,6 +42,10 @@ Organization, Industries and Office management
     1. Employee evaluation by project task.
     2. Employee evaluation record.
 
+* File
+    1. Share your file.
+    2. File inbox.
+
 
 == Installation ==
 
@@ -76,6 +80,11 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
+
+= 0.5 =
+* File management
+* Real time update insert, edit, delete, pagination, search
+* Punch In/Out bug fix
 
 = 0.4 =
 * hrm_employer can assign only project co-worder

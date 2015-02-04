@@ -12,7 +12,7 @@ function hrm_user_can_access( $tab = null, $subtab = null, $access_point = null,
     $page = hrm_page();
 
     //if tab has no access role
-    if ( isset( $page[$_GET['page']][$tab]['follow_access_role'] ) && ! $page[$_GET['page']][$tab]['follow_access_role'] ) {
+    if ( isset( $page[$_REQUEST['page']][$tab]['follow_access_role'] ) && ! $page[$_REQUEST['page']][$tab]['follow_access_role'] ) {
         return true;
     }
 
@@ -77,7 +77,7 @@ function hrm_date2mysql( $date, $gmt = 0 ) {
     return ( $gmt ) ? gmdate( 'Y-m-d H:i:s', $time ) : gmdate( 'Y-m-d H:i:s', ( $time + ( get_option( 'timezone_string' ) * 3600 ) ) );
 }
 
-function get_date2mysql( $date ) {
+function hrm_get_date2mysql( $date ) {
     if ( empty( $date ) ) {
         return;
     }
@@ -212,7 +212,7 @@ function hrm_get_query_args() {
     if ( isset( $_GET['tab'] ) && !empty( $_GET['tab'] ) ) {
         $tab = $_GET['tab'];
     } else if ( isset( $menu[$page] ) && count( $menu[$page] ) ) {
-        $tab = array_keys( $menu[$page] );
+        $tab =  array_keys( $menu[$page] );
         $tab = reset( $tab );
     } else {
         $tab = false;
@@ -251,6 +251,21 @@ function hrm_get_query_args() {
         );
 
         return apply_filters( 'hrm_query_var', $query );
+    }
+}
+
+function hrm_pagenum() {
+    return isset( $_POST['pagenum'] ) ? intval( $_POST['pagenum'] ) : 1;
+}
+
+function hrm_result_limit() {
+
+    if ( isset( $_POST['limit'] ) && $_POST['limit'] ) {
+        return intval( $_POST['limit'] );
+    } else if ( isset( $_POST['hrm_attr']['limit'] ) && $_POST['hrm_attr']['limit'] ) {
+        return intval( $_POST['hrm_attr']['limit'] );
+    } else {
+        return 2;
     }
 }
 
