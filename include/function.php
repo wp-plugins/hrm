@@ -265,7 +265,7 @@ function hrm_result_limit() {
     } else if ( isset( $_POST['hrm_attr']['limit'] ) && $_POST['hrm_attr']['limit'] ) {
         return intval( $_POST['hrm_attr']['limit'] );
     } else {
-        return 2;
+        return 10;
     }
 }
 

@@ -982,8 +982,8 @@ class Hrm_Settings {
     function pagination_select() {
         $selectd = isset( $_POST['limit'] ) ? $_POST['limit'] : 2;
         $arg = array(
-            '2'  => __( '10', 'hrm'),
-            '4'  => __( '20','hrm' ),
+            '10'  => __( '10', 'hrm'),
+            '20'  => __( '20','hrm' ),
             '50'  => __( '50', 'hrm' ),
             '100' => __( '100', 'hrm' ),
         );
