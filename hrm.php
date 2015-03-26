@@ -71,7 +71,7 @@ class Wp_Hrm {
 
     function fornt_end() {
          $license_status = get_option( 'hrm_front_end_license' );
-        if ( isset( $license_status->request_status ) || $license_status->request_status === true ) {
+        if ( isset( $license_status->request_status ) ) {
             return;
         }
         ?>
