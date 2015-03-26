@@ -440,6 +440,83 @@ label em {
   background-color: #5EB95E;
   width: 1px;
 }
+#hrm .hrm-personal {
+  position: relative;
+}
+#hrm .hrm-personal .hrm-employee-avatar,
+#hrm .hrm-personal .hrm-profile-image-wrap {
+  position: absolute;
+  top: -469px;
+  left: 56%;
+}
+#hrm .hrm-personal .hrm-employee-display-name {
+  font-size: 24px;
+  left: 110%;
+  line-height: 8px;
+  position: absolute;
+  top: 10%;
+  width: 375px;
+  font-weight: 900;
+}
+#hrm .hrm-personal #hrm-user-image-wrap img {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 2px;
+}
+#hrm .hrm-personal .hrm-employee-pic-text {
+  position: absolute;
+  top: 24%;
+  left: 110%;
+  width: 100%;
+}
+#hrm .hrm-personal #hrm-pickfiles {
+  position: absolute;
+  top: 24%;
+  left: 168%;
+  text-decoration: none;
+}
+#hrm .hrm-personal .hrm-delete-file {
+  position: absolute;
+  top: 24%;
+  left: 199%;
+  width: 100%;
+  text-decoration: none;
+  margin: 0;
+}
+#hrm .hrm-personal .hrm-delete-file:before {
+  content: "| ";
+}
+#hrm #hrm-eployee-list #hrm-upload-file-container {
+  margin-left: 21%;
+}
+#hrm #hrm-eployee-list .hrm-employee-pic-text {
+  left: 20%;
+  position: absolute;
+  top: 9%;
+}
+#hrm #hrm-eployee-list #hrm-user-image-wrap img {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 2px;
+}
+#hrm #hrm-eployee-list #hrm-drop-files-zone {
+  left: 20%;
+  position: absolute;
+  top: 21%;
+}
+#hrm #hrm-eployee-list #hrm-drop-files-zone a {
+  text-decoration: none;
+}
+#hrm #hrm-eployee-list .hrm-delete-file:before {
+  content: "| ";
+}
+#hrm #hrm-eployee-list .hrm-delete-file {
+  left: 25%;
+  position: absolute;
+  top: 21%;
+  text-decoration: none;
+  margin: 0;
+}
 .hrm-ui-dialog {
   left: 32% !important;
   top: 10% !important;

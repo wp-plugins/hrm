@@ -70,8 +70,25 @@ class Hrm_Ajax {
 
         add_action( 'wp_ajax_project_search', array( $this, 'project_search' ) );
         add_action( 'wp_ajax_hrm_search', array( $this, 'hrm_search' ) );
+        add_action( 'wp_ajax_hrm_profile_pic_del', array( $this, 'hrm_profile_pic_del' ) );
+        add_action( 'wp_ajax_punch_form_status', array( $this, 'punch_form_status' ) );
 
 
+    }
+
+    function punch_form_status() {
+        check_ajax_referer('hrm_nonce');
+        Hrm_Time::getInstance()->punch_form_status( $_POST );
+        wp_send_json_success( array( 'success_msg' => __( 'Save changes!', 'hrm' ) ) );
+    }
+
+    function hrm_profile_pic_del() {
+        check_ajax_referer('hrm_nonce');
+        $file_id = (isset( $_POST['file_id'] )) ? intval( $_POST['file_id'] ) : 0;
+        $employee_id = (isset( $_POST['employee_id'] )) ? intval( $_POST['employee_id'] ) : 0;
+        $content = Hrm_Employee::getInstance()->delete_file( $file_id, true, $employee_id );
+
+        wp_send_json_success(array( 'success_msg' => __( 'Deleted successfull', 'hrm' ), 'content' => $content ) );
     }
 
     function hrm_search() {
@@ -120,6 +137,10 @@ class Hrm_Ajax {
         $tab     = $_POST['tab'];
         $subtab  = $_POST['subtab'];
         $req_frm = urldecode( $_POST['req_frm'] );
+
+        if ( empty( $_POST['doc_search'] ) ) {
+            unset( $_POST['action'] );
+        }
         ob_start();
             require_once $req_frm;
         wp_send_json_success( array( 'content' => ob_get_clean() ) );
@@ -127,7 +148,7 @@ class Hrm_Ajax {
 
     function view_pagination() {
         check_ajax_referer('hrm_nonce');
-        $page    = $_POST['hrm_attr']['page'];
+        $page    = $_REQUEST['page'] = $_POST['hrm_attr']['page'];
         $tab     = $_POST['hrm_attr']['tab'];
         $subtab  = $_POST['hrm_attr']['subtab'];
         $req_frm = urldecode( $_POST['hrm_attr']['req_frm'] );
@@ -139,7 +160,7 @@ class Hrm_Ajax {
 
     function pagination() {
         check_ajax_referer('hrm_nonce');
-        $page    = $_POST['hrm_attr']['page'];
+        $page    = $_REQUEST['page'] = $_POST['hrm_attr']['page'];
         $tab     = $_POST['hrm_attr']['tab'];
         $subtab  = $_POST['hrm_attr']['subtab'];
         $req_frm = urldecode( $_POST['hrm_attr']['req_frm'] );
@@ -208,6 +229,7 @@ class Hrm_Ajax {
             $file_url = sprintf( '<a href="%1$s" target="_blank"><img src="%2$s" alt="%3$s" /></a>', $file['url'], $file['thumb'], esc_attr( $file['name'] ) );
 
             $html = '<div class="hrm-uploaded-item">' . $file_url . ' ' . $delete . $hidden . '</div>';
+            do_action('cpm_after_ajax_upload', $response, $file, $_POST );
             echo json_encode( array(
                 'success' => true,
                 'content' => $html
@@ -513,11 +535,19 @@ class Hrm_Ajax {
         check_ajax_referer('hrm_nonce');
         $postdata = $_POST;
         $update = hrm_Leave::getInstance()->new_leave( $postdata );
+        if ( isset( $update['error_msg'] ) ) {
+            wp_send_json_error( array( 'error_msg' => $update['error_msg'] ) );
+        }
         if( $update ) {
             $page    = $_POST['page'];
             $tab     = $_POST['tab'];
             $subtab  = $_POST['subtab'];
             $req_frm = urldecode( $_POST['req_frm'] );
+            $_POST['type'] = '_search';
+            $_POST['emp_id'] = $_POST['name'];
+            $_POST['type_id'] = $_POST['type_id'];
+
+            unset( $_POST['from'], $_POST['to'], $_POST['leave_status'], $_POST['leave_comments'] );
 
             ob_start();
                 require_once $req_frm;
@@ -1067,6 +1097,7 @@ class Hrm_Ajax {
             $capabilities = isset( $_POST['cap'] ) ? $_POST['cap'] : array();
             $edit_role = $this->edit_capabilities( $_POST['role_name'], $capabilities );
 
+            do_action( 'hrm_after_edit_capabilities', $_POST );
             if ( $edit_role ) {
                 $page    = $_POST['page'];
                 $tab     = $_POST['tab'];
@@ -1091,6 +1122,8 @@ class Hrm_Ajax {
             $cap = isset( $cap ) ? $cap : array();
 
             $add_role = $this->add_capabilities( $_POST['role_name'], $_POST['display_name'], $cap );
+
+            do_action( 'hrm_after_add_capabilities', $_POST );
 
             if ( $add_role == null ) {
                 wp_send_json_error( __( 'User role already exists', 'hrm' ) );
@@ -1320,10 +1353,12 @@ class Hrm_Ajax {
             $where  = apply_filters( 'hrm_change_where', $where, $data, $table_name,  $format, $update_status );
 
             $update = $wpdb->update( $table, $data, $where, $format );
+            do_action( 'hrm_after_update_new_information', $_POST );
 
         } else {
 
             $update = $wpdb->insert( $table, $data, $format );
+            do_action( 'hrm_after_new_information', $_POST, $wpdb->insert_id );
         }
 
         if( $update ) {

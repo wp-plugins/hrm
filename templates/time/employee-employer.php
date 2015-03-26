@@ -1,10 +1,12 @@
 <div class="hrm-update-notification"></div>
 <?php
+
 $users = get_users();
 $user_id = isset( $_POST['user_id'] ) ? $_POST['user_id'] : false;
 if ( !$user_id ) {
     $user_id = isset( $post['user_id_js'] ) ? $post['user_id_js'] : false;
 }
+
 $option_value = array();
 foreach( $users as $user ) {
 	$option_value[$user->ID] = $user->display_name;
@@ -49,6 +51,7 @@ echo hrm_Settings::getInstance()->get_serarch_form( $search, __( 'Attendance Rec
 <div id="hrm-attendance"></div>
 
 <?php
+
 
 $pagenum     = hrm_pagenum();
 $limit       = hrm_result_limit();
@@ -192,7 +195,6 @@ $file_path = urlencode(__FILE__);
            req_frm: '<?php echo $file_path; ?>',
            limit: '<?php echo $limit; ?>',
            search_satus: '<?php echo $search_satus; ?>',
-           subtab: true
         };
     });
 </script>

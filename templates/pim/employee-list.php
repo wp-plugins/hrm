@@ -7,7 +7,7 @@ if ( file_exists( $header_path ) ) {
     require_once $header_path;
 }
 
-
+$url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
 //search form
 
 $search['user'] = array(
@@ -95,16 +95,8 @@ foreach ( $employers as $key => $employer ) {
         $name_id = get_user_meta( $employer->ID, 'first_name', true );
     }
     $status = ( get_user_meta( $employer->ID, '_status', true ) == 'yes' ) ? 'Enable' : 'Disable';
-    $admin_url = add_query_arg(
-        array(
-            'page'        => 'hrm_pim',
-            'tab'         => 'personal',
-            'subtab'      => 'personal_info',
-            'employee_id' => $employer->ID
-        ), admin_url( 'admin.php' )
-    );
 
-    $admin_url = apply_filters( 'hrm_employee_profile', $admin_url, $page, 'personal', 'personal_info', $employer->ID );
+    $admin_url = hrm_employee_profile_url( 'hrm_pim', 'personal', 'personal_info', $employer->ID );
 
     $body[] = array(
         $del_checkbox,
@@ -140,8 +132,6 @@ echo hrm_Settings::getInstance()->table( $table );
 //pagination
 echo hrm_Settings::getInstance()->pagination( $total, $limit );
 
-$url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
-
 $job_titles = hrm_Settings::getInstance()->hrm_query( 'hrm_job_title' );
 
 unset($job_titles['total_row']);
@@ -175,6 +165,7 @@ $file_path = urlencode(__FILE__);
 <div class="hrm-pim">
     <?php Hrm_Settings::getInstance()->show_sub_tab_page( $page, $tab, $subtab ); ?>
 </div>
+<?php global $hrm_is_admin; ?>
 <script type="text/javascript">
 jQuery(function($) {
     hrm_dataAttr = {
@@ -192,7 +183,126 @@ jQuery(function($) {
         req_frm: '<?php echo $file_path; ?>',
         limit: '<?php echo $limit; ?>',
         search_satus: '<?php echo $search_satus; ?>',
-        subtab: false
+        is_admin: '<?php echo $hrm_is_admin; ?>',
     };
 });
+</script>
+
+<script type="text/javascript">
+
+    jQuery(function($) {
+
+        function hrm_profile_pic_uploder() {
+            var uploader = new plupload.Uploader({
+                runtimes : 'html5,html4',
+                browse_button : 'hrm-pickfiles',
+                container : 'hrm-upload-file-container',
+                file_data_name: 'hrm_attachment',
+                multi_selection: false,
+                max_file_size : '1mb',
+                url : hrm_ajax_data.ajax_url,
+                multipart_params: {
+                    action: 'hrm_ajax_upload',
+                    employee_id: '0',
+                    _wpnonce: hrm_ajax_data._wpnonce
+                },
+                filters : [
+                    {title : "Image files", extensions : 'jpg,JPEG,png'},
+                ],
+               // resize : {width : 1000, height : 1000 }
+            });
+
+            uploader.bind('Init', function(up, params) {
+                //console.log('alskjfhskfj');
+               //$('#art-filelist').html("<div>Current runtime: " + params.runtime + "</div>");
+            });
+
+
+            uploader.init();
+
+            uploader.bind('FilesAdded', function(up, files) {
+                $('#hrm-pickfiles').addClass('hrm-spinner');
+                up.start();
+                up.refresh(); // Reposition Flash/Silverlight
+            });
+
+
+
+            uploader.bind('UploadComplete', function( up, files, object ) {
+
+                $('#hrm-pickfiles').removeClass('hrm-spinner');
+            });
+
+            uploader.bind('Error', function(up, err) {
+
+                $('#art-filelist').append(
+                    '<div class="art-error">'+
+                    'Sorry, there was an error uploading some of your files.<br>Check to make sure they\'re JPG, JPEG, PNG, GIF files under '+art_image.max_file_size+'.<br>'+
+                    'Try again or manage your artwork'+
+                    '</div>'
+                );
+
+                up.refresh(); // Reposition Flash/Silverlight
+            });
+
+            uploader.bind('FileUploaded', function( up, file, response ) {
+
+                var res = $.parseJSON(response.response);
+
+                $('#' + file.id + " b").html("100%");
+
+                if(res.success) {
+
+                    $('#hrm-user-image-wrap').html(res.content);
+                    $('.hrm-delete-file').removeClass('button');
+                    $('.hrm-uploaded-item').find('img').attr({ width: 180, height: 180 });
+
+                } else {
+                    alert(res.error);
+                }
+            });
+        }
+     var hrm_file_ajax = {
+        init: function() {
+            $('#hrm').on( 'click', '.hrm-delete-file', this.deleteFile );
+
+            $('body').on( 'after_getInsertDataForm', function( e, self, res ) {
+                hrm_profile_pic_uploder();
+            });
+
+            $('body').on( 'after_success_edit', function( e, self, res ) {
+                hrm_profile_pic_uploder();
+            });
+        },
+
+
+
+         deleteFile: function(e) {
+            e.preventDefault();
+
+            if(confirm( hrm_ajax_data.confirm_msg )) {
+                $('.hrm-delete-file').addClass('hrm-spinner');
+                var that = $(this),
+                    data = {
+                        file_id: that.data('id'),
+                        action: 'hrm_profile_pic_del',
+                        employee_id: '0',
+                        _wpnonce: hrm_ajax_data._wpnonce
+                    };
+
+                $.post(hrm_ajax_data.ajax_url, data, function(res) {
+                    $('.hrm-delete-file').removeClass('hrm-spinner');
+                    if( res.success ) {
+                        that.closest('#hrm-user-image-wrap').html(res.data.content);
+                    }
+                });
+
+            }
+        }
+    }
+
+    hrm_file_ajax.init();
+});
+
+
 </script>

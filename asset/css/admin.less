@@ -436,7 +436,88 @@ label em {
         }
     }
 
+    .hrm-personal {
+        position: relative;
+        .hrm-employee-avatar, .hrm-profile-image-wrap {
+            position: absolute;
+            top: -469px;
+            left: 56%;
+        }
+        .hrm-employee-display-name {
+            font-size: 24px;
+            left: 110%;
+            line-height: 8px;
+            position: absolute;
+            top: 10%;
+            width: 375px;
+            font-weight: 900;
+        }
+        #hrm-user-image-wrap {
+            img {
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                padding: 2px;
+            }
+        }
+        .hrm-employee-pic-text {
+            position: absolute;
+            top: 24%;
+            left: 110%;
+            width: 100%;
+        }
+        #hrm-pickfiles {
+            position: absolute;
+            top: 24%;
+            left: 168%;
+            text-decoration: none;
+        }
+        .hrm-delete-file {
+            position: absolute;
+            top: 24%;
+            left: 199%;
+            width: 100%;
+            text-decoration: none;
+            margin: 0;
 
+        }
+        .hrm-delete-file:before {
+            content: "| ";
+        }
+    }
+
+    #hrm-eployee-list {
+        #hrm-upload-file-container {
+            margin-left: 21%;
+        }
+        .hrm-employee-pic-text {
+            left: 20%;
+            position: absolute;
+            top: 9%;
+        }
+        #hrm-user-image-wrap {
+            img {
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                padding: 2px;
+            }
+        }
+        #hrm-drop-files-zone {
+            left: 20%;
+            position: absolute;
+            top: 21%;
+            a { text-decoration: none; }
+        }
+        .hrm-delete-file:before {
+            content: "| ";
+        }
+        .hrm-delete-file {
+            left: 25%;
+            position: absolute;
+            top: 21%;
+            text-decoration: none;
+            margin: 0;
+        }
+    }
 
 }
 .hrm-ui-dialog {

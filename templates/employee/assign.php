@@ -1,23 +1,48 @@
 <div class="hrm-update-notification"></div>
 <?php
+
 if ( hrm_current_user_role() == 'hrm_employee' ) {
     $employer_id = get_current_user_id();
 } else {
     $employer_id = isset( $_REQUEST['employee_id'] ) ? trim( $_REQUEST['employee_id'] ) : '';
 }
-$search['leave_status'] = array(
-    'type'   => 'select',
-    'option' => Hrm_Leave::getInstance()->leave_status(),
-);
 
+$leave_types = Hrm_Settings::getInstance()->hrm_query('hrm_leave_type');
+
+$leave_cat = array( '' => '' );
+unset( $leave_types['total_row'] );
+foreach ( $leave_types as $key => $leave_type ) {
+    $leave_cat[$leave_type->id] = $leave_type->leave_type_name;
+}
+
+$leave_cat = isset( $leave_cat ) ? $leave_cat : array();
 $search['type'] = array(
     'type'  => 'hidden',
     'value' => '_search'
 );
+$search['type_id'] = array(
+    'label'    => __( 'Leave Type', 'hrm' ),
+    'type'     => 'select',
+    'required' => 'required',
+    'class'  => 'hrm-chosen',
+    'extra' => array(
+        'data-hrm_validation' => true,
+        'data-hrm_required' => true,
+        'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+    ),
+    'option'   => $leave_cat,
+
+
+);
+
+$search['emp_id'] = array(
+    'type' => 'hidden',
+    'value' => $employer_id
+);
 
 $search['table_option'] = 'hrm_leave';
-$search['action']       = 'hrm_search';
-echo Hrm_Settings::getInstance()->get_serarch_form( $search, 'Leave');
+$search['action'] = 'hrm_search';
+echo hrm_Settings::getInstance()->get_serarch_form( $search, 'Leave');
 ?>
 <div id="hrm_Leave_list"></div>
 <?php
@@ -28,13 +53,16 @@ if( isset( $_POST['type'] ) && ( $_POST['type'] == '_search' ) ) {
     $post         = $_POST;
     $search_satus = true;
     $results      = Hrm_Settings::getInstance()->search_query( $post, $limit, $pagenum );
-} else {
-    $results = Hrm_Settings::getInstance()->conditional_query_val( 'hrm_leave', $fields = '*', $compare = array( 'emp_id' => $employer_id) );
-    $search_satus = false;
-}
+    $total = $results['total_row'];
+    unset( $results['total_row'] );
+    $searc_leave_type = Hrm_Settings::getInstance()->edit_query( 'hrm_leave_type', $_POST['type_id'] );
 
-$total = $results['total_row'];
-unset( $results['total_row'] );
+} else {
+    $results = array();
+    $total = 0;
+    $search_satus = false;
+    $leave_type = array();
+}
 
 $leave_types = Hrm_Settings::getInstance()->hrm_query('hrm_leave_type');
 unset( $leave_types['total_row'] );
@@ -56,32 +84,26 @@ foreach ( $holidays as $key => $holiday ) {
     $holiday_index = array_merge( $holiday_index, maybe_unserialize( $holiday->index_holiday ) );
 }
 
+$total_leave_count = 0;
+$body = array();
 
 foreach ( $results as $key => $value) {
-    if ( !isset( $leave_cat[$value->leave_type_id] ) ) {
-        continue;
-    }
+    $leave_type = isset( $leave_cat[$value->leave_type_id] ) ? $leave_cat[$value->leave_type_id] : '';
 
-    $leave_action_dropdown = array(
-        'class'    => 'hrm-leave-action',
-        'extra'    => array(
-            'data-leave_id' => $value->id,
-        ),
-        'option'   => hrm_Leave::getInstance()->leave_employer_status(),
-        'selected' => $value->leave_status
-    );
+    $name_id = $leave_type;
 
+    $del_checkbox = '';
+
+    $individual_leave_total = hrm_Leave::getInstance()->total_leave( $value->start_time, $value->end_time, $work_in_week, $holiday_index );
+    $total_leave_count = $individual_leave_total + $total_leave_count;
     $body[] = array(
-        '<input name="hrm_check['.$value->id.']" value="" type="checkbox">',
-        '<a href="#" class="hrm-editable" data-user_id='.$employer_id.' data-table_option="hrm_leave" data-id='.$value->id.'>'.$leave_cat[$value->leave_type_id].'<a>',
+        $name_id,
         '<a href="#">'. $user_info[$value->emp_id] . '</a>',
         hrm_get_date2mysql( $value->start_time ),
         hrm_get_date2mysql( $value->end_time ),
-        Hrm_Leave::getInstance()->leave_status( $value->leave_status ),
+        hrm_Leave::getInstance()->leave_status( $value->leave_status ),
         $value->leave_comments,
-        Hrm_Leave::getInstance()->total_leave( $value->start_time, $value->end_time, $work_in_week, $holiday_index ),
-        Hrm_Leave::getInstance()->leave_take( $value->start_time, $value->end_time, $work_in_week, $holiday_index ),
-        Hrm_Leave::getInstance()->leave_remain( $value->start_time, $value->end_time, $work_in_week, $holiday_index ),
+        $individual_leave_total,
     );
 
     $td_attr[] = array(
@@ -89,8 +111,63 @@ foreach ( $results as $key => $value) {
     );
 }
 
+if( isset( $_POST['type'] ) && ( $_POST['type'] == '_search' ) ) {
+    $body[] = array(
+        '',
+        '',
+        '',
+        '',
+        '',
+        '<strong>'. __( 'Total leave take', 'hrm' ) . '</strong>',
+        '<strong>'. $total_leave_count .'</strong>'
+    );
+    $Balance = intval( $searc_leave_type['entitlement'] - $total_leave_count );
+    $body[] = array(
+        '',
+        '',
+        '',
+        '',
+        '',
+        '<strong>'. __( 'Leave Balance', 'hrm' ) . '</strong>',
+        '<strong>'. $Balance .'</strong>'
+    );
+    $body[] = array(
+        '',
+        '',
+        '',
+        '',
+        '',
+        '<strong>'. __( 'Leave Duration', 'hrm' ) . '</strong>',
+        '<strong>'. hrm_get_date2mysql( $searc_leave_type['entitle_from'] ) . ' to ' . hrm_get_date2mysql( $searc_leave_type['entitle_to'] ) .'</strong>'
+
+    );
+    $leave_for = $searc_leave_type['leave_type_name'];
+    $body[] = array(
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '<strong>'. __( 'Total leave for ' . $leave_for, 'hrm' ) . '</strong>',
+        '<strong>'. $searc_leave_type['entitlement'] .'</strong>'
+    );
+
+}
+
 $table = array();
-$table['head']       = array( '<input type="checkbox">', 'Leave Type', 'Employee Name', 'Start Date', 'End Date', 'Leave Status', 'Comments', 'Total Leave(day)', 'Leave Take(day)', 'Leave Remain(day)' );
+
+$table['head'] = array(
+    __('Leave Type', 'erhm' ),
+    __('Employee Name', 'erhm' ),
+    __('Start Date', 'erhm' ),
+    __('End Date', 'erhm' ),
+    __('Leave Status', 'erhm' ),
+    __('Comments', 'erhm' ),
+    __('Leave (day, include holiday and leave week) ', 'erhm' ),
+);
+
 $table['body']       = isset( $body ) ? $body : array();
 $table['td_attr']    = isset( $td_attr ) ? $td_attr : array();
 $table['th_attr']    = array( 'class="check-column"' );
@@ -99,6 +176,7 @@ $table['table']      = 'hrm_leave';
 $table['action']     = 'hrm_delete';
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
+$table['delete_button'] = false;
 
 echo Hrm_Settings::getInstance()->table( $table );
 //table
@@ -114,7 +192,7 @@ jQuery(function($) {
        add_form_apppend_wrap : 'hrm_Leave_list',
        class_name : 'Hrm_Leave',
        redirect : '<?php echo $url; ?>',
-       function_name : 'assign',
+       function_name : 'individula_apply_leave',
        user_id: '<?php echo $employer_id; ?>',
        user_info: '<?php echo json_encode( $user_info ); ?>',
        leave_cat: '<?php echo json_encode( $leave_cat ); ?>',
@@ -124,7 +202,6 @@ jQuery(function($) {
        subtab: '<?php echo $subtab; ?>',
        req_frm: '<?php echo $file_path; ?>',
        search_satus: '<?php echo $search_satus; ?>',
-       subtab: true
     };
 });
 </script>

@@ -46,3 +46,17 @@ function hrm_task_assing_user_url( $page, $tab, $user_id ) {
     $url = admin_url( 'admin.php?' ) . 'page='.$page.'&employee_id='.$user_id.'&tab='. $tab;
     return apply_filters( 'hrm_task_assign_user_url', $url, $page, $tab, $user_id );
 }
+
+function hrm_employee_profile_url( $page, $tab, $sub_tab, $employee_id ) {
+    $admin_url = add_query_arg(
+        array(
+            'page'        => $page,
+            'tab'         => $tab,
+            'subtab'      => $sub_tab,
+            'employee_id' => $employee_id
+        ), admin_url( 'admin.php' )
+    );
+
+    return apply_filters( 'hrm_employee_profile', $admin_url, $page, $tab, $sub_tab, $employee_id );
+
+}

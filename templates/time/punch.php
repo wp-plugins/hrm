@@ -32,7 +32,6 @@ $user_id = get_current_user_id();
 $pagenum     = hrm_pagenum();
 $limit       = hrm_result_limit();
 if( isset( $_POST['type'] ) && ( $_POST['type'] == '_search' ) ) {
-
     $search_satus     = true;
     $query = Hrm_Time::getInstance()->get_individulat_punch( $_POST, $limit, $pagenum );
 } else {
@@ -49,7 +48,6 @@ $total_pagination = $query->found_posts;
 
 	$add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
     $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
-   // $puch_status = get_user_meta( $user_id, '_puch_in_status', true );
 
     $total_duration = 0;
     foreach ( $posts as $key => $post ) {
@@ -111,6 +109,7 @@ $total_pagination = $query->found_posts;
             '',
             '',
             '',
+            '',
             '<strong>' . __( 'Total', 'hrm' ) . '</strong>',
             $total_time
         );
@@ -126,7 +125,7 @@ $total_pagination = $query->found_posts;
     	__( 'Punch Out Note', 'hrm' ),
     	__( 'Duration (Hours)', 'hrm' ),
     );
-    $table['body']       = isset( $body ) ? $body : array();
+    $table['body']  = isset( $body ) ? $body : array();
 
      $arg = array(
             'post_type' => 'hrm_punch',
@@ -181,7 +180,6 @@ $file_path = urlencode(__FILE__);
            req_frm: '<?php echo $file_path; ?>',
            limit: '<?php echo $limit; ?>',
            search_satus: '<?php echo $search_satus; ?>',
-           subtab: true
         };
     });
 </script>

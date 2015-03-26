@@ -10,7 +10,7 @@ if ( hrm_current_user_role() == 'hrm_employee' ) {
 <div id="hrm-employee-work-experience"></div>
 <?php
 
-$results = hrm_Settings::getInstance()->conditional_query_val( 'hrm_work_experience', $field = '*', $compare = array( 'emp_number' => $employer_id ) );
+$results = hrm_Settings::getInstance()->conditional_query_val( 'hrm_work_experience', '*', array( 'emp_number' => $employer_id ) );
 $total = $results['total_row'];
 
 foreach ( $results as $key => $value) {
@@ -59,7 +59,6 @@ $file_path = urlencode(__FILE__);
            tab: '<?php echo $tab; ?>',
            subtab: '<?php echo $subtab; ?>',
            req_frm: '<?php echo $file_path; ?>',
-           subtab: true
         };
     });
 </script>

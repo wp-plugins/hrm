@@ -36,10 +36,9 @@ $limit       = hrm_result_limit();
 if( isset( $_POST['action'] ) && $_POST['action'] == 'hrm_search' ) {
     $post = $_POST;
     $search_satus = true;
-    $query  = Hrm_Evaluation::getInstance()->search_rating_record( $post, $limit, $pagenum );
-
+    $query  = Hrm_Evaluation::getInstance()->search_rating_record( $post, -1, $pagenum );
 } else {
-    $query  = Hrm_Evaluation::getInstance()->rating_recored( $limit, $pagenum );
+    $query  = Hrm_Evaluation::getInstance()->rating_recored( -1, $pagenum );
     $search_satus = false;
 }
 
@@ -102,7 +101,7 @@ $table['delete_button'] = false;
 
 echo Hrm_Settings::getInstance()->table( $table );
 
-echo Hrm_Settings::getInstance()->pagination( $total_pagination, $limit, $pagenum );
+//echo Hrm_Settings::getInstance()->pagination( $total_pagination, $limit, $pagenum );
 $file_path = urlencode(__FILE__);
 ?>
 

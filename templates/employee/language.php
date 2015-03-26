@@ -10,7 +10,7 @@ if ( hrm_current_user_role() == 'hrm_employee' ) {
 
 <?php
 
-$results = hrm_Settings::getInstance()->conditional_query_val( 'hrm_personal_language', $field = '*', $compare = array( 'emp_id' => $employer_id ) );
+$results = hrm_Settings::getInstance()->conditional_query_val( 'hrm_personal_language', '*', array( 'emp_id' => $employer_id ) );
 
 $language_labels = hrm_Settings::getInstance()->hrm_query( 'hrm_language' );
 unset( $language_labels['total_row'] );
@@ -71,7 +71,6 @@ $file_path = urlencode(__FILE__);
            tab: '<?php echo $tab; ?>',
            subtab: '<?php echo $subtab; ?>',
            req_frm: '<?php echo $file_path; ?>',
-           subtab: true
         };
     });
 </script>

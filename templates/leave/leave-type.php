@@ -34,7 +34,10 @@ foreach ( $results as $key => $value) {
     }
     $body[] = array(
         $del_checkbox,
-        $name_id
+        $name_id,
+        intval( $value->entitlement ),
+        hrm_get_date2mysql( $value->entitle_from ),
+        hrm_get_date2mysql( $value->entitle_to )
     );
 
     $td_attr[] = array(
@@ -43,7 +46,7 @@ foreach ( $results as $key => $value) {
 }
 $table = array();
 $del_checkbox        = ( $delete_permission ) ? '<input type="checkbox">' : '';
-$table['head']       = array( $del_checkbox, 'Leave Type' );
+$table['head']       = array( $del_checkbox, __( 'Leave Type', 'hrm' ), __( 'Entitlement', 'hrm' ), __( 'Entitle From', 'hrm' ), __('Entitle To', 'hrm') );
 $table['body']       = isset( $body ) ? $body : array();
 $table['td_attr']    = isset( $td_attr ) ? $td_attr : '';
 $table['th_attr']    = array( 'class="check-column"' );
@@ -76,7 +79,6 @@ $file_path = urlencode(__FILE__);
            req_frm: '<?php echo $file_path; ?>',
            limit: '<?php echo $limit; ?>',
            search_satus: '<?php echo $search_satus; ?>',
-           subtab: true
         };
     });
 </script>

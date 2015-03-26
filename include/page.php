@@ -140,7 +140,7 @@ function hrm_page() {
     );
 
     $page[$hrm_pim]['personal'] = array(
-        //'follow_access_role' => false,
+        'follow_access_role' => false,
         'nested_tab' => true,
         'id'        => 'hrm-employee-personal',
         'title'     => __( 'Personal', 'hrm' ),
@@ -193,7 +193,7 @@ function hrm_page() {
     );
 
     $page[$hrm_pim]['organization_info'] = array(
-        //'follow_access_role' => false,
+        'follow_access_role' => false,
         'nested_tab' => true,
         'id'        => 'hrm-employee-organization',
         'title'     => __( 'Pim Organization', 'hrm' ),
@@ -243,6 +243,14 @@ function hrm_page() {
         //'submenu'            => false,
     );
 
+    $page[$hrm_file]['config'] = array(
+        'id'                 => 'hrm-file-config',
+        'title'              => __( 'Configuration', 'hrm' ),
+        'file_slug'          => 'file/config',
+        'file_path'          => $path . '/file/config.php',
+        //'submenu'            => false,
+    );
+
     $page[$hrm_pim]['my_task'] = array(
         //'follow_access_role' => false,
         'nested_tab' => true,
@@ -282,7 +290,7 @@ function hrm_page() {
         'submenu' => array(
             'assign' => array(
                 'id'        => 'hrm-leave-assign',
-                'title'     => __( 'Assigin', 'hrm' ),
+                'title'     => __( 'Apply', 'hrm' ),
                 'file_slug' => 'employee/assign',
                 'file_path' => $path . '/employee/assign.php',
             ),
@@ -348,12 +356,6 @@ function hrm_page() {
         'file_slug' => 'time/attendance',
         'file_path' => $path . '/time/attendance.php',
         'submenu' => array(
-            'employee_employer_records' => array(
-                'id'        => 'hrm-time-my-records',
-                'title'     => __( 'Employee/Employer', 'hrm' ),
-                'file_slug' => 'time/employee-employer',
-                'file_path' => $path . '/time/employee-employer.php',
-            ),
             'punch' => array(
                 'id'        => 'hrm-time-punch',
                 'title'     => __( 'Punch In/Out', 'hrm' ),
@@ -363,7 +365,12 @@ function hrm_page() {
                     'edit' => __( 'Edit', 'hrm' ),
                 )
             ),
-
+            'employee_employer_records' => array(
+                'id'        => 'hrm-time-my-records',
+                'title'     => __( 'Employee/Employer', 'hrm' ),
+                'file_slug' => 'time/employee-employer',
+                'file_path' => $path . '/time/employee-employer.php',
+            ),
             'config' => array(
                 'id'        => 'hrm-time-config',
                 'title'     => __( 'Configuration', 'hrm' ),
@@ -426,5 +433,9 @@ function hrm_evaluation_page() {
 }
 function hrm_file_page() {
     return 'hrm_file';
+}
+
+function hrm_employee() {
+    return 'hrm_employee';
 }
 

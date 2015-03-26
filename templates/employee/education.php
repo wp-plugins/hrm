@@ -83,7 +83,6 @@ $file_path = urlencode(__FILE__);
             tab: '<?php echo $tab; ?>',
             subtab: '<?php echo $subtab; ?>',
             req_frm: '<?php echo $file_path; ?>',
-            subtab: true
         };
     });
 </script>

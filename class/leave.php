@@ -136,6 +136,43 @@ class Hrm_Leave {
             'value' => isset( $field_value['leave_type'] ) ? $field_value['leave_type'] : '',
         );
 
+        $leave_hidden_form['entitlement'] = array(
+            'label' =>  __( 'Entitlement ', 'hrm' ),
+            'type' => 'text',
+            'extra' => array(
+                'data-hrm_validation' => true,
+                'data-hrm_required' => true,
+                'data-hrm_integer' => true,
+                'data-hrm_integer_error_msg'=> __( 'Your inserted value is not integer', 'hrm' ),
+                'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+            ),
+            'value' => isset( $field_value['entitlement'] ) ? $field_value['entitlement'] : '',
+        );
+
+        $leave_hidden_form['entitle_from'] = array(
+            'label' =>  __( 'Entitle from', 'hrm' ),
+            'type' => 'text',
+            'class' => 'hrm-datepicker-from',
+            'extra' => array(
+                'data-hrm_validation' => true,
+                'data-hrm_required' => true,
+                'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+            ),
+            'value' => isset( $field_value['entitle_from'] ) ? hrm_get_date2mysql( $field_value['entitle_from'] ) : '',
+        );
+
+        $leave_hidden_form['entitle_to'] = array(
+            'label' =>  __( 'Entitle to', 'hrm' ),
+            'type' => 'text',
+            'class' => 'hrm-datepicker-to',
+            'extra' => array(
+                'data-hrm_validation' => true,
+                'data-hrm_required' => true,
+                'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+            ),
+            'value' => isset( $field_value['entitle_to'] ) ? hrm_get_date2mysql( $field_value['entitle_to'] ) : '',
+        );
+
         $leave_hidden_form['action'] = 'ajax_referer_insert';
         $leave_hidden_form['table_option'] = 'hrm_leave_type';
         $leave_hidden_form['header'] = 'Leave Type';
@@ -225,39 +262,344 @@ class Hrm_Leave {
         return $return_value;
     }
 
+    function is_leave_take_prev( $emp_id, $post_from, $post_to ) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'hrm_leave';
+        $result = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table}
+            WHERE
+            emp_id = $emp_id
+            AND
+            ( ( start_time <= '%s' AND end_time >= '%s' )
+            OR
+            ( start_time <= '%s' AND end_time >= '%s' ) )
+            ", $post_from, $post_from, $post_to, $post_to
+        ) );
+
+        return $result;
+    }
+
+    function count_leave_between_two_date( $start_time, $end_time ) {
+        $start = strtotime( $start_time );
+        $end = strtotime( $end_time );
+        $days_between = intval( ($end - $start) / 86400 );
+        return $days_between + 1;
+    }
+
+    function count_leave_exclude_holiday_weekend( $start, $end, $work_in_week, $holiday ) {
+        $start = date( 'Y-m-d', strtotime( $start) );
+        $end = date( 'Y-m-d', strtotime( $end) );
+        if( $start > $end ) {
+            return 0;
+        }
+
+        $holiday_status = count( $holiday ) ? true : false;
+        $total = 0;
+        while( $start <= $end ) {
+            $day = strtolower( date('l', strtotime( $start ) ) );
+            $start = date( 'Y-m-d', strtotime( $start ) );
+            $weekend = isset( $work_in_week['data'][$day] ) ? $work_in_week['data'][$day] : '';
+            if ( !in_array( $start, $holiday ) && $weekend != 'non' ) {
+                $total++;
+            }
+
+            $start = date( 'Y-m-d', strtotime( $start . '+1 days') );
+        }
+
+        return $total;
+    }
+
     function new_leave( $post = null ) {
 
         global $wpdb;
-        $update = false;
-        $table_name = $wpdb->prefix. 'hrm_leave';
-        $post_name = isset( $post['name'] ) ? $post['name'] : array();
-        foreach ( $post_name as $key => $user_id ) {
-            $args = array(
-                'emp_id'         => $user_id,
-                'leave_type_id'  => $post['type_id'],
-                'start_time'     => hrm_date2mysql( $post['from'] ),
-                'end_time'       => hrm_date2mysql( $post['to'] ),
-                'leave_comments' => $post['comment'],
-                'leave_status'   => 1
-            );
+        $update       = false;
+        $table_name   = $wpdb->prefix. 'hrm_leave';
+        $get_duration = Hrm_Settings::getInstance()->edit_query( 'hrm_leave_type', $post['type_id'] );
+        $post_from    = date( 'Y-m-d H:i:s', strtotime( $post['from'] ) );
+        $post_to      = date( 'Y-m-d H:i:s', strtotime( $post['to'] ) );
+        $get_from     = $get_duration['entitle_from'];
+        $get_to       = $get_duration['entitle_to'];
+        $user_id      = isset( $post['name'] ) ? $post['name'] : array();
 
-            $format = array( '%d', '%d', '%s', '%s', '%s' );
+        $work_in_week = get_option( 'hrm_work_week' );
+        $holidays = Hrm_Settings::getInstance()->hrm_query('hrm_holiday');
+        unset( $holidays['total_row'] );
+        $holiday_index = array();
 
-            if( isset( $post['id'] ) && !empty( $post['id']  ) ) {
-                $where = array( 'id' => $post['id'] );
-                $update = $wpdb->update( $table_name, $args, $where, $format );
-            } else {
-                $update = $wpdb->insert( $table_name, $args, $format );
-            }
-
+        foreach ( $holidays as $key => $holiday ) {
+            $holiday_index = array_merge( $holiday_index, maybe_unserialize( $holiday->index_holiday ) );
         }
 
+        if ( $get_from <= $post_from && $get_to >= $post_to ) {
+
+            $get_apply_leave = Hrm_Settings::getInstance()->hrm_query( 'hrm_leave', $user_id );
+            $leave_take_prev = $this->is_leave_take_prev( $user_id, $post_from, $post_to );
+
+            if ( $leave_take_prev ) {
+                $prev_start = $leave_take_prev->start_time;
+                $prev_end = $leave_take_prev->end_time;
+                return array( 'error_msg'=> __( 'Leave record found '. $prev_start . ' to ' . $prev_end . ' so please apply leave out side this range', 'hrm' ) );
+            }
+
+            $leave_take = Hrm_Settings::getInstance()->conditional_query_val( 'hrm_leave', '*', array( 'leave_type_id' => $post['type_id'], 'emp_id' => $user_id ) );
+            $leave_count = 0;
+
+            if ( $leave_take['total_row'] ) {
+                unset( $leave_take['total_row'] );
+                foreach ( $leave_take as $key => $leave ) {
+                    $leave_count = $this->count_leave_exclude_holiday_weekend( $leave->start_time, $leave->end_time, $work_in_week, $holiday_index ) + $leave_count;
+                }
+                $apply_leave_count = $this->count_leave_exclude_holiday_weekend( $post_from, $post_to, $work_in_week, $holiday_index );
+
+                $post['apply_leave_total'] = $apply_leave_count;
+                $apply_leave_count = $apply_leave_count +  $leave_count;
+
+                if ( $get_duration['entitlement'] < $apply_leave_count ) {
+                    return array( 'error_msg'=> __( 'Unbalanced leave apply', 'hrm' ) );
+                }
+            } else {
+                $post['apply_leave_total'] = $this->count_leave_exclude_holiday_weekend( $post_from, $post_to, $work_in_week, $holiday_index );
+            }
+        } else {
+
+            return array( 'error_msg'=> __( 'Please chose date form '. $get_from . ' to ' . $get_to, 'hrm' ) );
+        }
+
+        $args = array(
+            'emp_id'         => $user_id,
+            'leave_type_id'  => $post['type_id'],
+            'start_time'     => hrm_date2mysql( $post_from ),
+            'end_time'       => hrm_date2mysql( $post_to ),
+            'leave_comments' => $post['comment'],
+            'leave_status'   => isset( $post['leave_status'] ) ? $post['leave_status'] : 1,
+        );
+
+        $format = array( '%d', '%d', '%s', '%s', '%s' );
+
+        if( isset( $post['id'] ) && !empty( $post['id']  ) ) {
+            $where = array( 'id' => $post['id'] );
+            $update = $wpdb->update( $table_name, $args, $where, $format );
+        } else {
+            $update = $wpdb->insert( $table_name, $args, $format );
+        }
+
+
         if ( $update ) {
+            $this->send_new_leave_email( $user_id, $post, $get_duration );
             return true;
         } else {
             return false;
         }
     }
+
+    function send_new_leave_email( $user_id, $post, $get_duration ) {
+
+        $current_user = wp_get_current_user();
+        $role = reset( $current_user->roles );
+        if ( $role == 'hrm_employee' ) {
+            $email = array();
+            foreach ( $post['apply_to'] as $key => $user_id ) {
+                $user = get_user_by( 'id', $user_id );
+                $email[] = $user->user_email;
+            }
+            $message = $this->employee_to_employer_leave_message( $post, $get_duration, $current_user );
+        } else {
+            $send_to_user = get_user_by( 'id', $user_id );
+            $email = $send_to_user->user_email;
+            $message = $this->employer_to_employee_leave_message( $send_to_user, $post, $get_duration, $current_user );
+        }
+
+        $subject = __( 'HRM-Leave' );
+        Hrm_Settings::getInstance()->send( $email, $subject, $message, $current_user->ID );
+    }
+
+    function employee_to_employer_leave_message( $post, $get_duration, $current_user ) {
+        $post_from    = hrm_get_date2mysql( $post['from'] );
+        $post_to      = hrm_get_date2mysql( $post['to'] );
+        return $message = sprintf(
+            '
+            <div style="width: 600px; background: #eee; padding: 5px;">
+            <table width="600" style="background: #fff; padding: 10px;">
+                <tr>
+                    <td style="padding: 10px;">Hello</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;">You have a leave approval notification</td>
+                </tr>
+            </table>
+            <table  width="600" style="border-collapse: collapse; background: #fff; padding: 10px;">
+            <thead>
+                <tr>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Employee ID</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Name</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Leave Type</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Duration</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Comment</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Status</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Leave Total</th>
+                <tr>
+            </thead>
+
+            <tr>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s to %s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s days</td>
+            <tr>
+            </table>
+            </div>
+            ',$current_user->ID, $current_user->display_name, $get_duration['leave_type_name'], $post_from, $post_to, $post['comment'],
+            $this->leave_status( 1 ), $post['apply_leave_total']
+        );
+    }
+
+    function employer_to_employee_leave_message( $send_to_user, $post, $get_duration, $current_user ) {
+        $post_from    = hrm_get_date2mysql( $post['from'] );
+        $post_to      = hrm_get_date2mysql( $post['to'] );
+        return $message = sprintf(
+            '
+            <div style="width: 600px; background: #eee; padding: 5px;">
+            <table width="600" style="background: #fff; padding: 10px;">
+            <tr>
+                <td style="padding: 10px;">Hello, %s</td>
+            </tr>
+            <tr>
+                <td style="padding: 10px;">You have a leave notification</td>
+            </tr>
+            </table>
+            <table  width="600" style="border-collapse: collapse; background: #fff; padding: 10px;">
+            <thead>
+                <tr>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Employer</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Leave Type</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Duration</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Comment</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Status</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Leave Total</th>
+                </tr>
+            </thead>
+
+            <tr>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s to %s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s days</td>
+            </tr>
+            </table>
+            </div>
+
+            ',$send_to_user->display_name, $current_user->display_name, $get_duration['leave_type_name'], $post_from, $post_to, $post['comment'],
+            $this->leave_status( $post['leave_status'] ), $post['apply_leave_total']
+        );
+    }
+
+    function individula_apply_leave( $field_value = null ) {
+
+        $from_pim = isset( $_POST['hrm_dataAttr']['user_id'] ) && !empty( $_POST['hrm_dataAttr']['user_id'] ) ? trim( $_POST['hrm_dataAttr']['user_id'] ) : false;
+
+        if ( $from_pim ) {
+            $field['name'] = array(
+                'type'   => 'hidden',
+                'value'  =>  $from_pim
+
+            );
+        }
+
+        $users = get_users();
+        $apply_to_users = array();
+        foreach ( $users as $key => $user ) {
+            if ( reset( $user->roles ) != 'hrm_employee' ) {
+                $apply_to_users[$user->ID] = $user->display_name;
+            }
+        }
+
+        if ( $field_value !== null ) {
+
+            $field['id'] = array(
+                'type'  => 'hidden',
+                'value' => isset( $field_value['id'] ) ? $field_value['id'] : '',
+            );
+        }
+
+        $field['type_id'] = array(
+            'label'    => __( 'Leave Type', 'hrm' ),
+            'type'     => 'select',
+            'required' => 'required',
+            'extra' => array(
+                'data-hrm_validation' => true,
+                'data-hrm_required' => true,
+                'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+            ),
+            'option'   => json_decode( stripcslashes( $_POST['hrm_dataAttr']['leave_cat'] ) ),
+            'selected' => isset( $field_value['type_id'] ) ? $field_value['type_id'] : ''
+
+        );
+
+        $field['apply_to[]'] = array(
+            'label'    => __( 'Apply To', 'hrm' ),
+            'type'     => 'multiple',
+            'class'    => 'hrm-chosen',
+            'required' => 'required',
+            'extra' => array(
+                'data-hrm_validation' => true,
+                'data-hrm_required' => true,
+                'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+            ),
+            'option'   => $apply_to_users
+
+        );
+
+
+        $field['from'] = array(
+            'label' => __( 'From Date', 'hrm' ),
+            'class' => 'hrm-datepicker-from',
+            'required' => 'required',
+            'extra' => array(
+                'data-hrm_validation' => true,
+                'data-hrm_required' => true,
+                'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+            ),
+            'type'  => 'text',
+            'value' => isset( $field_value['from'] ) ? hrm_get_date2mysql( $field_value['from'] ) : ''
+        );
+
+        $field['to'] = array(
+            'label' => __( 'To Date', 'hrm' ),
+            'class' => 'hrm-datepicker-to',
+            'required' => 'required',
+            'extra' => array(
+                'data-hrm_validation' => true,
+                'data-hrm_required' => true,
+                'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+            ),
+            'type'  => 'text',
+            'value' => isset( $field_value['to'] ) ? hrm_get_date2mysql( $field_value['to'] ) : ''
+        );
+
+        $field['comment'] = array(
+            'label' => __( 'Comment', 'hrm' ),
+            'type'  => 'textarea',
+            'value' => isset( $field_value['comment'] ) ? $field_value['comment'] : ''
+        );
+
+        $field['header']       = __( 'Apply Leave', 'hrm' );
+        $field['action']       = 'insert_leave';
+        $field['table_option'] = 'hrm_leave';
+
+        ob_start();
+        echo hrm_Settings::getInstance()->hidden_form_generator( $field );
+
+        $return_value = array(
+            'append_data' => ob_get_clean()
+        );
+
+        return $return_value;
+    }
+
 
     function assign( $field_value = null ) {
 
@@ -266,13 +608,13 @@ class Hrm_Leave {
         $from_pim = isset( $_POST['hrm_dataAttr']['user_id'] ) && !empty( $_POST['hrm_dataAttr']['user_id'] ) ? trim( $_POST['hrm_dataAttr']['user_id'] ) : false;
 
         if ( $user_id || $from_pim ) {
-            $field['name[]'] = array(
+            $field['name'] = array(
                 'type'   => 'hidden',
                 'value'  => $user_id ? $user_id : $from_pim
 
             );
         } else {
-            $field['name[]'] = array(
+            $field['name'] = array(
                 'label'  => __( 'Employee Name', 'hrm' ),
                 'required' => 'required',
                 'extra' => array(
@@ -281,7 +623,7 @@ class Hrm_Leave {
                     'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
                 ),
                 'class'  => 'hrm-chosen',
-                'type'   => 'multiple',
+                'type'   => 'select',
                 'option' => json_decode( stripcslashes( $_POST['hrm_dataAttr']['user_info'] ) ),
 
             );
@@ -308,9 +650,23 @@ class Hrm_Leave {
             'selected' => isset( $field_value['type_id'] ) ? $field_value['type_id'] : ''
 
         );
+
+        $field['leave_status'] = array(
+            'label'    => __( 'Status', 'hrm' ),
+            'type'     => 'select',
+            'required' => 'required',
+            'extra' => array(
+                'data-hrm_validation' => true,
+                'data-hrm_required' => true,
+                'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+            ),
+            'option'   => $this->leave_status(),
+            'selected' => isset( $field_value['leave_status'] ) ? $field_value['leave_status'] : '2',
+        );
+
         $field['from'] = array(
             'label' => __( 'From Date', 'hrm' ),
-            'class' => 'hrm-datepicker-leave-from',
+            'class' => 'hrm-datepicker-from',
             'required' => 'required',
             'extra' => array(
                 'data-hrm_validation' => true,
@@ -323,7 +679,7 @@ class Hrm_Leave {
 
         $field['to'] = array(
             'label' => __( 'To Date', 'hrm' ),
-            'class' => 'hrm-datepicker-leave-to',
+            'class' => 'hrm-datepicker-to',
             'required' => 'required',
             'extra' => array(
                 'data-hrm_validation' => true,
@@ -340,7 +696,7 @@ class Hrm_Leave {
             'value' => isset( $field_value['comment'] ) ? $field_value['comment'] : ''
         );
 
-        $field['header']       = __( 'Assign Leave', 'hrm' );
+        $field['header']       = __( 'Apply Leave', 'hrm' );
         $field['action']       = 'insert_leave';
         $field['table_option'] = 'hrm_leave';
         $field['url'] = $redirect;
@@ -363,7 +719,7 @@ class Hrm_Leave {
             '3' => __( 'Cancel', 'hrm' ),
         );
 
-        if ( $status == null ) {
+        if ( $status === null ) {
             return $leave;
         } else {
             return $leave[$status];
@@ -392,10 +748,79 @@ class Hrm_Leave {
         $format = array( '%d' );
 
         $update = $wpdb->update( $table, $data, $where, $format, $where_format = null );
+
         if ( $update ) {
+            $this->leave_status_update_message( $postdata );
             return $update;
         }
         return false;
+    }
+
+    function leave_status_update_message( $postdata ) {
+        global $wpdb;
+        $table  = $wpdb->prefix . 'hrm_leave';
+        $get_apply_leave = Hrm_Settings::getInstance()->conditional_query_val( 'hrm_leave', '*', array( 'id' => $postdata['leave_id'] ), true );
+        $leave_owner = get_user_by( 'id', $get_apply_leave->emp_id );
+
+        $to = $leave_owner->user_email;
+        $subject = __( 'Human Resource Management - Leave status changes', 'hrm' );
+        $sender_id = get_current_user_id();
+        $message = $this->leave_status_update_message_body( $get_apply_leave, $leave_owner, $postdata['status'] );
+        Hrm_Settings::getInstance()->send( $to, $subject, $message, $sender_id );
+    }
+
+    function leave_status_update_message_body( $get_apply_leave, $leave_owner, $status ) {
+        $post_from     = hrm_get_date2mysql( $get_apply_leave->start_time );
+        $post_to       = hrm_get_date2mysql( $get_apply_leave->end_time );
+        $leave_type    = Hrm_Settings::getInstance()->edit_query( 'hrm_leave_type', $get_apply_leave->leave_type_id );
+        $work_in_week  = get_option( 'hrm_work_week' );
+        $holidays      = Hrm_Settings::getInstance()->hrm_query('hrm_holiday');
+        $holiday_index = array();
+        unset( $holidays['total_row'] );
+
+        foreach ( $holidays as $key => $holiday ) {
+            $holiday_index = array_merge( $holiday_index, maybe_unserialize( $holiday->index_holiday ) );
+        }
+
+        $leave_count = $this->count_leave_exclude_holiday_weekend( $post_from, $post_to, $work_in_week, $holiday_index );
+
+        return $message = sprintf(
+            '
+            <div style="width: 600px; background: #eee; padding: 5px;">
+            <table width="600" style="background: #fff; padding: 10px;">
+                <tr>
+                    <td style="padding: 10px;">Hello</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px;">You apply leave status is changes</td>
+                </tr>
+            </table>
+            <table  width="600" style="border-collapse: collapse; background: #fff; padding: 10px;">
+            <thead>
+                <tr>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Employee ID</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Name</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Leave Type</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Duration</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Comment</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Status</th>
+                    <th style="background: #f7f5f5; border: 1px solid #e1e1e1;">Leave Total</th>
+                <tr>
+            </thead>
+
+            <tr>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s to %s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s</td>
+                <td style="border: 1px solid #eee; font-size: 12px; padding: 10px;">%s days</td>
+            <tr>
+            </table>
+            ',$leave_owner->ID, $leave_owner->display_name, $leave_type['leave_type_name'], $post_from, $post_to, $get_apply_leave->leave_comments,
+            $this->leave_status( $status ), $leave_count
+        );
     }
 }
 

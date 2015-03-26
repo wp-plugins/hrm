@@ -5,6 +5,11 @@ $header_path = apply_filters( 'hrm_header_path', $header_path, 'file' );
 if ( file_exists( $header_path ) ) {
 	require_once $header_path;
 }
+
+if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
+    printf( '<h1>%s</h1>', __( 'You do no have permission to access this page', 'cpm' ) );
+    return;
+}
 ?>
 <div id="hrm-file-index">
 <?php
@@ -50,7 +55,7 @@ foreach ( $posts as $key => $post ) {
 	$assign_to = HRM_File::getInstance()->get_assing_user( $post->ID );
 
     if ( $add_permission ) {
-        $post_title = '<a href="#" class="hrm-file-edit"  data-id='.$post->ID.'>'.$post->post_title.'<a>';
+        $post_title = $post->post_title;
     } else {
         $post_title = $post->post_title;
     }
@@ -60,10 +65,12 @@ foreach ( $posts as $key => $post ) {
     } else {
         $del_checkbox = '';
     }
+    $sender = get_user_by( 'id', $post->post_author );
 
     $body[] = array(
         $del_checkbox,
         $file_url,
+        $sender->display_name,
         $assign_to,
         $post_title,
         $post->post_content,
@@ -76,7 +83,7 @@ foreach ( $posts as $key => $post ) {
 
 $table                 = array();
 $del_checkbox          = ( $delete_permission ) ? '<input type="checkbox">' : '';
-$table['head']         = array( $del_checkbox, __( 'File', 'hrm' ), __( 'Share User', 'hrm' ), __( 'Title', 'hrm' ), __( 'Description', 'hrm' ) );
+$table['head']         = array( $del_checkbox, __( 'File', 'hrm' ), __( 'From', 'hrm' ), __( 'Share With', 'hrm' ), __( 'Title', 'hrm' ), __( 'Description', 'hrm' ) );
 $table['body']         = isset( $body ) ? $body : array();
 $table['td_attr']      = isset( $td_attr ) ? $td_attr : array();
 $table['th_attr']      = array( 'class="check-column"' );
@@ -95,6 +102,7 @@ $file_path = urlencode(__FILE__);
 
 ?>
 </div>
+<?php global $hrm_is_admin; ?>
 <script type="text/javascript">
 jQuery(function($) {
     hrm_dataAttr = {
@@ -109,7 +117,8 @@ jQuery(function($) {
        req_frm: '<?php echo $file_path; ?>',
        limit: '<?php echo $limit; ?>',
        search_satus: '<?php echo $search_satus; ?>',
-       user_id: '<?php echo $user_id; ?>'
+       user_id: '<?php echo $user_id; ?>',
+       is_admin: '<?php echo $hrm_is_admin; ?>',
     };
 });
 </script>

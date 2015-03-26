@@ -109,7 +109,6 @@ echo hrm_Settings::getInstance()->get_serarch_form( $search, 'Job Title');
             req_frm: '<?php echo $file_path; ?>',
             limit: '<?php echo $limit; ?>',
             search_satus: '<?php echo $search_satus; ?>',
-            subtab: true
         };
     });
 </script>

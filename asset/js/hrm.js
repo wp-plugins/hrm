@@ -28,6 +28,7 @@
             $('#hrm').on( 'click', '.hrm-pagination a', this.pagination );
             $('#hrm').on( 'change', '#hrm-pagination', this.viewPagination );
             $('#hrm').on( 'submit', '#hrm-search-form', this.search );
+            $('#hrm').on( 'change', '.hrm-punch-form-status', this.punch_form_status );
 
             $('#hrm').on( 'before_send_edit', function( e, self, data ) {
                 if ( self.data('action') == 'get_role' ) {
@@ -105,6 +106,18 @@
 
             $('#hrm').on( 'after_getInsertDataForm', function( e, self, res ) {
 
+                 if ( typeof res.data.disable_puch_frm !== 'undefined' && res.data.disable_puch_frm ) {
+
+                    $('#hrm-subtab-wrap').html( res.data.content );
+                    hrmGeneral.scrollTop( '.hrm-update-notification' );
+                    hrmGeneral.updateNotification( res.data.success_msg );
+                    hrmGeneral.chosen();
+                    hrmGeneral.datePicker();
+                    hrmGeneral.datePickerRestricted();
+
+                    return;
+                }
+
                 hrmGeneral.datePicker();
                 hrmGeneral.datePickerRestricted();
 
@@ -130,6 +143,8 @@
                     hrmGeneral.directDepositHandelar();
                     $('#hrm_personal_salary').on( 'change', '.hrm-direct-deposit-handelar', hrmGeneral.directDepositHandelar );
                 }
+
+
             });
 
             $('#hrm').on( 'after_success_edit', function( e, self, res ) {
@@ -146,6 +161,22 @@
                     hrmGeneral.datePickerLeaveRestricted();
                 }
 
+            });
+        },
+
+        punch_form_status: function(e) {
+            e.preventDefault();
+            var self = $(this),
+                data = {
+                    status: self.is(":checked") ? 'yes' : 0,
+                    action: 'punch_form_status',
+                    _wpnonce: hrm_ajax_data._wpnonce,
+                };
+            $.post( hrm_ajax_data.ajax_url, data, function( res ) {
+                if ( res.success ) {
+                    hrmGeneral.scrollTop( '.hrm-update-notification' );
+                    hrmGeneral.updateNotification( res.data.success_msg );
+                }
             });
         },
 
@@ -571,11 +602,11 @@
                     $('.hrm-error-notification')
                         .removeClass('error')
                         .addClass('updated')
-                        .html( '<p><strong>'+ res.data.msg+'</strong></p>' );
+                        .html( '<p><strong>'+ res.data.success_msg+'</strong></p>' );
                 } else {
                     $('.hrm-error-notification')
                         .addClass('updated error')
-                        .html( '<p><strong>'+res.data.msg+'<strong></p>' );
+                        .html( '<p><strong>'+res.data.error_msg+'<strong></p>' );
                 }
             });
         },
@@ -607,7 +638,11 @@
                 self.removeClass('hrm-spinner');
                 var form_wrap = $('#'+hrm_dataAttr.add_form_apppend_wrap);
                 if( res.success ) {
-                    form_wrap.html( res.data['append_data']['append_data'] );
+
+                    if ( typeof res.data.append_data !== 'undefined' ) {
+                        form_wrap.html( res.data.append_data.append_data );
+                    }
+
                     var hidden_form = form_wrap.find( '#hrm-hidden-form-warp');
 
                     hidden_form.slideDown('slow');
@@ -773,6 +808,16 @@
                         scroll_selector.push(self);
                     }
                 }
+
+                if ( validate && self.data('hrm_integer') ) {
+                    var field_val = self.val();
+                    if ( !hrmGeneral.isInt(field_val) ) {
+                        validate = false;
+                        field_wrap.find('.hrm-notification').remove();
+                        field_wrap.append('<div class="hrm-notification">'+self.data('hrm_integer_error_msg')+'</div>');
+                        scroll_selector.push(self);
+                    }
+                }
             });
 
             if( ! validate ) {
@@ -781,6 +826,12 @@
 
             return validate;
         },
+
+        isInt: function(value) {
+          var x = parseFloat(value);
+          return !isNaN(value) && (x | 0) === x;
+        },
+
 
         validateEmail: function($email) {
 
@@ -863,7 +914,7 @@
                         return;
                     }
 
-                    if ( typeof hrm_dataAttr.subtab !== 'undefined' && hrm_dataAttr.subtab ) {
+                    if ( typeof hrm_dataAttr.subtab !== 'undefined' && hrm_dataAttr.subtab !== '' ) {
                         $('#hrm-subtab-wrap').html( res.data.content );
                         hrmGeneral.scrollTop( '.hrm-update-notification' );
                         hrmGeneral.updateNotification( res.data.success_msg );

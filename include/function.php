@@ -2,17 +2,22 @@
 function hrm_user_can_access( $tab = null, $subtab = null, $access_point = null, $inside_role = false  ) {
 
 
-    $user_id = get_current_user_id();
+    $current_user = wp_get_current_user();
     $super_admin = get_option( 'hrm_admin', true );
 
-    if ( $user_id == $super_admin ) {
+    if ( $current_user->ID == $super_admin ) {
+        return true;
+    }
+
+    if ( reset( $current_user->roles ) == 'administrator' ) {
         return true;
     }
 
     $page = hrm_page();
+    $request_page = isset( $_REQUEST['page'] ) ? $_REQUEST['page'] : null;
 
     //if tab has no access role
-    if ( isset( $page[$_REQUEST['page']][$tab]['follow_access_role'] ) && ! $page[$_REQUEST['page']][$tab]['follow_access_role'] ) {
+    if ( isset( $page[$request_page][$tab]['follow_access_role'] ) && ! $page[$request_page][$tab]['follow_access_role'] ) {
         return true;
     }
 
@@ -55,7 +60,7 @@ function hrm_current_user_role() {
     global $current_user;
 
     $user_roles = $current_user->roles;
-    $user_role = array_shift($user_roles);
+    $user_role = reset($user_roles);
 
     return $user_role;
 }
@@ -267,5 +272,12 @@ function hrm_result_limit() {
     } else {
         return 10;
     }
+}
+
+function hrm_log( $type = '', $msg = '' ) {
+
+    $msg = sprintf( "[%s][%s] %s\n", date( 'd.m.Y h:i:s' ), $type, $msg );
+    error_log( $msg, 3, dirname( __FILE__ ) . '/log.txt' );
+
 }
 

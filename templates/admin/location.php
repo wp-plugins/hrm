@@ -1,5 +1,5 @@
 <div class="hrm-update-notification"></div>
-<!-- default instance $instance = hrm_Admin::getInstance(); -->
+
 <?php
 if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
 
@@ -151,7 +151,6 @@ $url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
             req_frm: '<?php echo $file_path; ?>',
             limit: '<?php echo $limit; ?>',
             search_satus: '<?php echo $search_satus; ?>',
-            subtab: true
         };
     });
 </script>

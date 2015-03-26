@@ -6,11 +6,14 @@ if ( hrm_current_user_role() == 'hrm_employee' ) {
 } else {
     $employer_id = isset( $_REQUEST['employee_id'] ) ? trim( $_REQUEST['employee_id'] ) : '';
 }
+$user = wp_get_current_user();
+$role = reset( $user->roles );
+
 ?>
 <div id="hrm_personal_salary"></div>
 <?php
 
-$results     = hrm_Settings::getInstance()->conditional_query_val( 'hrm_salary', $field = '*', $compare = array( 'emp_id' => $employer_id ) );
+$results     = hrm_Settings::getInstance()->conditional_query_val( 'hrm_salary', '*', array( 'emp_id' => $employer_id ) );
 $pary_grades = hrm_Settings::getInstance()->hrm_query( 'hrm_pay_grade' );
 
 unset( $pary_grades['total_row'] );
@@ -22,6 +25,12 @@ foreach ( $pary_grades as $key => $pary_grade ) {
 foreach ( $results as $key => $value) {
     if ( $results['total_row'] == 0 || $key === 'total_row' ) {
       continue;
+    }
+
+    if ( $role == 'hrm_employee' ) {
+        $date = hrm_get_date2mysql( $value->billing_date );
+    } else {
+        $date = '<a href="#" class="hrm-editable" data-table_option="hrm_salary"  data-id='.$value->id.'>' . hrm_get_date2mysql( $value->billing_date ) . '</a>';
     }
 
     $deposit = empty( $value->direct_deposit ) ? __( 'No', 'hrm' ) : ucfirst( $value->direct_deposit );
@@ -45,7 +54,8 @@ foreach ( $results as $key => $value) {
     $nameid = ( $page == 'hrm_pim' ) ? '<input name="hrm_check['.$value->id.']" value="" type="checkbox">' : '';
     $body[] = array(
         $nameid,
-        '<a href="#" class="hrm-editable" data-table_option="hrm_salary"  data-id='.$value->id.'>'.$pay_grade_label[$value->pay_grade].'<a>',
+        $date,
+        $pay_grade_label[$value->pay_grade],
         $value->component,
         hrm_Employee::getInstance()->pay_frequency( $value->frequency ),
         $value->currency,
@@ -62,6 +72,7 @@ $input_field = ( $page == 'hrm_pim' ) ? '<input type="checkbox">' : '';
 $table = array();
 $table['head'] = array(
     $input_field,
+    __( 'Date', 'hrm'),
     __( 'Pay Grade', 'hrm'),
     __( 'Salary Component', 'hrm'),
     __( 'Pay Frequency', 'hrm'),
@@ -78,6 +89,7 @@ $table['table']      = 'hrm_salary';
 $table['action']     = 'hrm_delete';
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
+$table['add_btn_name'] = $role == 'hrm_employee' ? false : __( 'Add', 'hrm' );
 
 if ( $page == 'hrm_employee') {
     $table['add_button']    = false;
@@ -104,7 +116,6 @@ $file_path = urlencode(__FILE__);
            tab: '<?php echo $tab; ?>',
            subtab: '<?php echo $subtab; ?>',
            req_frm: '<?php echo $file_path; ?>',
-           subtab: true
         };
     });
 </script>

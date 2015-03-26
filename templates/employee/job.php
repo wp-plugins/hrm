@@ -5,13 +5,13 @@ if ( hrm_current_user_role() == 'hrm_employee' ) {
     $employer_id = isset( $_GET['employee_id'] ) ? $_GET['employee_id'] : '';
 }
 $job_title_id = get_user_meta( $employer_id, '_job_title', true );
-$job_title = hrm_Settings::getInstance()->conditional_query_val( 'hrm_job_title_option', '*', array( 'id' => $job_title_id ) );
+$job_title = hrm_Settings::getInstance()->conditional_query_val( 'hrm_job_title', '*', array( 'id' => $job_title_id ) );
 
 $job_cat_id = get_user_meta( $employer_id, '_job_category', true );
-$job_category = hrm_Settings::getInstance()->conditional_query_val( 'hrm_job_category', $field = '*', $compare = array( 'id' => $job_cat_id ) );
+$job_category = hrm_Settings::getInstance()->conditional_query_val( 'hrm_job_category', '*', array( 'id' => $job_cat_id ) );
 
 $job_location_id = get_user_meta( $employer_id, '_location', true );
-$job_location = hrm_Settings::getInstance()->conditional_query_val( 'hrm_location_option', $field = '*', $compare = array( 'id' => $job_location_id ) );
+$job_location = hrm_Settings::getInstance()->conditional_query_val( 'hrm_location', '*', array( 'id' => $job_location_id ) );
 
 ?>
 

@@ -72,7 +72,6 @@ $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
            req_frm: '<?php echo $file_path; ?>',
            limit: '<?php echo $limit; ?>',
            search_satus: '<?php echo $search_satus; ?>',
-           subtab: true
         };
     });
 </script>

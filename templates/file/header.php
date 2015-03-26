@@ -14,6 +14,7 @@ $menu   = hrm_page();
     ?>
 </h2>
 <?php
+
 if ( ! $subtab ) {
    if( !isset( $menu[$page][$tab]['submenu'] ) ) {
         echo '<h3 class="hrm-sub-nav"></h3>';

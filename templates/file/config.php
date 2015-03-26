@@ -1,7 +1,20 @@
+<?php
+$header_path = dirname(__FILE__) . '/header.php';
+$header_path = apply_filters( 'hrm_header_path', $header_path, 'file' );
+
+if ( file_exists( $header_path ) ) {
+	require_once $header_path;
+}
+
+if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
+    printf( '<h1>%s</h1>', __( 'You do no have permission to access this page', 'cpm' ) );
+    return;
+}
+?>
 <div class="hrm-update-notification"></div>
+
 <div id="hrm-admin-role"></div>
 <?php
-$jk = get_option( 'pro_test_role' );
 
 //hidden form
 
@@ -19,8 +32,7 @@ $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : fal
 $current_user_role = hrm_current_user_role();
 
 foreach ( $role_names as $name => $display_name) {
-
-    if ( $current_user_role == $name || $name == 'hrm_employee'  ) {
+    if ( $current_user_role == $name ) {
         continue;
     }
 
@@ -40,39 +52,37 @@ foreach ( $role_names as $name => $display_name) {
         $name_id,
         $display_name
     );
-
-    $td_attr[] = array(
-        'class="check-column"'
-    );
 }
-$del_checkbox        = ( $delete_permission ) ? '<input type="checkbox">' : '';
-$table = array();
-$table['head']       = array( $del_checkbox, 'User Role', 'Display Name' );
-$table['body']       = isset( $body ) ? $body : array();
+
+$del_checkbox           = ( $delete_permission ) ? '<input type="checkbox">' : '';
+$table['head']          = array( $del_checkbox, 'User Role', 'Display Name' );
+$table['body']          = isset( $body ) ? $body : array();
 
 
-$table['td_attr']    = isset( $td_attr ) ? $td_attr : '';
-$table['th_attr']    = array( 'class="check-column"' );
-$table['table_attr'] = array( 'class' => 'widefat' );
+$table['td_attr']       = isset( $td_attr ) ? $td_attr : '';
+$table['th_attr']       = array( 'class="check-column"' );
+$table['table_attr']    = array( 'class' => 'widefat' );
 
-$table['action']     = 'role_delete';
-$table['table_attr'] = array( 'class' => 'widefat' );
-$table['tab']        = $tab;
-$table['subtab']     = $subtab;
-$table['pagination'] = false;
+$table['action']        = 'role_delete';
+$table['table_attr']    = array( 'class' => 'widefat' );
+$table['tab']           = $tab;
+$table['subtab']        = $subtab;
+$table['add_button']    = false;
+//$table['delete_button'] = false;
+$table['pagination']    = false;
 
 echo Hrm_Settings::getInstance()->table( $table );
 $file_path = urlencode(__FILE__);
-?>
-<?php $url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab ); ?>
+$url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab ); ?>
 <script type="text/javascript">
     jQuery(function($) {
         hrm_dataAttr = {
            add_form_generator_action : 'add_form',
            add_form_apppend_wrap : 'hrm-admin-role',
-           class_name : 'Hrm_Admin',
+           class_name : 'HRM_File',
            redirect : '<?php echo $url; ?>',
-           function_name : 'admin_role_form',
+           function_name : 'role_permission',
+           tab: '<?php echo $tab; ?>',
            page: '<?php echo $page; ?>',
            tab: '<?php echo $tab; ?>',
            subtab: '<?php echo $subtab; ?>',

@@ -4,7 +4,7 @@
  * Plugin URI: http://mishubd.com/plugin/human-resource-management-hrm/
  * Description: Organization, Industries and Office management
  * Author: asaquzzaman
- * Version: 0.5
+ * Version: 0.6
  * Author URI: http://mishubd.com
  * License: GPL2
  * TextDomain: hrm
@@ -37,7 +37,6 @@
  */
 
 
-
 function hrm_autoload( $class ) {
     $name = explode( '_', $class );
 
@@ -57,26 +56,28 @@ require_once dirname (__FILE__) . '/include/page.php';
 
 class Wp_Hrm {
 
-    private $is_admin;
-
     function __construct() {
-        $this->version = '0.5';
-        $this->db_version = '0.1';
+        $this->version = '0.6';
+        $this->db_version = '0.2';
+
         $this->plugin_dir = dirname(__FILE__);
-        $this->is_admin = ( is_admin() ) ? 'yes' : 'no';
         $this->instantiate();
         add_action( 'plugins_loaded', array($this, 'load_textdomain') );
         add_action( 'admin_menu', array($this, 'admin_menu') );
-        //add_action( 'admin_notices', array($this, 'fornt_end') );
+        add_action( 'admin_notices', array($this, 'fornt_end') );
         register_activation_hook( __FILE__, array($this, 'install') );
         add_action( 'init', array( $this, 'init' ) );
     }
 
     function fornt_end() {
+         $license_status = get_option( 'hrm_front_end_license' );
+        if ( isset( $license_status->request_status ) || $license_status->request_status === true ) {
+            return;
+        }
         ?>
          <div class="update-nag">
             <?php printf( __( 'If you want the <strong>front-end</strong> version of <strong>wp human resource management</strong> plugin,
-            then contact please, <a href="mailto:joy.mishu@gmail.com">Email</a> or <a href="http://mishubd.com/contact/" target="_blank">Website</a>' )  ); ?>
+            then please go & purchase it, <a href="http://mishubd.com/product/hrm-front-end/" target="_blank">HRM front-end</a>' )  ); ?>
         </div>
         <?php
     }
@@ -91,6 +92,24 @@ class Wp_Hrm {
     }
 
     function init() {
+
+        if ( !defined( 'DOING_AJAX' ) ) {
+            global $hrm_is_admin;
+            $hrm_is_admin = is_admin() ? 1 : 0;
+
+        } else {
+            global $hrm_is_admin;
+
+            if ( isset( $_REQUEST['hrm_dataAttr']['is_admin'] ) ) {
+                $hrm_is_admin = $_REQUEST['hrm_dataAttr']['is_admin'];
+            } else if ( isset( $_REQUEST['hrm_attr']['is_admin'] ) ) {
+                $hrm_is_admin = $_REQUEST['hrm_attr']['is_admin'];
+            } else if ( isset( $_REQUEST['is_admin'] ) ) {
+                $hrm_is_admin = $_REQUEST['is_admin'];
+            }
+        }
+
+
         Hrm_Init::getInstance()->register_post_type();
     }
 
@@ -105,11 +124,10 @@ class Wp_Hrm {
         wp_enqueue_script( 'hrm_datetimepicker', plugins_url( '/asset/js/jquery-ui-timepicker.js', __FILE__ ), array( 'jquery' ), false, true);
         wp_enqueue_script( 'hrm_admin', plugins_url( '/asset/js/hrm.js', __FILE__ ), array( 'jquery' ), false, true);
 
-
         wp_localize_script( 'hrm_admin', 'hrm_ajax_data', array(
             'ajax_url'    => admin_url( 'admin-ajax.php' ),
             '_wpnonce'    => wp_create_nonce( 'hrm_nonce' ),
-            'is_admin'    => is_admin() ? 'yes' : 'no',
+            'is_admin'    => is_admin() ? 1 : 0,
             'confirm_msg' => __( 'Are you sure!', 'hrm'),
             'success_msg' => __( 'Changed Successfully', 'hrm' )
         ));
@@ -142,6 +160,10 @@ class Wp_Hrm {
 
     function pim_scripts() {
         $this->admin_scripts();
+        wp_enqueue_script( 'jquery-ui' );
+        wp_enqueue_script( 'jquery-ui-mouse' );
+        wp_enqueue_script( 'jquery-ui-sortable' );
+        wp_enqueue_script( 'plupload-handlers' );
     }
 
     function leave_scripts() {
@@ -237,3 +259,4 @@ class Wp_Hrm {
 }
 
 new Wp_Hrm();
+

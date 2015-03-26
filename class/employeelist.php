@@ -11,6 +11,73 @@ class Hrm_Employeelist {
         return self::$_instance;
     }
 
+    function do_action() {
+        add_action( 'hrm_after_new_entry_form_field', array( $this, 'employee_image_upload_form' ) );
+    }
+
+    function get_image( $attachment_id ) {
+        $file = get_post( $attachment_id );
+        if ( $file ) {
+            $response = array(
+                'id' => $attachment_id,
+                'name' => get_the_title( $attachment_id ),
+                'url' => wp_get_attachment_url( $attachment_id ),
+            );
+
+            if ( wp_attachment_is_image( $attachment_id ) ) {
+
+                $thumb = wp_get_attachment_image_src( $attachment_id, 'thumbnail' );
+                $response['thumb'] = $thumb[0];
+                $response['type'] = 'image';
+                return $response;
+            }
+        }
+
+        return false;
+    }
+
+    function employee_image_upload_form($data) {
+        $employee_id     = isset( $data['employer_id'] ) && is_array( $data['employer_id'] ) && $data['employer_id'] ? reset( $data['employer_id'] ) : false;
+        $this->emp_upload_image($employee_id);
+    }
+
+    function emp_upload_image($employee_id) {
+
+        $image_id        = get_user_meta( $employee_id, '_hrm_user_image_id', true );
+        $image_attchment = $this->get_image( $image_id );
+
+        ?>
+
+        <div id="hrm-upload-file-container" >
+            <div class="hrm-employee-pic-text"><strong><?php  _e( 'Profile Picture', 'hrm' ); ?></strong></div>
+            <div class="hrm-drop-area" id="hrm-drop-files-zone">
+                <a id="hrm-pickfiles" href="#"><?php _e( 'Change', 'hrm' ); ?></a>
+                <?php
+                if ( $image_attchment ) {
+                    ?>
+                    <!-- <a href="#" data-id="<?php echo $image_attchment['id']; ?>" class="hrm-delete-file"><?php _e( 'Delete', 'hrm' ); ?></a> -->
+                    <?php
+                }
+                ?>
+            </div>
+            <div id="hrm-user-image-wrap">
+                <?php
+                if ( $image_attchment ) {
+                    $delete = sprintf( '<a href="#" data-id="%d" class="hrm-delete-file">%s</a>', $image_attchment['id'], __( 'Delete', 'hrm' ) );
+                    $hidden = sprintf( '<input type="hidden" name="hrm_attachment[]" value="%d" />', $image_attchment['id'] );
+                    $file_url = sprintf( '<a href="%1$s" target="_blank"><img src="%2$s" alt="%3$s" height="160" width="160"/></a>', $image_attchment['url'], $image_attchment['thumb'], esc_attr( $image_attchment['name'] ) );
+
+                    echo '<div class="hrm-uploaded-item">' . $delete.' '. $file_url  . $hidden . '</div>';
+                } else {
+                    echo get_avatar( $employee_id, 160 );
+                }
+                ?>
+
+            </div>
+        </div>
+        <?php
+    }
+
     function add_new_employer( $postdata ) {
         if ( isset( $postdata['employer_id'] ) && !empty( $postdata['employer_id'] ) ) {
             $user_id = $postdata['employer_id'];
@@ -41,7 +108,10 @@ class Hrm_Employeelist {
         $user_id = wp_insert_user( $userdata );
 
         if( $user_id ) {
+            $image = isset( $postdata['hrm_attachment'] ) ? $postdata['hrm_attachment'] : array();
+            $image_id = is_array( $image ) && $image ? reset( $image ) : 0;
             update_user_meta( $user_id, '_hrm_user_role', 'hrm_employee' );
+            update_user_meta( $user_id, '_hrm_user_image_id', $image_id );
             $this->update_empoyer( $user_id, $postdata );
 
             wp_new_user_notification( $user_id, $random_password );
@@ -67,6 +137,10 @@ class Hrm_Employeelist {
         update_user_meta( $user_id, '_status', $postdata['status'] );
         update_user_meta( $user_id, '_mob_number', $postdata['mobile'] );
         update_user_meta( $user_id, '_joined_date', hrm_date2mysql( $postdata['joined_date'] ) );
+
+        $image = isset( $postdata['hrm_attachment'] ) ? $postdata['hrm_attachment'] : array();
+        $image_id = is_array( $image ) && $image ? reset( $image ) : 0;
+        update_user_meta( $user_id, '_hrm_user_image_id', $image_id );
 
     }
 
@@ -99,11 +173,11 @@ class Hrm_Employeelist {
         $redirect = ( isset( $_POST['hrm_dataAttr']['redirect'] ) && !empty( $_POST['hrm_dataAttr']['redirect'] ) ) ? $_POST['hrm_dataAttr']['redirect'] : '';
 
 
-        $job_title = json_decode( stripcslashes( $_POST['hrm_dataAttr']['job_title'] ) );
+        $job_title    = json_decode( stripcslashes( $_POST['hrm_dataAttr']['job_title'] ) );
         $job_category = json_decode( stripcslashes( $_POST['hrm_dataAttr']['job_category'] ) );
-        $location = json_decode( stripcslashes( $_POST['hrm_dataAttr']['location'] ) );
+        $location     = json_decode( stripcslashes( $_POST['hrm_dataAttr']['location'] ) );
 
-        $employer_id = isset( $employer->ID ) ? $employer->ID : '';
+        $employer_id = isset( $employer->ID ) ? $employer->ID : false;
         if ( $employer === null ) {
             $hidden_form['user_name'] = array(
                 'label' =>  __( 'User Name', 'hrm' ),
@@ -223,8 +297,8 @@ class Hrm_Employeelist {
         $hidden_form['url'] = $redirect;
 
         ob_start();
+        $this->do_action();
         echo hrm_Settings::getInstance()->hidden_form_generator( $hidden_form );
-
         $return_value = array(
             'append_data' => ob_get_clean(),
         );

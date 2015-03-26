@@ -1,4 +1,23 @@
 <div class="hrm-update-notification"></div>
+<?php
+$hidden_form['punch_without_frm'] = array(
+    'label'      => __( 'Punch form disable' ),
+    'type'       => 'checkbox',
+    'desc'       => 'Punch in/out without submit form',
+    'wrap_class' => 'hrm-parent-field',
+    'fields'     => array(
+        array(
+            'label' => __( 'Form Disable', 'hrm' ),
+            'value' => 'yes',
+            'checked' => get_option( 'hrm_punch_form_status', true ),
+            'class'  => 'hrm-punch-form-status'
+        )
+    )
+);
+$hidden_form['header'] = __( 'Punch Form Enable', 'hrm' );
+//echo Hrm_Settings::checkbox_field( 'punch_without_frm', $hidden_form );
+echo hrm_Settings::getInstance()->form_field_only( $hidden_form  );
+?>
 <div id="hrm-admin-role"></div>
 <?php
 $jk = get_option( 'pro_test_role' );
@@ -51,6 +70,7 @@ $table['delete_button'] = false;
 echo Hrm_Settings::getInstance()->table( $table );
 $file_path = urlencode(__FILE__);
 $url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab ); ?>
+
 <script type="text/javascript">
     jQuery(function($) {
         hrm_dataAttr = {
@@ -64,7 +84,6 @@ $url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
            tab: '<?php echo $tab; ?>',
            subtab: '<?php echo $subtab; ?>',
            req_frm: '<?php echo $file_path; ?>',
-           subtab: true
         };
     });
 </script>
