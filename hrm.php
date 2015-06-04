@@ -5,7 +5,7 @@
  * Description: Organization, Industries and Office management
  * Author: asaquzzaman
  * Stable tag: 0.6
- * Version: 0.7
+ * Version: 0.6
  * Author URI: http://mishubd.com
  * License: GPL2
  * TextDomain: hrm
