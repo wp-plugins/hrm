@@ -648,6 +648,7 @@ class Hrm_Admin {
         $form['description'] = array(
             'label' => __( 'Description', 'hrm' ),
             'type' => 'textarea',
+            'class' => 'hrm-pro-des',
             'value' => isset( $project->post_content ) ? $project->post_content : '',
         );
 

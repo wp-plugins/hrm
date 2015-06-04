@@ -381,7 +381,7 @@ jQuery(function($) {
        req_frm: '<?php echo $file_path; ?>',
        limit: '<?php echo $limit; ?>',
        search_status: '<?php echo $search_status; ?>',
-       is_admin : '<?php echo $is_admin; ?>'
+       is_admin : '<?php echo $hrm_is_admin; ?>'
     };
 });
 </script>

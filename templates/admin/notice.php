@@ -115,7 +115,7 @@ global $hrm_is_admin;
             tab: '<?php echo $tab; ?>',
             subtab: '<?php echo $subtab; ?>',
             req_frm: '<?php echo $file_path; ?>',
-            is_admin : '<?php echo $is_admin; ?>'
+            is_admin : '<?php echo $hrm_is_admin; ?>'
         };
     });
 </script>
