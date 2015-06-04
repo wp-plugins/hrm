@@ -4,6 +4,7 @@
  * Plugin URI: http://mishubd.com/plugin/human-resource-management-hrm/
  * Description: Organization, Industries and Office management
  * Author: asaquzzaman
+ * Stable tag: 0.6
  * Version: 0.7
  * Author URI: http://mishubd.com
  * License: GPL2
