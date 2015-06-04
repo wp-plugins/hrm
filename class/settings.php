@@ -895,7 +895,7 @@ class Hrm_Settings {
 
     function table_generate( $table ) {
         $body            = isset( $table['body'] ) && is_array( $table['body'] ) ? $table['body'] : array();
-        $td_length       = count( reset( $body ) );
+        $td_length   = $count    = count( reset( $body ) );
         if ( isset( $table['data_table'] ) && $table['data_table'] ) {
             $datatable = 'hrm-data-table';
         } else if ( isset( $table['data_table'] ) && !$table['data_table'] ) {
