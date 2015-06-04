@@ -80,6 +80,13 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
+= 0.7 =
+* Change design and menu rearrange
+* leave system change
+
+= 0.6 =
+* fix permission management
+* extra field add for salary
 
 = 0.5 =
 * File management

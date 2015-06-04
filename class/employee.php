@@ -3,7 +3,7 @@
 class Hrm_Employee {
 
     function __construct() {
-        add_filter( 'hrm_employee_memu', array( $this, 'pim_to_employer' ) );
+        //add_filter( 'hrm_employee_memu', array( $this, 'pim_to_employer' ) );
         add_action( 'cpm_after_ajax_upload', array( $this, 'after_ajax_upload' ), 10, 3 );
         add_action( 'hrm_after_new_information', array( $this, 'after_inset_information' ), 10, 2 );
     }
@@ -251,7 +251,8 @@ class Hrm_Employee {
 
     function delete_employee( $users_id = array() ) {
         $delte_user = false;
-        foreach ( $users_id as $user_id ) {
+
+        foreach ( $users_id as $user_id => $empty ) {
             $delte_user = wp_delete_user( $user_id );
         }
 
@@ -581,6 +582,63 @@ class Hrm_Employee {
         }
     }
 
+    function salary_search_query( $search_post, $limit, $pagenum ) {
+
+        if ( !isset( $search_post['emp_id'] ) || !$search_post['emp_id'] ) {
+            return array( 'total_row' => 0 );
+        }
+
+        $emp_id = $search_post['emp_id'];
+        $where = "emp_id = $emp_id";
+
+        $year = false;
+        $month = false;
+
+        if ( isset( $search_post['year'] ) && $search_post['year'] != '-1' ) {
+            $year = $search_post['year'];
+        }
+
+        if ( isset( $search_post['month'] ) && $search_post['month'] != '-1' ) {
+            $month = $search_post['month'];
+        }
+
+        if ( $year && $month ) {
+
+            $custom_start = $year .'-'. $month . '-' . '01';
+            $custom_end   = $year .'-'. $month . '-' . '31';
+
+            $start_date   = date( 'Y-m-d H:i:s', strtotime( $custom_start ) );
+            $end_date     = date( 'Y-m-d H:i:s', strtotime( $custom_end ) );
+
+            $where        .= " AND billing_date >= '$start_date' AND billing_date <= '$end_date'";
+        } else if ( $year && !$month ) {
+            $custom_start = $year .'-01-01';
+            $custom_end   = $year .'-12-31';
+
+            $start_date   = date( 'Y-m-d H:i:s', strtotime( $custom_start ) );
+            $end_date     = date( 'Y-m-d H:i:s', strtotime( $custom_end ) );
+            $where        .= " AND billing_date >= '$start_date' AND billing_date <= '$end_date'";
+        } else if ( !$year && $month ) {
+            $year = date( 'Y' );
+
+            $custom_start = $year . '-' .$month. '-01';
+            $custom_end   = $year . '-' .$month. '-31';
+
+            $start_date   = date( 'Y-m-d H:i:s', strtotime( $custom_start ) );
+            $end_date     = date( 'Y-m-d H:i:s', strtotime( $custom_end ) );
+
+            $where        .= " AND billing_date >= '$start_date' AND billing_date <= '$end_date'";
+        }
+        $offset = ( $pagenum - 1 ) * $limit;
+        global $wpdb;
+        $table                = $wpdb->prefix . 'hrm_salary';
+        $sql                  = "SELECT SQL_CALC_FOUND_ROWS * FROM $table WHERE $where ORDER BY id desc LIMIT $offset,$limit";
+        $results              = $wpdb->get_results( $sql );
+        $results['total_row'] = $wpdb->get_var("SELECT FOUND_ROWS()" );
+
+        return $results;
+    }
+
     function salary( $field_value = null ) {
         $redirect = ( isset( $_POST['hrm_dataAttr']['redirect'] ) && !empty( $_POST['hrm_dataAttr']['redirect'] ) ) ? $_POST['hrm_dataAttr']['redirect'] : '';
         if ( $field_value !== null ) {
@@ -591,16 +649,34 @@ class Hrm_Employee {
             );
         }
 
-        $field['emp_id'] = array(
-            'type'  => 'hidden',
-            'value' => isset( $_POST['hrm_dataAttr']['employee_id'] ) ? $_POST['hrm_dataAttr']['employee_id'] : '',
-        );
+        $users = get_users();
 
+        foreach ( $users as $key => $user ) {
+            $user_info[$user->ID] = $user->display_name;
+        }
+
+        $user_info = isset( $user_info ) ? $user_info : array();
+
+        $field['emp_id'] = array(
+            'label'    => __( 'Employee Name', 'hrm' ),
+            'required' => 'required',
+            'extra' => array(
+                'data-hrm_validation' => true,
+                'data-hrm_required' => true,
+                'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
+            ),
+            'class'  => 'hrm-chosen',
+            'type'   => 'select',
+            'option' => $user_info,
+            'selected' => $search_status ? $search_post['emp_id'] : ''
+        );
+        $new_pay_grade = hrm_new_pay_grade_url();
         $field['pay_grade'] = array(
             'label'    => __( 'Pay Grade', 'hrm' ),
             'type'     => 'select',
             'option'   => json_decode( stripcslashes( $_POST['hrm_dataAttr']['pay_grade_js'] ) ),
-            'selected' => isset( $field_value->pay_grade ) ? $field_value->pay_grade : '',
+            'selected' => isset( $field_value['pay_grade'] ) ? $field_value['pay_grade'] : '',
+            'desc' => sprintf( '<a class="hrm-form-link" href="%s">%s</a>', $new_pay_grade,  __( 'Create New', 'hrm' ) ),
             'extra' => array(
                 'data-hrm_validation'         => true,
                 'data-hrm_required'           => true,
@@ -620,8 +696,15 @@ class Hrm_Employee {
         );
 
         $field['billing_date'] = array(
-            'type'  => 'hidden',
-            'value' => isset( $field_value['billing_date'] ) ? $field_value['billing_date'] : current_time( 'mysql' ),
+            'label' =>  __( 'Billing Date', 'hrm' ),
+            'type'  => 'text',
+            'class' => 'hrm-datepicker',
+            'value' => isset( $field_value['billing_date'] ) ? hrm_get_date2mysql( $field_value['billing_date'] ) : hrm_get_date2mysql( current_time( 'mysql' ) ),
+            'extra' => array(
+                'data-hrm_validation'         => true,
+                'data-hrm_required'           => true,
+                'data-hrm_required_error_msg' => __( 'This field is required', 'hrm' ),
+            ),
         );
 
         $field['frequency'] = array(

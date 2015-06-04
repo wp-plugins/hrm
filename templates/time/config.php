@@ -1,3 +1,15 @@
+<?php
+$header_path = dirname(__FILE__) . '/header.php';
+$header_path = apply_filters( 'hrm_header_path', $header_path, 'time' );
+
+if ( file_exists( $header_path ) ) {
+  require_once $header_path;
+}
+if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
+    printf( '<h1>%s</h1>', __( 'You do no have permission to access this page', 'cpm' ) );
+    return;
+}
+?>
 <div class="hrm-update-notification"></div>
 <?php
 $hidden_form['punch_without_frm'] = array(
@@ -18,7 +30,7 @@ $hidden_form['header'] = __( 'Punch Form Enable', 'hrm' );
 //echo Hrm_Settings::checkbox_field( 'punch_without_frm', $hidden_form );
 echo hrm_Settings::getInstance()->form_field_only( $hidden_form  );
 ?>
-<div id="hrm-admin-role"></div>
+<div id="hrm-admin-role" class="hrm-time-attendance"></div>
 <?php
 $jk = get_option( 'pro_test_role' );
 
@@ -69,7 +81,9 @@ $table['delete_button'] = false;
 
 echo Hrm_Settings::getInstance()->table( $table );
 $file_path = urlencode(__FILE__);
-$url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab ); ?>
+$url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
+global $hrm_is_admin;
+?>
 
 <script type="text/javascript">
     jQuery(function($) {
@@ -84,6 +98,7 @@ $url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
            tab: '<?php echo $tab; ?>',
            subtab: '<?php echo $subtab; ?>',
            req_frm: '<?php echo $file_path; ?>',
+           is_admin: '<?php echo $hrm_is_admin; ?>',
         };
     });
 </script>

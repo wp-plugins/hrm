@@ -1,6 +1,6 @@
 <?php
 function hrm_user_can_access( $tab = null, $subtab = null, $access_point = null, $inside_role = false  ) {
-
+    return true;
 
     $current_user = wp_get_current_user();
     $super_admin = get_option( 'hrm_admin', true );
@@ -260,17 +260,17 @@ function hrm_get_query_args() {
 }
 
 function hrm_pagenum() {
-    return isset( $_POST['pagenum'] ) ? intval( $_POST['pagenum'] ) : 1;
+    return isset( $_REQUEST['pagenum'] ) ? intval( $_REQUEST['pagenum'] ) : 1;
 }
 
 function hrm_result_limit() {
 
-    if ( isset( $_POST['limit'] ) && $_POST['limit'] ) {
-        return intval( $_POST['limit'] );
-    } else if ( isset( $_POST['hrm_attr']['limit'] ) && $_POST['hrm_attr']['limit'] ) {
-        return intval( $_POST['hrm_attr']['limit'] );
+    if ( isset( $_REQUEST['limit'] ) && $_REQUEST['limit'] != '-1' ) {
+        return intval( $_REQUEST['limit'] );
+    } else if ( isset( $_REQUEST['hrm_attr']['limit'] ) && $_REQUEST['hrm_attr']['limit'] != '-1' ) {
+        return intval( $_REQUEST['hrm_attr']['limit'] );
     } else {
-        return 10;
+        return 2;
     }
 }
 
@@ -279,5 +279,15 @@ function hrm_log( $type = '', $msg = '' ) {
     $msg = sprintf( "[%s][%s] %s\n", date( 'd.m.Y h:i:s' ), $type, $msg );
     error_log( $msg, 3, dirname( __FILE__ ) . '/log.txt' );
 
+}
+
+function hrm_message() {
+    $message = array(
+        'datatable_pagination' => __( '--Select Pagination--', 'hrm' ),
+        'searchPlaceholder'    => __( 'Seach...', 'hrm' ),
+        'dtb_pag_all'          => __( 'All', 'hrm' ),
+     );
+
+    return apply_filters( 'hrm_message', $message );
 }
 

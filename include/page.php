@@ -3,7 +3,7 @@ function hrm_page() {
     $path = dirname(__FILE__) . '/../templates';
 
     $hrm_management = hrm_management_page();
-
+    $page = array();
 	$page[$hrm_management]['organization'] = array(
         'id'        => 'hrm-organization',
         'title'     => __( 'Organization', 'hrm' ),
@@ -33,7 +33,7 @@ function hrm_page() {
         ),
     );
 
-    $page[$hrm_management]['admin'] = array(
+    /*$page[$hrm_management]['admin'] = array(
         'id'        => 'hrm-admin',
         'title'     => __( 'Designation', 'hrm' ),
         'file_slug' => 'admin/admin',
@@ -55,7 +55,23 @@ function hrm_page() {
             ),
         ),
 
+    );*/
+
+    //HRM employer
+    /*$employer = hrm_employer();
+    $page[$employer]['designation'] = array(
+        'id'        => 'hrm-employer',
+        'title'     => __( 'Designation', 'hrm' ),
+        'file_slug' => 'employer/designation',
+        'file_path' => $path . '/employer/designation.php',
     );
+
+    $page[$employer]['employer-list'] = array(
+        'id'        => 'hrm-employer',
+        'title'     => __( 'Employer List', 'hrm' ),
+        'file_slug' => 'employer/employer-list',
+        'file_path' => $path . '/employer/employer-list.php',
+    );*/
 
     $page[$hrm_management]['job'] = array(
         'id'        => 'hrm-job',
@@ -111,7 +127,7 @@ function hrm_page() {
 
     );
 
-    $page[$hrm_management]['project_info'] = array(
+    /*$page[$hrm_management]['project_info'] = array(
         'id'        => 'hrm-project-info',
         'title'     => __( 'Project info', 'hrm' ),
         'file_slug' => 'admin/project-info',
@@ -127,7 +143,7 @@ function hrm_page() {
             ),
         ),
 
-    );
+    );*/
 
     $hrm_pim = hrm_pim_page();
 
@@ -243,13 +259,13 @@ function hrm_page() {
         //'submenu'            => false,
     );
 
-    $page[$hrm_file]['config'] = array(
+    /*$page[$hrm_file]['config'] = array(
         'id'                 => 'hrm-file-config',
         'title'              => __( 'Configuration', 'hrm' ),
         'file_slug'          => 'file/config',
         'file_path'          => $path . '/file/config.php',
         //'submenu'            => false,
-    );
+    );*/
 
     $page[$hrm_pim]['my_task'] = array(
         //'follow_access_role' => false,
@@ -350,58 +366,77 @@ function hrm_page() {
 
     $hrm_time = hrm_time_page();
 
-    $page[$hrm_time]['attendance'] = array(
-        'id'        => 'hrm-employee-attendance',
-        'title'     => __( 'Attendance', 'hrm' ),
-        'file_slug' => 'time/attendance',
-        'file_path' => $path . '/time/attendance.php',
-        'submenu' => array(
-            'punch' => array(
-                'id'        => 'hrm-time-punch',
-                'title'     => __( 'Punch In/Out', 'hrm' ),
-                'file_slug' => 'time/punch',
-                'file_path' => $path . '/time/punch.php',
-                'role' => array(
-                    'edit' => __( 'Edit', 'hrm' ),
-                )
-            ),
-            'employee_employer_records' => array(
-                'id'        => 'hrm-time-my-records',
-                'title'     => __( 'Employee/Employer', 'hrm' ),
-                'file_slug' => 'time/employee-employer',
-                'file_path' => $path . '/time/employee-employer.php',
-            ),
-            'config' => array(
-                'id'        => 'hrm-time-config',
-                'title'     => __( 'Configuration', 'hrm' ),
-                'file_slug' => 'time/config',
-                'file_path' => $path . '/time/config.php',
-            ),
-        ),
+    $page[$hrm_time]['punch'] = array(
+        'id'        => 'hrm-time-punch',
+        'title'     => __( 'My Punch In/Out', 'hrm' ),
+        'file_slug' => 'time/punch',
+        'file_path' => $path . '/time/punch.php',
+        'role'      => array(
+            'edit' => __( 'Edit', 'hrm' ),
+        )
     );
+
+    $page[$hrm_time]['employee_employer_records'] = array(
+        'id'        => 'hrm-time-my-records',
+        'title'     => __( 'Employee Punch In/Out History', 'hrm' ),
+        'file_slug' => 'time/employee-employer',
+        'file_path' => $path . '/time/employee-employer.php',
+    );
+    /*$page[$hrm_time]['config'] = array(
+        'id'        => 'hrm-time-config',
+        'title'     => __( 'Configuration', 'hrm' ),
+        'file_slug' => 'time/config',
+        'file_path' => $path . '/time/config.php',
+    );*/
 
     $hrm_evaluation = hrm_evaluation_page();
 
-    $page[$hrm_evaluation]['evaluation'] = array(
-        'id' => 'hrm-workier-evaluation',
-        'title' => __( 'Evaluation', 'hrm' ),
-        'file_slug' => 'evaluation/evaluation',
-        'file_path' => $path . '/evaluation/evaluation.php',
+    $page[$hrm_evaluation]['rating_task'] = array(
+        'id'        => 'hrm-evaluation-records',
+        'title'     => __( 'Rating For Task', 'hrm' ),
+        'file_slug' => 'evaluation/rating-task',
+        'file_path' => $path . '/evaluation/rating-task.php',
+    );
+    $page[$hrm_evaluation]['rating_action'] = array(
+        'id'        => 'hrm-evaluation-action',
+        'title'     => __( 'Employee/Employer Rating', 'hrm' ),
+        'file_slug' => 'evaluation/rating-action',
+        'file_path' => $path . '/evaluation/rating-action.php',
+    );
+
+    $hrm_project = hrm_project();
+
+    $page[$hrm_project]['project_info'] = array(
+        'id'        => 'hrm-project-info',
+        'title'     => __( 'Project info', 'hrm' ),
+        'file_slug' => 'projects/project-info',
+        'file_path' => $path . '/projects/project-info.php',
         'submenu' => array(
-            'rating_task' => array(
-                'id'        => 'hrm-evaluation-records',
-                'title'     => __( 'Rating For Task', 'hrm' ),
-                'file_slug' => 'evaluation/rating-task',
-                'file_path' => $path . '/evaluation/rating-task.php',
-            ),
-            'rating_action' => array(
-                'id'        => 'hrm-evaluation-action',
-                'title'     => __( 'Employee/Employer Rating', 'hrm' ),
-                'file_slug' => 'evaluation/rating-action',
-                'file_path' => $path . '/evaluation/rating-action.php',
+            'projects' => array(
+                'title'     => __( 'Project', 'hrm' ),
+                'file_slug' => 'projects/projects',
+                'file_path' => $path . '/projects/projects.php',
+                'role' => array(
+                    'assign_project' => __( 'View only assign project', 'hrm' ),
+                )
             ),
         ),
+
     );
+
+    $hrm_salary = hrm_salary();
+    $page[$hrm_salary]['salary'] = array(
+        'id'        => 'hrm-personal-salary',
+        'title'     => __( 'Salary', 'hrm' ),
+        'file_slug' => 'salary/salary',
+        'file_path' => $path . '/salary/salary.php',
+    );
+
+    $employee = hrm_employee();
+    $page[$employee]['personal']          = $page[$hrm_pim]['personal'];
+    $page[$employee]['organization_info'] = $page[$hrm_pim]['organization_info'];
+    $page[$employee]['my_task']           = $page[$hrm_pim]['my_task'];
+    $page[$employee]['leave']             = $page[$hrm_pim]['leave'];
 
     $page = apply_filters( 'hrm_employee_memu', $page );
 
@@ -435,7 +470,18 @@ function hrm_file_page() {
     return 'hrm_file';
 }
 
+function hrm_employer() {
+    return 'hrm_employer';
+}
+function hrm_project() {
+    return 'hrm_project';
+}
+
 function hrm_employee() {
     return 'hrm_employee';
+}
+
+function hrm_salary() {
+    return 'hrm_salary';
 }
 

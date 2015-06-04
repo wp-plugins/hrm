@@ -78,16 +78,16 @@ class HRM_File {
         return new WP_Query( $args );
     }
 
-    function get_share_file_posts( $limit = 0, $pagenum, $post_author = false ) {
+    function get_share_file_posts( $limit = 0, $pagenum = 1, $post_author = false ) {
         $post_author = $post_author ? $post_author : get_current_user_id();
-        $offset  = ( $pagenum - 1 ) * $limit;
+        //$offset  = ( $pagenum - 1 ) * $limit;
 
         $args = array(
             'post_type'      => 'hrm_file',
             'author'         => $post_author,
             'post_status'    => 'publish',
-            'offset'         => $offset,
-            'posts_per_page' => $limit,
+            //'offset'         => $offset,
+            'posts_per_page' => -1,
         );
 
         return new WP_Query( $args );

@@ -97,10 +97,12 @@ class Hrm_Ajax {
         $tab     = $_POST['tab'];
         $subtab  = $_POST['subtab'];
         $req_frm = urldecode( $_POST['req_frm'] );
+        $pagenum = $_POST['pagenum'];
+        $limit   = $_POST['limit'];
 
         ob_start();
             require_once $req_frm;
-        wp_send_json_success( array( 'content' => ob_get_clean() ) );
+        wp_send_json_success( array( 'content' => ob_get_clean(), 'redirect' => add_query_arg( array( 'action_search' => 1, 'pagenum' => $pagenum, 'limit' => $limit ), $_POST['redirect'] ) ) );
     }
 
     function project_search() {
@@ -148,27 +150,44 @@ class Hrm_Ajax {
 
     function view_pagination() {
         check_ajax_referer('hrm_nonce');
-        $page    = $_REQUEST['page'] = $_POST['hrm_attr']['page'];
-        $tab     = $_POST['hrm_attr']['tab'];
-        $subtab  = $_POST['hrm_attr']['subtab'];
-        $req_frm = urldecode( $_POST['hrm_attr']['req_frm'] );
+
+        $page     = $_REQUEST['page'] = $_POST['page'];
+        $tab      = $_POST['tab'];
+        $subtab   = $_POST['subtab'];
+        $req_frm  = urldecode( $_POST['req_frm'] );
+        $_REQUEST['pagenum'] = 1;
+
+        $search   = ( isset( $_POST['search_status'] ) && $_POST['search_status'] ) ? array( 'action_search' => 1 ) : array();
+        $limit    = array( 'limit' => $_POST['limit'] );
+        $query    = array_merge( $search, $limit );
+        $redirect = add_query_arg( $query, $_POST['redirect'] );
+
 
         ob_start();
             require_once $req_frm;
-            wp_send_json_success( array( 'content' => ob_get_clean() ) );
+
+        wp_send_json_success( array( 'content' => ob_get_clean(), 'redirect' => $redirect ) );
     }
 
     function pagination() {
         check_ajax_referer('hrm_nonce');
-        $page    = $_REQUEST['page'] = $_POST['hrm_attr']['page'];
-        $tab     = $_POST['hrm_attr']['tab'];
-        $subtab  = $_POST['hrm_attr']['subtab'];
-        $req_frm = urldecode( $_POST['hrm_attr']['req_frm'] );
+
+        $page    = $_REQUEST['page'] = $_POST['page'];
+        $tab     = $_POST['tab'];
+        $subtab  = $_POST['subtab'];
+        $req_frm = urldecode( $_POST['req_frm'] );
 
         ob_start();
             require_once $req_frm;
-        wp_send_json_success( array( 'content' => ob_get_clean() ) );
+        $content = ob_get_clean();
 
+        $search   = ( isset( $_POST['search_status'] ) && $_POST['search_status'] ) ? array( 'action_search' => 1 ) : array();
+        $limit    = array( 'limit' => $_POST['limit'] );
+        $pagenum  = array( 'pagenum' => $_POST['pagenum'] );
+        $query    = array_merge( $search, $limit, $pagenum );
+        $redirect = add_query_arg( $query, $_POST['redirect'] );
+
+        wp_send_json_success( array( 'content' => $content, 'redirect' => $redirect ) );
     }
 
     function delete_inbox_file() {
@@ -398,6 +417,9 @@ class Hrm_Ajax {
     function project_delete() {
         check_ajax_referer('hrm_nonce');
         $postdata = $_POST;
+        if ( !isset( $postdata['hrm_check'] ) ) {
+            wp_send_json_error( array( 'error_msg' => __( 'You does not select any item!', 'hrm' ) ) );
+        }
         foreach ( $postdata['hrm_check'] as $key => $porject_id ) {
             $project_delete = Hrm_Admin::getInstance()->project_delete( $porject_id );
             Hrm_Evaluation::getInstance()->parent_rating_delete( $porject_id );
@@ -423,6 +445,7 @@ class Hrm_Ajax {
     function delete_employee() {
         check_ajax_referer('hrm_nonce');
         $postdata = $_POST;
+
         if ( !isset( $postdata['hrm_check'] ) || !is_array( $postdata['hrm_check'] ) ) {
             wp_send_json_error( array(
                 'success_msg' => __( 'Failed to deletet employee', 'hrm' ),
@@ -543,11 +566,11 @@ class Hrm_Ajax {
             $tab     = $_POST['tab'];
             $subtab  = $_POST['subtab'];
             $req_frm = urldecode( $_POST['req_frm'] );
-            $_POST['type'] = '_search';
+            /*$_POST['type'] = '_search';
             $_POST['emp_id'] = $_POST['name'];
-            $_POST['type_id'] = $_POST['type_id'];
+            $_POST['type_id'] = $_POST['type_id'];*/
 
-            unset( $_POST['from'], $_POST['to'], $_POST['leave_status'], $_POST['leave_comments'] );
+            //unset( $_POST['from'], $_POST['to'], $_POST['leave_status'], $_POST['leave_comments'] );
 
             ob_start();
                 require_once $req_frm;
@@ -891,12 +914,8 @@ class Hrm_Ajax {
 
     function user_role_update() {
         check_ajax_referer('hrm_nonce');
-        $admin = isset( $_POST['admin'] ) ? $_POST['admin'] : array();
-        foreach ($_POST['admin'] as $key => $user_id) {
-            wp_update_user( array( 'ID' => $user_id, 'role' => $_POST['admin_role'][$key] ) );
-            update_user_meta( $user_id, 'hrm_admin_level', 'admin' );
-        }
-
+        $post = $_POST;
+        Hrm_Admin::getInstance()->add_new_employer( $post );
         $page    = $_POST['page'];
         $tab     = $_POST['tab'];
         $subtab  = $_POST['subtab'];
@@ -1355,10 +1374,26 @@ class Hrm_Ajax {
             $update = $wpdb->update( $table, $data, $where, $format );
             do_action( 'hrm_after_update_new_information', $_POST );
 
-        } else {
+            $query_arg = array();
+            if ( isset( $_POST['search_status'] ) && $_POST['search_status']  ) {
+               $query_arg =  array_merge( $query_arg, array( 'action_search' => 1 ) );
+            }
 
+            if ( isset( $_POST['pagenum'] ) ) {
+                $query_arg = array_merge( $query_arg, array( 'pagenum' => $_POST['pagenum'] ) );
+            }
+
+            if ( isset( $_POST['limit'] ) ) {
+                $query_arg = array_merge( $query_arg, array( 'limit' => $_POST['limit'] ) );
+            }
+
+            $redirect = add_query_arg( $query_arg, $_POST['redirect'] );
+        } else {
             $update = $wpdb->insert( $table, $data, $format );
             do_action( 'hrm_after_new_information', $_POST, $wpdb->insert_id );
+            $redirect = $_POST['redirect'];
+            unset( $_REQUEST['limit'] );
+            unset( $_REQUEST['pagenum'] );
         }
 
         if( $update ) {
@@ -1367,11 +1402,14 @@ class Hrm_Ajax {
                 $tab     = $_POST['tab'];
                 $subtab  = $_POST['subtab'];
                 $req_frm = urldecode( $_POST['req_frm'] );
+
                     require_once $req_frm;
             do_action( 'hrm_after_save_data', $update, $update_status, $table_option['table_name'], $_POST );
-            wp_send_json_success(  array( 'content'=> ob_get_clean(), 'success_msg' => __( 'Updated successfully', 'hrm' )) );
+            $content = ob_get_clean();
+            wp_send_json_success(  array( 'content'=> $content, 'redirect' => $redirect, 'success_msg' => __( 'Updated successfully', 'hrm' )) );
         } else {
             wp_send_json_error( array( 'error_msg' => __( 'Failed!', 'hrm' ) ) );
         }
     }
 }
+

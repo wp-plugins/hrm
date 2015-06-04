@@ -5,11 +5,14 @@
             this.datePicker();
             this.timePicker();
             this.datePickerRestricted();
+            this.hrmDataTable();
+            this.monthYearPicker();
+            this.crossNotice();
             //this.slider();
             $('#hrm').on( 'click', '.hrm-add-button', this.getInsertDataForm );
             $('#hrm').on( 'click', '.hrm-form-cancel', this.formshowHide );
             $('#hrm').on( 'submit', '#hrm-hidden-form', this.add );
-            $('#hrm').on( 'click', 'a.hrm-editable', this.edit );
+            $('#hrm').on( 'click', '.hrm-editable', this.edit );
             $('#hrm').on( 'click', '.hrm-delete-button', this.delete );
             $('#hrm').on( 'submit', '#hrm-visible-form-warp #hrm-visible-form', this.singleFormAdd );
             $('body').on('submit', '.hrm-user-create-form', this.userCreate);
@@ -17,8 +20,8 @@
             $('#hrm').on('change', '.hrm-leave-action', this.leaveStatusChange);
             $('#hrm').on( 'click', '.hrm-complete-task', this.taskComplete );
             $('#hrm').on( 'click', '.hrm-incomplete-task', this.taskInComplete );
-            $('#hrm').on( 'click', '.hrm-personal .hrm-deposit-check', this.depositStatus );
-            $('#hrm').on( 'click', '.hrm-task-desc', this.showTaskDesc );
+            $('#hrm').on( 'click', '.hrm-popup-desc', this.popUpDescription );
+            $('#hrm').on( 'click', '.hrm-popup-desc-leave-cat', this.popUpDescriptionCat );
             $('#hrm').on( 'change', '.hrm-admin-status', this.changeAdminStatus );
             $('#hrm').on( 'click', '.hrm-time-editable', this.editAttendance );
             $('#hrm').on( 'change', '#hrm-search-form #hrm-rank-task-user', this.userTaskRating );
@@ -29,6 +32,10 @@
             $('#hrm').on( 'change', '#hrm-pagination', this.viewPagination );
             $('#hrm').on( 'submit', '#hrm-search-form', this.search );
             $('#hrm').on( 'change', '.hrm-punch-form-status', this.punch_form_status );
+            $('#hrm').on( 'click', '.hrm-delete', this.deleteIndividulaElement );
+            $('#hrm').on( 'click', '.hrm-search-button', this.showHideSearchContent );
+            $('#hrm').on( 'change', '.hrm-all-checked', this.allChecked );
+            $('#hrm').on( 'change', '.hrm-single-checked', this.singleChecked );
 
             $('#hrm').on( 'before_send_edit', function( e, self, data ) {
                 if ( self.data('action') == 'get_role' ) {
@@ -164,6 +171,54 @@
             });
         },
 
+        allChecked: function() {
+            var self = $(this),
+                table = self.closest('table');
+            if ( self.is(':checked') ) {
+                table.find('.hrm-single-checked').prop( 'checked', true );
+            } else {
+                table.find('.hrm-single-checked').prop( 'checked', false );
+            }
+        },
+
+        singleChecked: function() {
+            var all_checked = true;
+            $('.hrm-single-checked').each(function(){
+                if( !$(this).is(':checked') ){
+                    all_checked = false;
+                }
+            });
+
+            if ( all_checked ) {
+                $('.hrm-all-checked').prop( 'checked', true );
+            } else {
+                $('.hrm-all-checked').prop( 'checked', false );
+            }
+        },
+
+        showHideSearchContent: function(e) {
+            e.preventDefault();
+            var self = $(this),
+                content = $('.hrm-search-content');
+            if ( content.is(':visible') ) {
+                content.slideUp( 500 );
+            } else {
+               content.slideDown( 500 );
+            }
+        },
+
+        deleteIndividulaElement: function(e) {
+            e.preventDefault();
+            if ( !confirm( hrm_ajax_data.confirm_msg ) ) {
+                return;
+            }
+
+            var self = $(this),
+                target = self.closest('tr').find('.hrm-single-checked');
+            target.prop( 'checked', true );
+            hrmGeneral.delete(e);
+        },
+
         punch_form_status: function(e) {
             e.preventDefault();
             var self = $(this),
@@ -185,8 +240,8 @@
             var form = $(this),
                 btn = form.find('.hrm-spinner'),
                 limit = $('#hrm-pagination').val(),
-                limit = ( typeof limit !== 'undefined' ) ? limit : 0,
-                data = form.serialize()+'&'+$.param(hrm_dataAttr)+'&limit='+limit;
+                limit = ( typeof limit !== 'undefined' ) ? limit : hrm_dataAttr.limit,
+                data = form.serialize()+'&'+$.param(hrm_dataAttr)+'&limit='+limit+'&action_search=search';
 
             var validate = hrmGeneral.formValidation( form );
             if( ! validate ) {
@@ -198,11 +253,13 @@
                 if( res.success ) {
                     if ( typeof hrm_dataAttr.subtab !== 'undefined' && hrm_dataAttr.subtab ) {
                         $('#hrm-subtab-wrap').html( res.data.content );
+                        window.history.pushState("object or string", "Title", res.data.redirect);
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
                     } else {
                         $('#hrm').html( res.data.content );
+                        window.history.pushState("object or string", "Title", res.data.redirect);
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
@@ -213,26 +270,26 @@
 
         viewPagination: function() {
             var self = $(this),
-                limit = $('#hrm-pagination').val();
-            if ( hrm_dataAttr.search_satus ) {
-                var data = $('#hrm-search-form').serialize()+'&'+$.param(hrm_dataAttr)+'&limit='+limit;
+                limit = $('#hrm-pagination').val(),
+                pagenum  = parseInt( $('.hrm-pagination').find('.current').text() ),
+                pagenum  = pagenum ? pagenum : 1;
+
+            if ( hrm_dataAttr.search_status ) {
+                var data = $('#hrm-search-form').serialize()+'&'+$.param(hrm_dataAttr)+'&limit='+limit+'&pagenum='+pagenum;
             } else {
-                var data = {
-                    action: 'view_pagination',
-                    _wpnonce: hrm_ajax_data._wpnonce,
-                    hrm_attr: hrm_dataAttr,
-                    limit: self.val(),
-                };
+                var data = 'action=view_pagination&pagenum='+pagenum+'&_wpnonce='+hrm_ajax_data._wpnonce+'&'+$.param(hrm_dataAttr)+'&limit='+limit;
             }
             $.post( hrm_ajax_data.ajax_url, data, function( res ) {
                 if( res.success ) {
                     if ( typeof hrm_dataAttr.subtab !== 'undefined' && hrm_dataAttr.subtab ) {
                         $('#hrm-subtab-wrap').html( res.data.content );
+                        window.history.pushState("object or string", "Title", res.data.redirect);
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
                     } else {
                         $('#hrm').html( res.data.content );
+                        window.history.pushState("object or string", "Title", res.data.redirect);
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
@@ -246,27 +303,26 @@
             var self = $(this),
                 url = self.attr('href'),
                 limit = $('#hrm-pagination').val(),
+                limit = ( typeof limit !== 'undefined' ) ? limit : hrm_dataAttr.limit,
                 pagenum = hrmGetUrlParameter( url )['pagenum'];
-            if ( hrm_dataAttr.search_satus ) {
+            if ( hrm_dataAttr.search_status ) {
                 var data = $('#hrm-search-form').serialize()+'&'+$.param(hrm_dataAttr)+'&pagenum='+pagenum+'&limit='+limit;
             } else {
-                var data = {
-                    action: 'pagination',
-                    pagenum: pagenum,
-                    _wpnonce: hrm_ajax_data._wpnonce,
-                    hrm_attr: hrm_dataAttr
-                };
+                var data = 'action=pagination&pagenum='+pagenum+'&_wpnonce='+hrm_ajax_data._wpnonce+'&'+$.param(hrm_dataAttr)+'&limit='+limit;
             }
-
+            self.addClass('hrm-spinner');
             $.post( hrm_ajax_data.ajax_url, data, function( res ) {
                 if ( res.success ) {
+                    self.removeClass('hrm-spinner');
                     if ( typeof hrm_dataAttr.subtab !== 'undefined' && hrm_dataAttr.subtab ) {
                         $('#hrm-subtab-wrap').html( res.data.content );
+                        window.history.pushState("object or string", "Title", res.data.redirect);
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
                     } else {
                         $('#hrm').html( res.data.content );
+                        window.history.pushState("object or string", "Title", res.data.redirect);
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
@@ -422,10 +478,12 @@
                     task_id : self.data('task_id'),
                     assing_to: self.data('task_assign')
                 };
+            self.addClass('hrm-spinner');
             $.post( hrm_ajax_data.ajax_url, data, function( res ) {
                 if ( res.success ) {
                     self.closest('.hrm-task-wrap').fadeOut(1000);
                 }
+                self.removeClass('hrm-spinner');
             });
         },
 
@@ -523,23 +581,23 @@
             });
         },
 
-        showTaskDesc: function(e) {
+        popUpDescription: function(e) {
             e.preventDefault();
             var self = $(this),
                 task_id = self.data('task_id');
-                open_dialog_wrap = 'hrm-task-desc-wrap-'+task_id;
+                open_dialog_wrap = 'hrm-popup-desc-wrap-'+task_id;
 
             $( '#'+open_dialog_wrap ).dialog( "open" );
 
         },
 
-        depositStatus: function(e) {
+        popUpDescriptionCat: function(e) {
             e.preventDefault();
             var self = $(this),
-                self_id = self.data('id'),
-                open_dialog_wrap = 'hrm-deposit-wrap-'+self_id;
+                task_id = self.data('task_id');
+                open_dialog_wrap = 'hrm-cat-popup-desc-wrap-'+task_id;
 
-            $( '.'+open_dialog_wrap ).dialog( "open" );
+            $( '#'+open_dialog_wrap ).dialog( "open" );
         },
 
         directDepositHandelar: function() {
@@ -755,7 +813,7 @@
 
             $.post( hrm_ajax_data.ajax_url, data, function(res) {
 
-                hrmGeneral.scrollTop();
+                hrmGeneral.scrollTop( '.hrm-update-notification' );
                 form.find('.hrm-spinner').hide();
                 submit_button.attr('disabled', false );
 
@@ -858,10 +916,15 @@
             var message = ( typeof message !== 'undefined' ) ? message : '';
             $('.hrm-update-notification')
                 .addClass('error')
-                .html( '<p class="hrm-error"><strong>'+message+'<strong></p>' );
-            setTimeout(function() {
+                .html( '<p class="hrm-error"><strong>'+message+'<span class="hrm-notification-cross">x</span><strong></p>' );
+            hrmGeneral.crossNotice();
+        },
+
+        crossNotice: function() {
+            $('#hrm').on( 'click', '.hrm-notification-cross', function(e) {
+                e.preventDefault();
                 $('.hrm-update-notification').removeClass('error').html('');
-            }, 5000);
+            });
         },
 
         updateNotification: function( message ) {
@@ -885,9 +948,11 @@
         add: function(e) {
             e.preventDefault();
             var form = $(this),
-            spinner = form.find('.hrm-spinner'),
-            submit = form.find('.hrm-submit-button'),
-            data = form.serialize()+'&'+$.param(hrm_dataAttr);
+            spinner  = form.find('.hrm-spinner'),
+            submit   = form.find('.hrm-submit-button'),
+            pagenum  = parseInt( $('.hrm-pagination').find('.current').text() ),
+            pagenum  = pagenum ? pagenum : 1,
+            data     = form.serialize()+'&'+$.param(hrm_dataAttr)+'&pagenum='+pagenum;
 
             $('#hrm').trigger( 'before_send_insert_data', [form, data] );
 
@@ -916,11 +981,15 @@
 
                     if ( typeof hrm_dataAttr.subtab !== 'undefined' && hrm_dataAttr.subtab !== '' ) {
                         $('#hrm-subtab-wrap').html( res.data.content );
+                        if ( res.data.redirect ) {
+                            window.history.pushState("object or string", "Title", res.data.redirect);
+                        }
                         hrmGeneral.scrollTop( '.hrm-update-notification' );
                         hrmGeneral.updateNotification( res.data.success_msg );
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
+                        hrmGeneral.hrmDataTable();
                     } else {
                         $('#hrm').html( res.data.content );
                         hrmGeneral.scrollTop( '.hrm-update-notification' );
@@ -928,6 +997,8 @@
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
+                        window.history.pushState("object or string", "Title", res.data.redirect);
+                        hrmGeneral.hrmDataTable();
                     }
                 } else {
                     hrmGeneral.scrollTop( '.hrm-update-notification' );
@@ -938,8 +1009,9 @@
 
         delete: function(e) {
             e.preventDefault();
-            var form = $('#hrm-list-form'),
-                btn  = form.find('.hrm-delete-button'),
+            var self = e.currentTarget,
+                form = $('#hrm-list-form'),
+                btn  = $(self).closest('form').find('.hrm-delete-button'),
                 data = form.serialize()+'&'+$.param(hrm_dataAttr);
 
             btn.addClass('hrm-spinner');
@@ -954,6 +1026,7 @@
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
+                        hrmGeneral.hrmDataTable();
                     } else {
                         $('#hrm').html( res.data.content );
                         hrmGeneral.scrollTop( '.hrm-update-notification' );
@@ -961,6 +1034,7 @@
                         hrmGeneral.chosen();
                         hrmGeneral.datePicker();
                         hrmGeneral.datePickerRestricted();
+                        hrmGeneral.hrmDataTable();
                     }
                 } else {
                     hrmGeneral.scrollTop( '.hrm-update-notification' );
@@ -984,10 +1058,11 @@
                 }
 
             $('#hrm').trigger( 'before_send_edit', [self, data] );
-
+            self.addClass('hrm-spinner');
             $.post( hrm_ajax_data.ajax_url, data, function( res ) {
                 var form_wrap = $('#'+hrm_dataAttr.add_form_apppend_wrap);
                 if( res.success ) {
+                    self.removeClass('hrm-spinner');
                     form_wrap.html( res.data['append_data']['append_data'] );
                     var hidden_form = form_wrap.find( '#hrm-hidden-form-warp');
                     hidden_form.slideDown('slow');
@@ -998,7 +1073,7 @@
 
         chosen: function() {
 
-            $('#hrm .hrm-chosen').chosen().change(function(e, value) {
+            $('#hrm .hrm-chosen').chosen({ width: 170 }).change(function(e, value) {
                 hrmGeneral.getRatingTaskUser(value);
             });
 
@@ -1134,6 +1209,51 @@
                 }
             });
         },
+
+        hrmDataTable: function( $id ) {
+            if (typeof( $id ) === "undefined") {
+                $id = "hrm-data-table";
+            }
+
+            $('#'+$id).DataTable({
+                aLengthMenu: [[2, 5, 10, 100, -1], [hrm_ajax_data.message.datatable_pagination, 5, 10, 100, hrm_ajax_data.message.dtb_pag_all]],
+                iDisplayLength: 2,
+                bInfo: false,
+                language: {
+                    lengthMenu: '_MENU_',
+                    search: '',
+                    searchPlaceholder: hrm_ajax_data.message.searchPlaceholder
+                },
+                columnDefs: [ {
+                    targets: '0',
+                    searchable: false
+                } ]
+
+            });
+        },
+        monthYearPicker: function() {
+            $('#hrm-month-year-picker').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                dateFormat: 'MM yy',
+
+                onClose: function() {
+                    var iMonth = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var iYear = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(iYear, iMonth, 1));
+                },
+
+                beforeShow: function() {
+                    if ((selDate = $(this).val()).length > 0) {
+                        iYear = selDate.substring(selDate.length - 4, selDate.length);
+                        iMonth = jQuery.inArray(selDate.substring(0, selDate.length - 5),
+                        $(this).datepicker('option', 'monthNames'));
+                        $(this).datepicker('option', 'defaultDate', new Date(iYear, iMonth, 1));
+                        $(this).datepicker('setDate', new Date(iYear, iMonth, 1));
+                    }
+                }
+            });
+        }
     }
 
     hrmGeneral.init();
@@ -1181,7 +1301,5 @@
         }
         return vars;
     }
-
-
 
 })(jQuery);

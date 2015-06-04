@@ -79,6 +79,7 @@ class Hrm_Employeelist {
     }
 
     function add_new_employer( $postdata ) {
+
         if ( isset( $postdata['employer_id'] ) && !empty( $postdata['employer_id'] ) ) {
             $user_id = $postdata['employer_id'];
             $this->update_empoyer( $user_id, $postdata );
@@ -91,18 +92,18 @@ class Hrm_Employeelist {
         }
 
         $random_password = wp_generate_password( 8, false );
-        $first_name = sanitize_text_field( $postdata['first_name'] );
-        $last_name = sanitize_text_field( $postdata['last_name'] );
-        $display_name = $first_name .' '. $last_name;
+        $first_name      = sanitize_text_field( $postdata['first_name'] );
+        $last_name       = sanitize_text_field( $postdata['last_name'] );
+        $display_name    = $first_name .' '. $last_name;
 
         $userdata = array(
-            'user_login' => $postdata['user_name'],
-            'user_pass' =>  $random_password,
-            'user_email' => $postdata['email'],
-            'first_name' => $first_name,
-            'last_name' => $last_name,
+            'user_login'   => $postdata['user_name'],
+            'user_pass'    => $random_password,
+            'user_email'   => $postdata['email'],
+            'first_name'   => $first_name,
+            'last_name'    => $last_name,
             'display_name' => $display_name,
-            'role'  => 'hrm_employee'
+            'role'         => $postdata['emp_role']
         );
 
         $user_id = wp_insert_user( $userdata );
@@ -110,7 +111,6 @@ class Hrm_Employeelist {
         if( $user_id ) {
             $image = isset( $postdata['hrm_attachment'] ) ? $postdata['hrm_attachment'] : array();
             $image_id = is_array( $image ) && $image ? reset( $image ) : 0;
-            update_user_meta( $user_id, '_hrm_user_role', 'hrm_employee' );
             update_user_meta( $user_id, '_hrm_user_image_id', $image_id );
             $this->update_empoyer( $user_id, $postdata );
 
@@ -126,17 +126,23 @@ class Hrm_Employeelist {
 
     function update_empoyer( $user_id, $postdata ) {
         $display_name = $postdata['first_name'] . ' ' . $postdata['last_name'];
+        $join_date = empty( $postdata['joined_date'] ) ? current_time( 'mysql' ) : $postdata['joined_date'];
         update_user_meta( $user_id, 'first_name', $postdata['first_name'] );
         update_user_meta( $user_id, 'last_name', $postdata['last_name'] );
 
-        wp_update_user(array( 'ID' =>  $user_id, 'display_name' => $display_name));
-        update_user_meta( $user_id, '_job_title', $postdata['job_title'] );
-        update_user_meta( $user_id, '_job_category', $postdata['job_category'] );
-        update_user_meta( $user_id, '_location', $postdata['location'] );
+        wp_update_user( array(
+            'ID'           =>  $user_id,
+            'display_name' => $display_name,
+            'role'         => $postdata['emp_role']
+        ) );
+
+        update_user_meta( $user_id, '_job_title', $postdata['emp_job_title'] );
+        update_user_meta( $user_id, '_job_category', $postdata['emp_job_category'] );
+        update_user_meta( $user_id, '_location', $postdata['emp_location'] );
         update_user_meta( $user_id, '_job_desc', $postdata['job_desc'] );
         update_user_meta( $user_id, '_status', $postdata['status'] );
         update_user_meta( $user_id, '_mob_number', $postdata['mobile'] );
-        update_user_meta( $user_id, '_joined_date', hrm_date2mysql( $postdata['joined_date'] ) );
+        update_user_meta( $user_id, '_joined_date', hrm_date2mysql( $join_date ) );
 
         $image = isset( $postdata['hrm_attachment'] ) ? $postdata['hrm_attachment'] : array();
         $image_id = is_array( $image ) && $image ? reset( $image ) : 0;
@@ -172,12 +178,23 @@ class Hrm_Employeelist {
     function new_employee_form( $employer = null ) {
         $redirect = ( isset( $_POST['hrm_dataAttr']['redirect'] ) && !empty( $_POST['hrm_dataAttr']['redirect'] ) ) ? $_POST['hrm_dataAttr']['redirect'] : '';
 
+        global $wp_roles;
+
+        if ( !$wp_roles ) {
+            $wp_roles = new WP_Roles();
+        }
+
+        $role_names   = $wp_roles->get_names();
 
         $job_title    = json_decode( stripcslashes( $_POST['hrm_dataAttr']['job_title'] ) );
         $job_category = json_decode( stripcslashes( $_POST['hrm_dataAttr']['job_category'] ) );
         $location     = json_decode( stripcslashes( $_POST['hrm_dataAttr']['location'] ) );
 
         $employer_id = isset( $employer->ID ) ? $employer->ID : false;
+        if ( $employer_id ) {
+            $user = get_user_by( 'id', $employer_id );
+        }
+
         if ( $employer === null ) {
             $hidden_form['user_name'] = array(
                 'label' =>  __( 'User Name', 'hrm' ),
@@ -227,12 +244,27 @@ class Hrm_Employeelist {
                 'data-hrm_required_error_msg'=> __( 'This field is required', 'hrm' ),
             ),
         );
+        $new_role_url = hrm_new_role_url();
+        $hidden_form['emp_role'] = array(
+            'label'    => __( 'Role', 'hrm' ),
+            'type'     => 'select',
+            'option'   => $role_names,
+            'selected' => isset( $user->roles ) ? reset( $user->roles ) : '',
+            //'desc' => sprintf( '<a class="hrm-form-link" href="%s">%s</a>', $new_role_url,  __( 'Create New', 'hrm' ) ),
+            'extra' => array(
+                'data-hrm_validation'         => true,
+                'data-hrm_required'           => true,
+                'data-hrm_required_error_msg' => __( 'This field is required', 'hrm' ),
+            ),
+        );
 
-        $hidden_form['job_title'] = array(
+        $new_job_title_url = hrm_job_title();
+        $hidden_form['emp_job_title'] = array(
             'label' => __( 'Job Title', 'hrm' ),
             'type' => 'select',
             'option' => $job_title,
             'selected' => get_user_meta( $employer_id, '_job_title', true ),
+            'desc' => sprintf( '<a class="hrm-form-link" href="%s">%s</a>', $new_job_title_url,  __( 'Create New', 'hrm' ) ),
             'extra' => array(
                 'data-hrm_validation' => true,
                 'data-hrm_required' => true,
@@ -240,11 +272,13 @@ class Hrm_Employeelist {
             ),
         );
 
-        $hidden_form['job_category'] = array(
+        $category_url = hrm_job_category();
+        $hidden_form['emp_job_category'] = array(
             'label' => __( 'Job Category', 'hrm' ),
             'type' => 'select',
             'option' => $job_category,
             'selected' => get_user_meta( $employer_id, '_job_category', true ),
+            'desc' => sprintf( '<a class="hrm-form-link" href="%s">%s</a>', $category_url,  __( 'Create New', 'hrm' ) ),
             'extra' => array(
                 'data-hrm_validation' => true,
                 'data-hrm_required' => true,
@@ -252,11 +286,13 @@ class Hrm_Employeelist {
             ),
         );
 
-        $hidden_form['location'] = array(
+        $location_url = hrm_job_location();
+        $hidden_form['emp_location'] = array(
             'label' => __( 'Location', 'hrm' ),
             'type' => 'select',
             'option' => $location,
             'selected' => get_user_meta( $employer_id, '_location', true ),
+            'desc' => sprintf( '<a class="hrm-form-link" href="%s">%s</a>', $location_url,  __( 'Create New', 'hrm' ) ),
             'extra' => array(
                 'data-hrm_validation' => true,
                 'data-hrm_required' => true,
@@ -362,12 +398,9 @@ class Hrm_Employeelist {
         return $user_query;
     }
 
-    function get_employee( $limit = 0, $pagenum ) {
-        $offset = ( $pagenum - 1 ) * $limit;
+    function get_employee() {
         $employers = new WP_User_Query( array(
-            'role'   => 'hrm_employee',
-            'number' => $limit,
-            'offset' => $offset
+            //'role'   => 'hrm_employee',
         ) );
         return $employers;
     }

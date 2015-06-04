@@ -73,7 +73,9 @@ $table['pagination']    = false;
 
 echo Hrm_Settings::getInstance()->table( $table );
 $file_path = urlencode(__FILE__);
-$url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab ); ?>
+$url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
+global $hrm_is_admin;
+?>
 <script type="text/javascript">
     jQuery(function($) {
         hrm_dataAttr = {
@@ -87,6 +89,7 @@ $url = Hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
            tab: '<?php echo $tab; ?>',
            subtab: '<?php echo $subtab; ?>',
            req_frm: '<?php echo $file_path; ?>',
+           is_admin : '<?php echo $is_admin; ?>'
         };
     });
 </script>

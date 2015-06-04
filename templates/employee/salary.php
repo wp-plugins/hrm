@@ -1,11 +1,11 @@
 <div class="hrm-update-notification"></div>
 <?php
-
-if ( hrm_current_user_role() == 'hrm_employee' ) {
-    $employer_id = get_current_user_id();
+if ( isset( $_REQUEST['employee_id'] ) && $_REQUEST['employee_id'] ) {
+    $employer_id = intval( $_REQUEST['employee_id'] );
 } else {
-    $employer_id = isset( $_REQUEST['employee_id'] ) ? trim( $_REQUEST['employee_id'] ) : '';
+    $employer_id = get_current_user_id();
 }
+
 $user = wp_get_current_user();
 $role = reset( $user->roles );
 
@@ -15,7 +15,7 @@ $role = reset( $user->roles );
 
 $results     = hrm_Settings::getInstance()->conditional_query_val( 'hrm_salary', '*', array( 'emp_id' => $employer_id ) );
 $pary_grades = hrm_Settings::getInstance()->hrm_query( 'hrm_pay_grade' );
-
+unset( $results['total_row'] );
 unset( $pary_grades['total_row'] );
 
 foreach ( $pary_grades as $key => $pary_grade ) {
@@ -23,16 +23,8 @@ foreach ( $pary_grades as $key => $pary_grade ) {
 }
 
 foreach ( $results as $key => $value) {
-    if ( $results['total_row'] == 0 || $key === 'total_row' ) {
-      continue;
-    }
 
-    if ( $role == 'hrm_employee' ) {
-        $date = hrm_get_date2mysql( $value->billing_date );
-    } else {
-        $date = '<a href="#" class="hrm-editable" data-table_option="hrm_salary"  data-id='.$value->id.'>' . hrm_get_date2mysql( $value->billing_date ) . '</a>';
-    }
-
+    $date = hrm_get_date2mysql( $value->billing_date );
     $deposit = empty( $value->direct_deposit ) ? __( 'No', 'hrm' ) : ucfirst( $value->direct_deposit );
     if ( $deposit != 'No') {
 
@@ -51,7 +43,7 @@ foreach ( $results as $key => $value) {
         <?php
     }
 
-    $nameid = ( $page == 'hrm_pim' ) ? '<input name="hrm_check['.$value->id.']" value="" type="checkbox">' : '';
+    $nameid = '';
     $body[] = array(
         $nameid,
         $date,
@@ -68,7 +60,7 @@ foreach ( $results as $key => $value) {
         'class="check-column"'
     );
 }
-$input_field = ( $page == 'hrm_pim' ) ? '<input type="checkbox">' : '';
+$input_field =  '';
 $table = array();
 $table['head'] = array(
     $input_field,
@@ -89,7 +81,8 @@ $table['table']      = 'hrm_salary';
 $table['action']     = 'hrm_delete';
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
-$table['add_btn_name'] = $role == 'hrm_employee' ? false : __( 'Add', 'hrm' );
+$table['add_btn_name'] = false;
+$table['delete_button'] = false;
 
 if ( $page == 'hrm_employee') {
     $table['add_button']    = false;
@@ -101,6 +94,7 @@ echo hrm_Settings::getInstance()->table( $table );
 
 $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab ) . '&employee_id='. $employer_id;
 $file_path = urlencode(__FILE__);
+global $hrm_is_admin;
 ?>
 <script type="text/javascript">
     jQuery(function($) {
@@ -116,6 +110,7 @@ $file_path = urlencode(__FILE__);
            tab: '<?php echo $tab; ?>',
            subtab: '<?php echo $subtab; ?>',
            req_frm: '<?php echo $file_path; ?>',
+           is_admin : '<?php echo $is_admin; ?>'
         };
     });
 </script>

@@ -3,53 +3,74 @@
 <div id="hrm-leave-type"></div>
 
 <?php
-$pagenum     = hrm_pagenum();
-$limit       = hrm_result_limit();
-if( isset( $_POST['type'] ) && ( $_POST['type'] == '_search' ) ) {
-    $post         = $_POST;
-    $search_satus = true;
-    $results      = Hrm_Settings::getInstance()->search_query( $post, $limit, $pagenum );
-} else {
-    $results = Hrm_Settings::getInstance()->hrm_query( 'hrm_leave_type', $limit, $pagenum );
-    $search_satus = false;
-}
+
+$results = Hrm_Settings::getInstance()->hrm_query( 'hrm_leave_type' );
 
 $total = $results['total_row'];
 unset( $results['total_row'] );
 
-$add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
+$add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
 $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$body              = array();
+$td_attr           = array();
 
 foreach ( $results as $key => $value) {
+
+    if ( $delete_permission ) {
+        $del_checkbox = '<input class="hrm-single-checked" name="hrm_check['.$value->id.']" value="" type="checkbox">';
+        $delete_text  = '<a href="#" class="hrm-delete" data-id='.$value->id.'>'.__( 'Delete', 'hrm' ).'</a>';
+        $td_attr[][0] = 'class="hrm-table-checkbox"';
+    } else {
+        $del_checkbox = '';
+        $delete_text  = '';
+    }
+
     if ( $add_permission ) {
-        $name_id = '<a href="#" class="hrm-editable" data-table_option="hrm_leave_type" data-id='.$value->id.'>'.$value->leave_type_name.'<a>';
+        $name_id = '<div class="hrm-title-wrap"><a href="#" class="hrm-editable hrm-title" data-table_option="hrm_leave_type" data-id='.$value->id.'>'.$value->leave_type_name.'</a>
+        <div class="hrm-title-action"><a href="#" class="hrm-editable hrm-edit" data-table_option="hrm_leave_type" data-id='.$value->id.'>'.__( 'Edit', 'hrm' ).'</a>'
+        .$delete_text. '</div></div>';
     } else {
         $name_id = $value->leave_type_name;
     }
 
     if ( $delete_permission ) {
-        $del_checkbox = '<input name="hrm_check['.$value->id.']" value="" type="checkbox">';
+        $body[] = array(
+            $del_checkbox,
+            $name_id,
+            intval( $value->entitlement ),
+            hrm_get_date2mysql( $value->entitle_from ),
+            hrm_get_date2mysql( $value->entitle_to )
+        );
     } else {
-        $del_checkbox = '';
+        $body[] = array(
+            $name_id,
+            intval( $value->entitlement ),
+            hrm_get_date2mysql( $value->entitle_from ),
+            hrm_get_date2mysql( $value->entitle_to )
+        );
     }
-    $body[] = array(
-        $del_checkbox,
-        $name_id,
-        intval( $value->entitlement ),
-        hrm_get_date2mysql( $value->entitle_from ),
-        hrm_get_date2mysql( $value->entitle_to )
-    );
-
-    $td_attr[] = array(
-        'class="check-column"'
-    );
 }
 $table = array();
-$del_checkbox        = ( $delete_permission ) ? '<input type="checkbox">' : '';
-$table['head']       = array( $del_checkbox, __( 'Leave Type', 'hrm' ), __( 'Entitlement', 'hrm' ), __( 'Entitle From', 'hrm' ), __('Entitle To', 'hrm') );
+
+if ( $delete_permission ) {
+    $table['head'] = array(
+        '<input class="hrm-all-checked" type="checkbox">',
+        __( 'Leave Type', 'hrm' ),
+        __( 'Entitlement', 'hrm' ),
+        __( 'Entitle From', 'hrm' ),
+        __( 'Entitle To', 'hrm' )
+    );
+} else {
+    $table['head'] = array(
+        __( 'Leave Type', 'hrm' ),
+        __( 'Entitlement', 'hrm' ),
+        __( 'Entitle From', 'hrm' ),
+        __( 'Entitle To', 'hrm' )
+    );
+}
+
 $table['body']       = isset( $body ) ? $body : array();
 $table['td_attr']    = isset( $td_attr ) ? $td_attr : '';
-$table['th_attr']    = array( 'class="check-column"' );
 $table['table_attr'] = array( 'class' => 'widefat' );
 $table['table']      = 'hrm_leave_type';
 $table['action']     = 'hrm_delete';
@@ -60,10 +81,9 @@ $table['subtab']     = $subtab;
 echo hrm_Settings::getInstance()->table( $table );
 //table
 
-//pagination
-echo hrm_Settings::getInstance()->pagination( $total, $limit, $pagenum );
 $url       = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
 $file_path = urlencode(__FILE__);
+global $hrm_is_admin;
 ?>
 <script type="text/javascript">
     jQuery(function($) {
@@ -77,8 +97,7 @@ $file_path = urlencode(__FILE__);
            tab: '<?php echo $tab; ?>',
            subtab: '<?php echo $subtab; ?>',
            req_frm: '<?php echo $file_path; ?>',
-           limit: '<?php echo $limit; ?>',
-           search_satus: '<?php echo $search_satus; ?>',
+           is_admin : '<?php echo $is_admin; ?>'
         };
     });
 </script>

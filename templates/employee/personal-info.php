@@ -1,10 +1,13 @@
 <div class="hrm-update-notification"></div>
 <?php
-if ( hrm_current_user_role() == 'hrm_employee' ) {
-    $employee_id = get_current_user_id();
+
+if ( isset( $_REQUEST['employee_id'] ) && $_REQUEST['employee_id'] ) {
+    $employee_id = intval( $_REQUEST['employee_id'] );
 } else {
-    $employee_id = isset( $_GET['employee_id'] ) ? $_GET['employee_id'] : '';
+    $employee_id = get_current_user_id();
 }
+
+
 $employee = get_user_by( 'id', $employee_id );
 $country = hrm_Settings::getInstance()->country_list();
 $image_id        = get_user_meta( $employee_id, '_hrm_user_image_id', true );

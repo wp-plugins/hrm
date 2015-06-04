@@ -4,168 +4,174 @@ $header_path = dirname(__FILE__) . '/header.php';
 $header_path = apply_filters( 'hrm_header_path', $header_path, 'pim' );
 
 if ( file_exists( $header_path ) ) {
-    require_once $header_path;
+    //require_once $header_path;
 }
 
 $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
-//search form
-
-$search['user'] = array(
-    'label' => __( 'User Name/E-mail', 'hrm' ),
-    'type'  => 'text',
-    'desc'  => 'please insert username or E-mail',
-    'value' => isset( $_POST['user'] ) ? $_POST['user'] : '',
-);
-$search['first_name'] = array(
-    'label' => __( 'First Name', 'hrm' ),
-    'type'  => 'text',
-    'desc'  => 'please insert First Name',
-    'value' => isset( $_POST['first_name'] ) ? $_POST['first_name'] : '',
-);
-
-$search['last_name'] = array(
-    'label' => __( 'Last Name', 'hrm' ),
-    'type'  => 'text',
-    'desc'  => 'please insert Last Name',
-    'value' => isset( $_POST['last_name'] ) ? $_POST['last_name'] : '',
-);
-
-$search['status'] = array(
-    'label'    => __( 'Status', 'hrm' ),
-    'type'     => 'select',
-    'selected' => isset( $_POST['status'] ) ? $_POST['status'] : '',
-    'option' => array(
-        ''    => __('--Select--', 'hrm'),
-        'yes' => __('Enable', 'hrm' ),
-        'no'  => __('Disable', 'hrm' )
-    ),
-);
-
-$search['mobile'] = array(
-    'label' => __( 'Mobile', 'hrm' ),
-    'type'  => 'text',
-    'desc'  => 'please insert mobile number',
-    'value' => isset( $_POST['mobile'] ) ? $_POST['mobile'] : '',
-);
-
-$search['type'] = array(
-    'type'  => 'hidden',
-    'value' => '_search'
-);
-
-$search['action']       = 'hrm_search';
-$search['table_option'] = 'hrm_employee';
-
-echo hrm_Settings::getInstance()->get_serarch_form( $search, 'Employee Information');
 ?>
 <div id="hrm-eployee-list"></div>
 <?php
+    global $wp_roles;
 
-$pagenum     = hrm_pagenum();
-$limit       = hrm_result_limit();
-if( isset( $_POST['type'] ) && ( $_POST['type'] == '_search' ) ) {
-    $post         = $_POST;
-    $search_satus = true;
-    $employers    = hrm_Employeelist::getInstance()->employeer_search_query( $post, $limit, $pagenum );
-} else {
-    $employers    = hrm_Employeelist::getInstance()->get_employee( $limit, $pagenum );
-    $search_satus = false;
-}
+    if ( !$wp_roles ) {
+        $wp_roles = new WP_Roles();
+    }
 
-if ( !$employers ) {
-    return;
-}
+    $role_names   = $wp_roles->get_names();
 
-$total             = $employers->total_users;
-$employers         = $employers->results;
-$add_permission    = hrm_user_can_access( $tab, null, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, null, 'delete' ) ? true : false;
+    $employers = get_users(); //hrm_Employeelist::getInstance()->get_employee();
 
-foreach ( $employers as $key => $employer ) {
+    if ( !$employers ) {
+        return;
+    }
+
+    //$total             = $employers->total_users;
+    //$employers         = $employers->results;
+    $add_permission    = hrm_user_can_access( $tab, null, 'add' ) ? true : false;
+    $delete_permission = hrm_user_can_access( $tab, null, 'delete' ) ? true : false;
+
+    foreach ( $employers as $key => $employer ) {
+        $admin_url = hrm_employee_profile_url( 'hrm_pim', 'personal', 'personal_info', $employer->ID );
+
+        if ( $delete_permission ) {
+            $del_checkbox = '<input class="hrm-single-checked" name="hrm_check['.$employer->ID.']" value="" type="checkbox">';
+            $delete_text  = '<a href="#" class="hrm-delete" data-id='.$employer->ID.'>'.__( 'Delete', 'hrm' ).'</a>';
+            $td_attr[][0] = 'class="hrm-table-checkbox"';
+        } else {
+            $del_checkbox = '';
+            $delete_text  = '';
+        }
+
+        if ( $add_permission ) {
+            $name_id = '<div class="hrm-title-wrap">
+            <a href="'.$admin_url.'" class="hrm-title"  data-table_option="" data-id='.$employer->ID.'>'
+                .$employer->display_name.
+            '</a>
+            <div class="hrm-title-action">
+                <a href="'.$admin_url.'" class="hrm-edit">'
+                    .__( 'Profile', 'hrm' ).
+                '</a>
+                <a href="#" class="hrm-editable hrm-edit" data-action="employer_edit" data-table_option="hrm_notice" data-id='.$employer->ID.'>'
+                    .__( 'Edit', 'hrm' ).
+                '</a>'
+
+                .$delete_text.
+            '</div>';
+        } else {
+            $name_id = $employer->display_name;
+        }
+
+        /*if ( $delete_permission ) {
+            $del_checkbox = '<input name="hrm_check['.$employer->ID.']" value="'.$employer->ID.'" type="checkbox">';
+        } else {
+            $del_checkbox = '';
+        }
+
+        if ( $add_permission ) {
+            $name_id = '<a href="#" class="hrm-editable" data-action="employer_edit" data-table_option="" data-id='.$employer->ID.'>'.get_user_meta( $employer->ID, 'first_name', true ).'<a>';
+        } else {
+            $name_id = get_user_meta( $employer->ID, 'first_name', true );
+        }*/
+
+        $status = ( get_user_meta( $employer->ID, '_status', true ) == 'yes' ) ? 'Enable' : 'Disable';
+
+
+        $role_display_name = reset( $employer->roles );
+        $role_display_name = isset( $role_names[$role_display_name] ) ? $role_names[$role_display_name] : '';
+
+        if ( $delete_permission ) {
+            $body[] = array(
+                $del_checkbox,
+                $name_id,
+                get_user_meta( $employer->ID, 'first_name', true ),
+                get_user_meta( $employer->ID, 'last_name', true ),
+                $role_display_name,
+                $status,
+                get_user_meta( $employer->ID, '_mob_number', true ),
+                hrm_get_date2mysql( get_user_meta( $employer->ID, '_joined_date', true ) ),
+            );
+        } else {
+            $body[] = array(
+                $name_id,
+                get_user_meta( $employer->ID, 'last_name', true ),
+                get_user_meta( $employer->ID, 'first_name', true ),
+                $role_display_name,
+                $status,
+                get_user_meta( $employer->ID, '_mob_number', true ),
+                hrm_get_date2mysql( get_user_meta( $employer->ID, '_joined_date', true ) ),
+            );
+        }
+    }
+
+    $table = array();
 
     if ( $delete_permission ) {
-        $del_checkbox = '<input name="hrm_check['.$employer->ID.']" value="'.$employer->ID.'" type="checkbox">';
+        $table['head'] = array(
+            '<input class="hrm-all-checked" type="checkbox">',
+            __( 'Profile', 'hrm' ),
+            __( 'First Name', 'hrm' ),
+            __( 'Last Name', 'hrm' ),
+            __( 'Role', 'hrm' ),
+            __( 'Status', 'hrm' ),
+            __( 'Mobile', 'hrm' ),
+            __( 'Joined Date', 'hrm' ),
+        );
     } else {
-        $del_checkbox = '';
+        $table['head'] = array(
+            __( 'Profile', 'hrm' ),
+            __( 'First Name', 'hrm' ),
+            __( 'Last Name', 'hrm' ),
+            __( 'Role', 'hrm' ),
+            __( 'Status', 'hrm' ),
+            __( 'Mobile', 'hrm' ),
+            __( 'Joined Date', 'hrm' ),
+        );
     }
 
-    if ( $add_permission ) {
-        $name_id = '<a href="#" class="hrm-editable" data-action="employer_edit" data-table_option="" data-id='.$employer->ID.'>'.get_user_meta( $employer->ID, 'first_name', true ).'<a>';
-    } else {
-        $name_id = get_user_meta( $employer->ID, 'first_name', true );
+    $table['body']       = isset( $body ) ? $body : '';
+    $table['td_attr']    = isset( $td_attr ) ?$td_attr : '';
+    $table['table_attr'] = array( 'class' => 'widefat' );
+    $table['table']      = 'hrm_employee';
+    $table['tab']        = $tab;
+    $table['action']     = 'employee_delete';
+    $table['table_attr'] = array( 'class' => 'widefat' );
+
+    echo hrm_Settings::getInstance()->table( $table );
+    //table
+    $job_titles = hrm_Settings::getInstance()->hrm_query( 'hrm_job_title' );
+
+    unset($job_titles['total_row']);
+
+    foreach ($job_titles as $key => $value) {
+        $job_title[$value->id] = $value->job_title;
     }
-    $status = ( get_user_meta( $employer->ID, '_status', true ) == 'yes' ) ? 'Enable' : 'Disable';
+    $job_title     = isset( $job_title ) ? $job_title : array();
+    $job_categorys = hrm_Settings::getInstance()->hrm_query( 'hrm_job_category' );
 
-    $admin_url = hrm_employee_profile_url( 'hrm_pim', 'personal', 'personal_info', $employer->ID );
+    unset($job_categorys['total_row']);
 
-    $body[] = array(
-        $del_checkbox,
-        '<a href="'.$admin_url.'">'.$employer->display_name.'</a>',
-        $name_id,
-        get_user_meta( $employer->ID, 'last_name', true ),
-        $status,
-        get_user_meta( $employer->ID, '_mob_number', true ),
-        hrm_get_date2mysql( get_user_meta( $employer->ID, '_joined_date', true ) ),
+    foreach ($job_categorys as $key => $value) {
+        $job_category[$value->id] = $value->name;
+    }
 
-    );
+    $job_category = isset( $job_category ) ? $job_category : array();
+    $locations    = hrm_Settings::getInstance()->hrm_query( 'hrm_location' );
 
-    $td_attr[] = array(
-        'class="check-column"'
-    );
-}
+    unset($locations['total_row']);
 
-$table               = array();
-$del_checkbox        = ( $delete_permission ) ? '<input type="checkbox">' : '';
-$table['head']       = array( $del_checkbox,'Profile', 'First Name', 'Last Name', 'Status', 'Mobile', 'Joined Date' );
-$table['body']       = isset( $body ) ? $body : '';
-$table['td_attr']    = isset( $td_attr ) ?$td_attr : '';
-$table['th_attr']    = array( 'class="check-column"' );
-$table['table_attr'] = array( 'class' => 'widefat' );
-$table['table']      = 'hrm_employee';
-$table['tab']        = $tab;
-$table['action']     = 'employee_delete';
-$table['table_attr'] = array( 'class' => 'widefat' );
+    foreach ($locations as $key => $value) {
+        $location[$value->id] = $value->name;
+    }
 
-echo hrm_Settings::getInstance()->table( $table );
-//table
+    $location  = isset( $location ) ? $location : array();
+    $file_path = urlencode(__FILE__);
+    ?>
 
-//pagination
-echo hrm_Settings::getInstance()->pagination( $total, $limit );
-
-$job_titles = hrm_Settings::getInstance()->hrm_query( 'hrm_job_title' );
-
-unset($job_titles['total_row']);
-
-foreach ($job_titles as $key => $value) {
-    $job_title[$value->id] = $value->job_title;
-}
-$job_title     = isset( $job_title ) ? $job_title : array();
-$job_categorys = hrm_Settings::getInstance()->hrm_query( 'hrm_job_category' );
-
-unset($job_categorys['total_row']);
-
-foreach ($job_categorys as $key => $value) {
-    $job_category[$value->id] = $value->name;
-}
-
-$job_category = isset( $job_category ) ? $job_category : array();
-$locations    = hrm_Settings::getInstance()->hrm_query( 'hrm_location' );
-
-unset($locations['total_row']);
-
-foreach ($locations as $key => $value) {
-    $location[$value->id] = $value->name;
-}
-
-$location  = isset( $location ) ? $location : array();
-$file_path = urlencode(__FILE__);
-?>
-
-<!-- default $this for class hrm_Admin, $tab; -->
-<div class="hrm-pim">
-    <?php Hrm_Settings::getInstance()->show_sub_tab_page( $page, $tab, $subtab ); ?>
-</div>
-<?php global $hrm_is_admin; ?>
+    <!-- default $this for class hrm_Admin, $tab; -->
+    <div class="hrm-pim">
+        <?php Hrm_Settings::getInstance()->show_sub_tab_page( $page, $tab, $subtab ); ?>
+    </div>
+    <?php global $hrm_is_admin; ?>
 <script type="text/javascript">
 jQuery(function($) {
     hrm_dataAttr = {
@@ -181,8 +187,6 @@ jQuery(function($) {
         tab: '<?php echo $tab; ?>',
         subtab: '<?php echo $subtab; ?>',
         req_frm: '<?php echo $file_path; ?>',
-        limit: '<?php echo $limit; ?>',
-        search_satus: '<?php echo $search_satus; ?>',
         is_admin: '<?php echo $hrm_is_admin; ?>',
     };
 });

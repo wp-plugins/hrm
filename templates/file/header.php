@@ -17,12 +17,10 @@ $menu   = hrm_page();
 
 if ( ! $subtab ) {
    if( !isset( $menu[$page][$tab]['submenu'] ) ) {
-        echo '<h3 class="hrm-sub-nav"></h3>';
         return;
     }
 
     if ( !count( $menu[$page][$tab]['submenu'] ) ) {
-        echo '<h3 class="hrm-sub-nav"></h3>';
         return;
     }
 

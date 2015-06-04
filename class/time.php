@@ -19,7 +19,7 @@ class Hrm_Time {
         update_option( 'hrm_punch_form_status', $post['status'] );
     }
 
-    function get_individulat_punch( $post, $limit, $pagenum ) {
+    function get_individual_punch( $limit, $pagenum, $post = null ) {
 
         if ( isset( $post['from_date'] ) && isset( $post['to_date'] ) ) {
             if ( !empty( $post['from_date'] ) && !empty( $post['to_date'] ) ) {
@@ -132,48 +132,60 @@ class Hrm_Time {
     }
 
     function generate_edit_form( $post ) {
-        $post_id = $post['post_id'];
-        $post = get_post( $post_id );
+        $post_id        = $post['post_id'];
+        $post           = get_post( $post_id );
         $punch_out_time = get_post_meta( $post_id, '_puch_out_time', true );
-        $puch_out_note = get_post_meta( $post_id, '_puch_out_note', true );
+        $puch_out_note  = get_post_meta( $post_id, '_puch_out_note', true );
 
         $redirect = ( isset( $_POST['hrm_dataAttr']['redirect'] ) && !empty( $_POST['hrm_dataAttr']['redirect'] ) ) ? $_POST['hrm_dataAttr']['redirect'] : '';
 
         $form['post_id'] = array(
-            'type' => 'hidden',
+            'type'  => 'hidden',
             'value' => isset( $post_id ) ? $post_id : '',
         );
 
         $form['punch_in_date'] = array(
-            'type' => 'text',
-            'label'=> __( 'Punch In Date', 'hrm' ),
+            'type'  => 'text',
+            'label' => __( 'Punch In Date', 'hrm' ),
             'class' => 'hrm-datepicker',
             'value' => date( 'Y-m-d', strtotime( $post->post_date ) )
         );
         $form['punch_in_time'] = array(
-            'type' => 'text',
-            'class' => 'hrm-timepicker',
-            'label'=> __( 'Punch In Time', 'hrm' ),
-            'value' => date( 'h:i:s a', strtotime( $post->post_date ) )
+            'type'     => 'text',
+            'class'    => 'hrm-timepicker',
+            'label'    => __( 'Punch In Time', 'hrm' ),
+            'value'    => date( 'h:i:s a', strtotime( $post->post_date ) ),
+            'required' => 'required',
+            'extra' => array(
+                'data-hrm_validation'         => true,
+                'data-hrm_required'           => true,
+                'data-hrm_required_error_msg' => __( 'This field is required', 'hrm' ),
+            ),
         );
 
 
         $form['punch_in_note'] = array(
-            'label' => __( 'Punch In Note', 'hrm' ),
-            'type' => 'textarea',
-            'value' => isset( $post->post_content ) ? $post->post_content : '',
+            'label'    => __( 'Punch In Note', 'hrm' ),
+            'type'     => 'textarea',
+            'value'    => isset( $post->post_content ) ? $post->post_content : '',
+            'required' => 'required',
+            'extra' => array(
+                'data-hrm_validation'         => true,
+                'data-hrm_required'           => true,
+                'data-hrm_required_error_msg' => __( 'This field is required', 'hrm' ),
+            ),
         );
 
         $form['punch_out_date'] = array(
-            'type' => 'text',
-            'label'=> __( 'Punch Out Date', 'hrm' ),
+            'type'  => 'text',
+            'label' => __( 'Punch Out Date', 'hrm' ),
             'class' => 'hrm-datepicker',
             'value' => !empty( $punch_out_time ) ? date( 'Y-m-d', $punch_out_time ) : '',
         );
         $form['punch_out_time'] = array(
-            'type' => 'text',
+            'type'  => 'text',
             'class' => 'hrm-timepicker',
-            'label'=> __( 'Punch Out Time', 'hrm' ),
+            'label' => __( 'Punch Out Time', 'hrm' ),
             'value' => !empty( $punch_out_time ) ? date( 'h:i:s a', $punch_out_time ) : ''
         );
 
@@ -185,13 +197,13 @@ class Hrm_Time {
 
         $form['punch_out_note'] = array(
             'label' => __( 'Punch Out Note', 'hrm' ),
-            'type' => 'textarea',
+            'type'  => 'textarea',
             'value' => isset( $puch_out_note ) ? $puch_out_note : '',
         );
 
         $form['header'] = __( 'Attendance', 'hrm' );
         $form['action'] = 'edit_attendance_save';
-        $form['url'] = $redirect;
+        $form['url']    = $redirect;
 
         ob_start();
         echo hrm_Settings::getInstance()->hidden_form_generator( $form );
@@ -199,6 +211,7 @@ class Hrm_Time {
     }
 
     function edit_attendance_save($post) {
+
         $post_date = $post['punch_in_date'] .' '. $post['punch_in_time'];
         $punch_out = $post['punch_out_date'] .' '. $post['punch_out_time'];
 
@@ -207,6 +220,13 @@ class Hrm_Time {
         $diff = $datetime2 - $datetime1;
 
         if ( $diff <= 0  ) {
+            $arg = array(
+                'ID'           => $post['post_id'],
+                'post_date'    => date( 'Y-m-d H:i:s', strtotime( $post_date ) ),
+                'post_content' => $post['punch_in_note']
+            );
+
+            wp_update_post($arg);
             return true;
         }
 
