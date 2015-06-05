@@ -641,6 +641,7 @@ class Hrm_Employee {
 
     function salary( $field_value = null ) {
         $redirect = ( isset( $_POST['hrm_dataAttr']['redirect'] ) && !empty( $_POST['hrm_dataAttr']['redirect'] ) ) ? $_POST['hrm_dataAttr']['redirect'] : '';
+        $search_status = $_POST['hrm_dataAttr']['search_status'] ? $_POST['hrm_dataAttr']['search_status'] : false;
         if ( $field_value !== null ) {
 
             $field['id'] = array(

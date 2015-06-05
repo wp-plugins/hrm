@@ -90,7 +90,7 @@
 
     $add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
     $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
-
+    $pay_grade_label = array();
     foreach ( $pary_grades as $key => $pary_grade ) {
         $pay_grade_label[$pary_grade->id] = $pary_grade->name;
     }
