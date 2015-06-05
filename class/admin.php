@@ -255,6 +255,7 @@ class Hrm_Admin {
 
         $form['description'] = array(
             'label' => __( 'Description', 'hrm' ),
+            'class' => 'hrm-task-des-field',
             'value' => isset( $post->post_content ) ? $post->post_content : '',
             'type' => 'textarea'
         );

@@ -326,7 +326,7 @@ class Hrm_Time {
         $subtab =  $_POST['hrm_dataAttr']['subtab'];
         $user_id = isset( $_POST['hrm_dataAttr']['user_id_js'] ) && $_POST['hrm_dataAttr']['user_id_js'] ? $_POST['hrm_dataAttr']['user_id_js'] : false;
 
-        if ( get_option( 'hrm_punch_form_status', true ) == 'yes' ) {
+        if ( get_option( 'hrm_punch_form_status', true ) != 'yes' ) {
             $post['user_id'] = $_POST['user_id'] = $user_id;
             $post['note'] = __( 'No comment found!', 'hrm' );
             $insert = $this->new_punch_in($post);
@@ -417,7 +417,7 @@ class Hrm_Time {
         $tab    =  $_POST['hrm_dataAttr']['tab'];
         $subtab =  $_POST['hrm_dataAttr']['subtab'];
 
-        if ( get_option( 'hrm_punch_form_status', true ) == 'yes' ) {
+        if ( get_option( 'hrm_punch_form_status', true ) != 'yes' ) {
             $post_out['user_id'] = $user_id;
             $post_out['note'] = __( 'No comment found!', 'hrm' );
             $post_out['post_id'] = isset( $post->ID ) ? intval( $post->ID ) : false;
