@@ -97,8 +97,8 @@ class Hrm_Ajax {
         $tab     = $_POST['tab'];
         $subtab  = $_POST['subtab'];
         $req_frm = urldecode( $_POST['req_frm'] );
-        $pagenum = $_POST['pagenum'];
-        $limit   = $_POST['limit'];
+        //$pagenum = $_POST['pagenum'];
+        //$limit   = $_POST['limit'];
 
         ob_start();
             require_once $req_frm;

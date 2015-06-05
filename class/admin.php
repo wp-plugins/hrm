@@ -92,6 +92,7 @@ class Hrm_Admin {
 
         $notice['description'] = array(
             'label' =>  __( 'Description', 'hrm' ),
+            'class' => 'hrm-admin-notice-field',
             'type' => 'textarea',
             'value' => isset( $field_value['description'] ) ? $field_value['description'] : '',
         );
