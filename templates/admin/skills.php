@@ -3,7 +3,7 @@
 
 <?php
 
-    $results = Hrm_Settings::getInstance()->hrm_query( 'hrm_skill', $limit, $pagenum );
+    $results = Hrm_Settings::getInstance()->hrm_query( 'hrm_skill' );
     if( isset( $results['total_row'] ) ) {
         $total = $results['total_row'];
         unset( $results['total_row'] );
