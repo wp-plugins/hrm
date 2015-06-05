@@ -1216,8 +1216,8 @@
             }
 
             $('#'+$id).DataTable({
-                aLengthMenu: [[2, 5, 10, 100, -1], [hrm_ajax_data.message.datatable_pagination, 5, 10, 100, hrm_ajax_data.message.dtb_pag_all]],
-                iDisplayLength: 2,
+                aLengthMenu: [[10, 20, 50, 100, -1], [hrm_ajax_data.message.datatable_pagination, 20, 50, 100, hrm_ajax_data.message.dtb_pag_all]],
+                //iDisplayLength: 2,
                 bInfo: false,
                 language: {
                     lengthMenu: '_MENU_',
