@@ -80,6 +80,12 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
+
+= 0.8 =
+* fix many undefined index
+* Advanced leave search
+* fix conflict for individual employee profile and my info
+
 = 0.7 =
 * Change design and menu rearrange
 * leave system change
