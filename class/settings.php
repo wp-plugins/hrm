@@ -1156,6 +1156,9 @@ class Hrm_Settings {
 
         foreach ($compare as $tb_field => $value ) {
             if ( is_array( $value ) ) {
+                if ( ! count( $value ) ) {
+                    continue;
+                }
                 $in = implode( ',' , $value );
                 $where[] = "$tb_field IN ( $in )";
             } else {
@@ -1166,8 +1169,8 @@ class Hrm_Settings {
         $where = implode( ' AND ', $where );
         $where = apply_filters( 'hrm_where_query', $where );
 
-        if ( $where ) {
-            $where = " $where";
+        if ( ! $where ) {
+            return array();
         }
 
         global $wpdb;
