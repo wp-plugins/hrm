@@ -17,7 +17,7 @@ $results     = hrm_Settings::getInstance()->conditional_query_val( 'hrm_salary',
 $pary_grades = hrm_Settings::getInstance()->hrm_query( 'hrm_pay_grade' );
 unset( $results['total_row'] );
 unset( $pary_grades['total_row'] );
-
+$pay_grade_label = array();
 foreach ( $pary_grades as $key => $pary_grade ) {
     $pay_grade_label[$pary_grade->id] = $pary_grade->name;
 }
