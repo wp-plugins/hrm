@@ -16,7 +16,7 @@ if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
 <?php
 $user_id = get_current_user_id();
 
-$file_posts  = HRM_File::getInstance()->get_file_posts_inbox( $limit, $pagenum, $user_id );
+$file_posts  = HRM_File::getInstance()->get_file_posts_inbox( $user_id );
 
 $share_files       = HRM_File::getInstance()->get_share_files();
 $posts             = $file_posts->posts;
@@ -137,8 +137,6 @@ jQuery(function($) {
        tab: '<?php echo $tab; ?>',
        subtab: '<?php echo $subtab; ?>',
        req_frm: '<?php echo $file_path; ?>',
-       limit: '<?php echo $limit; ?>',
-       search_status: '<?php echo $search_status; ?>',
        user_id: '<?php echo $user_id; ?>',
        is_admin: '<?php echo $hrm_is_admin; ?>',
     };

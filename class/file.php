@@ -116,14 +116,14 @@ class HRM_File {
         return new WP_Query( $args );
     }
 
-    function get_file_posts_inbox( $limit = 0, $pagenum, $inbox_user_id ) {
+    function get_file_posts_inbox( $inbox_user_id ) {
 
-        $offset  = ( $pagenum - 1 ) * $limit;
+        //$offset  = ( $pagenum - 1 ) * $limit;
         $args = array(
             'post_type'      => 'hrm_file',
             'post_status'    => 'publish',
-            'offset'         => $offset,
-            'posts_per_page' => $limit,
+            //'offset'         => $offset,
+            'posts_per_page' => -1,
             'meta_query'     => array(
                 array(
                     'key'    => '_attachment_user',
