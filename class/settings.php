@@ -1117,7 +1117,7 @@ class Hrm_Settings {
         $selectd = isset( $_REQUEST['limit'] ) ? $_REQUEST['limit'] : 2;
         $arg = array(
             '-1'  => __( '--Select Pagination--', 'hrm' ),
-            '4'  => __( '10', 'hrm'),
+            '10'  => __( '10', 'hrm'),
             '20'  => __( '20','hrm' ),
             '50'  => __( '50', 'hrm' ),
             '100' => __( '100', 'hrm' ),
