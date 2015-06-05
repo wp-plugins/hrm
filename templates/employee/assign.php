@@ -166,6 +166,7 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
         $table['data_table'] = false;
         $table['pagination'] = false;
         $table['add_btn_name'] = false;
+        $table['search'] = false;
 
         $table['body']       = isset( $body ) ? $body : array();
         echo Hrm_Settings::getInstance()->table( $table );
