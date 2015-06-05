@@ -420,6 +420,7 @@ class Hrm_Employee {
 
         $hidden_form['description'] = array(
             'label' =>  __( 'Description', 'hrm' ),
+            'class' => 'hrm-des-field',
             'type' => 'textarea',
             'value' => isset( $field_data['description'] ) ? $field_data['description'] : '',
         );

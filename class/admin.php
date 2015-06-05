@@ -943,6 +943,7 @@ class Hrm_Admin {
         );
         $hidden_form['description'] = array(
             'label' =>  __( 'Description', 'hrm' ),
+            'class' => 'hrm-des-field',
             'type' => 'text',
             'value' => isset( $field_value['description'] ) ? $field_value['description'] : '',
         );
