@@ -17,6 +17,11 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
 } else {
     $search_status = false;
 }
+if ( $search_status && $search_post['emp_id'] == -1 ) {
+    $summery = false;
+} else {
+    $summery = true;
+}
 if ( $search_status ) {
     ?>
     <div class="hrm-update-notification"></div>
@@ -32,7 +37,7 @@ if ( $search_status ) {
     <?php
 
     $users = get_users();
-    //$user_info['-1'] = __( 'All', 'hrm' );
+    $user_info['-1'] = __( 'All', 'hrm' );
     foreach ( $users as $key => $user ) {
         $user_info[$user->ID] = $user->display_name;
     }
@@ -42,7 +47,7 @@ if ( $search_status ) {
     $leave_types = Hrm_Settings::getInstance()->hrm_query('hrm_leave_type');
 
     unset( $leave_types['total_row'] );
-    //$leave_cat[-1] = __( 'All', 'hrm' );
+    $leave_cat[-1] = __( 'All', 'hrm' );
     foreach ( $leave_types as $key => $leave_type ) {
         $leave_cat[$leave_type->id] = $leave_type->leave_type_name;
     }
@@ -329,6 +334,9 @@ if ( $search_status ) {
 
             $Balance          = intval( $searc_leave_type['entitlement'] - $total_leave_count );
             $leave_for        = $searc_leave_type['leave_type_name'];
+            if ( ! $summery ) {
+                continue;
+            }
             ?>
             <a href="#" class="hrm-popup-desc-leave-cat" data-task_id="<?php echo $leave_id; ?>"><?php _e( "$leave_type Leave Summary" ); ?></a>
             <div title="<?php _e( "$leave_type Leave details", 'hrm' ); ?>" class="hrm-leave-details-dialog" id="hrm-cat-popup-desc-wrap-<?php echo $leave_id; ?>" style="display: none;">

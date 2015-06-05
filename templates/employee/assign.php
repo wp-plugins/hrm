@@ -1,7 +1,14 @@
 <?php
 if ( isset( $_REQUEST['employee_id'] ) && $_REQUEST['employee_id'] ) {
     $employer_id = intval( $_REQUEST['employee_id'] );
+    $url                 = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
+    $url = add_query_arg( array( 'employee_id' => $employer_id ), $url );
+} else if ( isset( $_REQUEST['emp_id'] ) && $_REQUEST['emp_id'] ) {
+    $employer_id = intval( $_REQUEST['emp_id'] );
+    $url                 = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
+    $url = add_query_arg( array( 'employee_id' => $employer_id ), $url );
 } else {
+    $url                 = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
     $employer_id = get_current_user_id();
 }
 
@@ -9,12 +16,12 @@ if ( isset( $_REQUEST['employee_id'] ) && $_REQUEST['employee_id'] ) {
 <div class="hrm-update-notification"></div>
 
 <?php
-$header_path = dirname(__FILE__) . '/header.php';
+/*$header_path = dirname(__FILE__) . '/header.php';
 $header_path = apply_filters( 'hrm_header_path', $header_path, 'leave' );
 
 if ( file_exists( $header_path ) ) {
     require_once $header_path;
-}
+}*/
 if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
     $search_status = true;
     $search_post = get_user_meta( get_current_user_id(), '_hrm_search_data', true );
@@ -125,7 +132,8 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
     foreach ( $get_leave_users as $key => $get_leave_user ) {
         $get_distinct_users[] = $get_leave_user->emp_id;
     }
-    if( $search_status ) {
+
+    if( $search_status && $get_distinct_users ) {
         $results  = Hrm_Leave::getInstance()->leave_search_query( $search_post,  $get_distinct_users );
     } else {
         $results  = Hrm_Settings::getInstance()->conditional_query_val( 'hrm_leave', '*', array( 'emp_id' => $get_distinct_users ) );
@@ -166,7 +174,6 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
         $table['data_table'] = false;
         $table['pagination'] = false;
         $table['add_btn_name'] = false;
-        $table['search'] = false;
 
         $table['body']       = isset( $body ) ? $body : array();
         echo Hrm_Settings::getInstance()->table( $table );
@@ -350,7 +357,7 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
         echo '</div>';
     }
 
-    $url                 = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab );
+
     $file_path           = urlencode(__FILE__);
     echo hrm_Settings::getInstance()->pagination( $total, $limit, $pagenum );
     global $hrm_is_admin;
@@ -372,7 +379,10 @@ jQuery(function($) {
        req_frm: '<?php echo $file_path; ?>',
        limit: '<?php echo $limit; ?>',
        search_status: '<?php echo $search_status; ?>',
-       is_admin : '<?php echo $hrm_is_admin; ?>'
+       is_admin : '<?php echo $hrm_is_admin; ?>',
+       employee_id : '<?php echo $employer_id; ?>',
+       //need for search pararmetar
+       emp_id : '<?php echo $employer_id; ?>'
     };
 });
 </script>

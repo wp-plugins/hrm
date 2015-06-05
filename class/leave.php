@@ -905,8 +905,9 @@ class Hrm_Leave {
         $end_time   = isset( $post['end_time'] ) && $post['end_time'] ? $post['end_time'] : '';
 
         $where = array();
-        $in = implode( ',' , $users_id );
-        if ( $emp_id ) {
+        $in = $users_id ? implode( ',' , $users_id ) : false;
+
+        if ( $emp_id && $in ) {
             $where[] = "emp_id IN ( $in )";
         }
 

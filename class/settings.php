@@ -1,6 +1,6 @@
 <?php
 class Hrm_Settings {
-	private static $_instance;
+    private static $_instance;
 
     public static function getInstance() {
         if ( !self::$_instance ) {
@@ -88,7 +88,7 @@ class Hrm_Settings {
         }
     }
 
-	function select_field( $name, $element ) {
+    function select_field( $name, $element ) {
 
         $extra_field = '';
         $id          = isset( $element['id'] ) ? esc_attr( $element['id'] ) : esc_attr( $name );
@@ -123,7 +123,7 @@ class Hrm_Settings {
         $wrap_close = sprintf('</%1$s>', $wrap_tag);
 
         ob_start();
-           	echo $this->multiple_field_inside_this_wrap( $element );
+            echo $this->multiple_field_inside_this_wrap( $element );
                 echo $wrap;
                 echo $html;
                 echo $wrap_close;
@@ -1117,7 +1117,7 @@ class Hrm_Settings {
         $selectd = isset( $_REQUEST['limit'] ) ? $_REQUEST['limit'] : 2;
         $arg = array(
             '-1'  => __( '--Select Pagination--', 'hrm' ),
-            '10'  => __( '10', 'hrm'),
+            '4'  => __( '10', 'hrm'),
             '20'  => __( '20','hrm' ),
             '50'  => __( '50', 'hrm' ),
             '100' => __( '100', 'hrm' ),
@@ -1169,12 +1169,15 @@ class Hrm_Settings {
         $where = implode( ' AND ', $where );
         $where = apply_filters( 'hrm_where_query', $where );
 
-        if ( ! $where ) {
-            return array();
-        }
-
         global $wpdb;
         $table = $wpdb->prefix . $table;
+
+        if ( empty( $where ) ) {
+            $results = $wpdb->get_results( "SELECT SQL_CALC_FOUND_ROWS $fields FROM $table WHERE 1=1 $limit" );
+
+            $results['total_row'] = $wpdb->get_var("SELECT FOUND_ROWS()" );
+            return $results;
+        }
 
         if ( $row ) {
             return $wpdb->get_row( "SELECT $fields FROM $table WHERE $where" );
