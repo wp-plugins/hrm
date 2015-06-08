@@ -4,7 +4,7 @@
  * Plugin URI: http://mishubd.com/plugin/human-resource-management-hrm/
  * Description: Organization, Industries and Office management
  * Author: asaquzzaman
- * Version: 0.8
+ * Version: 0.8.1
  * Author URI: http://mishubd.com
  * License: GPL2
  * TextDomain: hrm
@@ -57,7 +57,7 @@ require_once dirname (__FILE__) . '/include/page.php';
 class Wp_Hrm {
 
     function __construct() {
-        $this->version = '0.7';
+        $this->version = '0.8.1';
         $this->db_version = '0.2';
 
         $this->plugin_dir = dirname(__FILE__);

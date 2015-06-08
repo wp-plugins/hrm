@@ -398,16 +398,6 @@ label em {
 #hrm .hrm-assign-leave #hrm-list-form .hrm-pagi-src {
   margin-top: 0;
 }
-#hrm .hrm-assign-leave #hrm-list-form .hrm-before-table {
-  float: left;
-  display: inline-block;
-  width: auto;
-}
-#hrm .hrm-assign-leave #hrm-list-form .hrm-search-head h3 {
-  padding: 8px 0;
-  float: left;
-  width: 300px;
-}
 #hrm .hrm-notification-cross {
   float: right;
   color: #dd3d36;
@@ -422,7 +412,7 @@ label em {
 }
 #hrm .chosen-results {
   overflow-x: visible;
-  overflow-y: visible;
+  overflow-y: hidden;
 }
 #hrm .hrm-pagination .tablenav .tablenav-pages a {
   background: none;
@@ -656,65 +646,82 @@ label em {
   text-decoration: none;
   margin: 0;
 }
-#hrm #hrm-admin-leave-summary {
+#hrm #hrm-admin-leave-summary,
+#hrm #hrm-assign-leave-summary {
   margin-top: 0px;
 }
-#hrm #hrm-admin-leave-summary .hrm-popup-desc-leave-cat {
+#hrm #hrm-admin-leave-summary .hrm-popup-desc-leave-cat,
+#hrm #hrm-assign-leave-summary .hrm-popup-desc-leave-cat {
   float: right;
 }
-#hrm #hrm-admin-leave-summary .hrm-table-action-wrap {
+#hrm #hrm-admin-leave-summary .hrm-table-action-wrap,
+#hrm #hrm-assign-leave-summary .hrm-table-action-wrap {
   float: none;
   margin-bottom: 0;
   width: auto;
 }
-#hrm #hrm-admin-leave-summary #hrm-list-form {
+#hrm #hrm-admin-leave-summary #hrm-list-form,
+#hrm #hrm-assign-leave-summary #hrm-list-form {
   position: relative;
   margin-top: 55px;
 }
-#hrm #hrm-admin-leave-summary .hrm-delete-button {
+#hrm #hrm-admin-leave-summary .hrm-delete-button,
+#hrm #hrm-assign-leave-summary .hrm-delete-button {
   float: left;
 }
-#hrm #hrm-admin-leave-summary .hrm-before-table {
+#hrm #hrm-admin-leave-summary .hrm-before-table,
+#hrm #hrm-assign-leave-summary .hrm-before-table {
   float: right;
   width: auto;
 }
-#hrm #hrm-admin-leave-summary .hrm-add-button {
+#hrm #hrm-admin-leave-summary .hrm-add-button,
+#hrm #hrm-assign-leave-summary .hrm-add-button {
   position: absolute;
   top: -43px;
   left: 0;
 }
-#hrm #hrm-admin-leave-summary .hrm-pagi-src {
+#hrm #hrm-admin-leave-summary .hrm-pagi-src,
+#hrm #hrm-assign-leave-summary .hrm-pagi-src {
   position: absolute;
   top: -55px;
   left: 30%;
 }
 #hrm #hrm-admin-leave-summary table th,
-#hrm #hrm-admin-leave-summary table td {
+#hrm #hrm-assign-leave-summary table th,
+#hrm #hrm-admin-leave-summary table td,
+#hrm #hrm-assign-leave-summary table td {
   padding: 0;
 }
-#hrm #hrm-admin-leave-summary .hrm-head-notice {
+#hrm #hrm-admin-leave-summary .hrm-head-notice,
+#hrm #hrm-assign-leave-summary .hrm-head-notice {
   font-size: 10px;
 }
-#hrm #hrm-admin-leave-summary .hrm-nested-table {
+#hrm #hrm-admin-leave-summary .hrm-nested-table,
+#hrm #hrm-assign-leave-summary .hrm-nested-table {
   border-spacing: 0;
   border-collapse: collapse;
 }
-#hrm #hrm-admin-leave-summary .hrm-nested-table td:first-child {
+#hrm #hrm-admin-leave-summary .hrm-nested-table td:first-child,
+#hrm #hrm-assign-leave-summary .hrm-nested-table td:first-child {
   padding-left: 11px;
   padding-top: 10px;
   width: 30px;
 }
-#hrm #hrm-admin-leave-summary .hrm-nested-table .hrm-table-checkbox {
+#hrm #hrm-admin-leave-summary .hrm-nested-table .hrm-table-checkbox,
+#hrm #hrm-assign-leave-summary .hrm-nested-table .hrm-table-checkbox {
   width: 16px;
 }
-#hrm #hrm-admin-leave-summary .hrm-nested-table .hrm-leave-td-tr {
+#hrm #hrm-admin-leave-summary .hrm-nested-table .hrm-leave-td-tr,
+#hrm #hrm-assign-leave-summary .hrm-nested-table .hrm-leave-td-tr {
   padding: 10px;
   padding-left: 0;
 }
-#hrm #hrm-admin-leave-summary .hrm-nested-table .hrm-leave-cal-bottom {
+#hrm #hrm-admin-leave-summary .hrm-nested-table .hrm-leave-cal-bottom,
+#hrm #hrm-assign-leave-summary .hrm-nested-table .hrm-leave-cal-bottom {
   padding-bottom: 20px;
 }
-#hrm #hrm-admin-leave-summary .hrm-leave-td-tr {
+#hrm #hrm-admin-leave-summary .hrm-leave-td-tr,
+#hrm #hrm-assign-leave-summary .hrm-leave-td-tr {
   width: 12%;
 }
 #hrm .hrm-my-task .hrm-my-task-body {

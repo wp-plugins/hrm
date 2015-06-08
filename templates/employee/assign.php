@@ -37,7 +37,7 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
 
 
 ?>
-    <div class="hrm-update-notification"></div>
+
 <div id="hrm-assign-leave-summary" class="hrm-assign-leave">
     <?php
 
@@ -99,8 +99,8 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
         $holiday_index = array_merge( $holiday_index, maybe_unserialize( $holiday->index_holiday ) );
     }
 
-    $add_permission = false;//hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-    $delete_permission = false; //hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+    $add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
+    $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
     $body              = array();
     $td_attr           = array();
     $leave_action_acess = hrm_user_can_access( $tab, $subtab, 'leave_summary_action', true );
@@ -149,6 +149,7 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
     if ( ! count( $leaves ) ) {
         $table = array();
         $table['head'] = array(
+            '<input class="hrm-all-checked" type="checkbox">',
             __('Employee', 'hrm' ),
             __('Start', 'hrm' ),
             __('End', 'hrm' ),
@@ -173,7 +174,6 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
         $table['subtab']     = $subtab;
         $table['data_table'] = false;
         $table['pagination'] = false;
-        $table['add_btn_name'] = false;
 
         $table['body']       = isset( $body ) ? $body : array();
         echo Hrm_Settings::getInstance()->table( $table );
@@ -291,6 +291,7 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
             }
 
             $table['head'] = array(
+                '<input class="hrm-all-checked" type="checkbox">',
                 __('Employee', 'hrm' ),
                 __('Start', 'hrm' ),
                 __('End', 'hrm' ),
@@ -301,7 +302,7 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
                 //__('Action', 'hrm' )
             );
 
-            $table['add_btn_name'] = false;
+
             $table['td_attr']    = isset( $td_attr ) ? $td_attr : '';
             $table['th_attr']    = isset( $th_attr ) ? $th_attr : '';
             $table['table_attr'] = array( 'class' => 'widefat' );
@@ -312,7 +313,7 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
             $table['data_table'] = false;
             $table['body']       = isset( $body ) ? $body : '';
             $table['pagination'] = false;
-            $table['delete_button'] = false;
+
             echo Hrm_Settings::getInstance()->table( $table );
             $body = array();
 
@@ -320,7 +321,6 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
                 'search'        => false,
                 'search_mode'   => false,
                 'add_btn_name'  => false,
-                'delete_button' => true,
             );
 
             $searc_leave_type = Hrm_Settings::getInstance()->edit_query( 'hrm_leave_type', $leave_id );

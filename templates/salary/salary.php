@@ -210,7 +210,7 @@
     $table['action']     = 'hrm_delete';
     $table['tab']        = $tab;
     $table['subtab']     = $subtab;
-    $table['add_btn_name'] = $role == 'hrm_employee' ? false : __( 'Add', 'hrm' );
+    $table['add_btn_name'] = __( 'Add', 'hrm' );
     $table['data_table']   = false;
     $table['search_mode']  = true;
     $table['search']  = __( 'Search Mode', 'hrm' );

@@ -80,6 +80,10 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
+= 0.8.1 =
+* fix chosen problem.
+* employee can apply there leave from their personal profile
+* fix undefined problem from salary
 
 = 0.8 =
 * fix many undefined index
