@@ -1,3 +1,4 @@
+<div id="hrm-subtab-wrap">
 <?php
 $header_path = dirname(__FILE__) . '/header.php';
 $header_path = apply_filters( 'hrm_header_path', $header_path, 'time' );
@@ -212,6 +213,7 @@ $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
 $file_path = urlencode(__FILE__);
 global $hrm_is_admin;
 ?>
+</div>
 <script type="text/javascript">
     jQuery(function($) {
         hrm_dataAttr = {
