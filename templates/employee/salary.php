@@ -73,15 +73,16 @@ $table['head'] = array(
     __( 'Comments', 'hrm'),
     __( 'Direct Deposit Details', 'hrm'),
 );
-$table['body']       = isset( $body ) ? $body : array();
-$table['td_attr']    = isset( $td_attr ) ? $td_attr : array();
-$table['th_attr']    = array( 'class="check-column"' );
-$table['table_attr'] = array( 'class' => 'widefat' );
-$table['table']      = 'hrm_salary';
-$table['action']     = 'hrm_delete';
-$table['tab']        = $tab;
-$table['subtab']     = $subtab;
-$table['add_btn_name'] = false;
+$table['body']          = isset( $body ) ? $body : array();
+$table['td_attr']       = isset( $td_attr ) ? $td_attr : array();
+$table['th_attr']       = array( 'class="check-column"' );
+$table['table_attr']    = array( 'class' => 'widefat' );
+$table['table']         = 'hrm_salary';
+$table['action']        = 'hrm_delete';
+$table['tab']           = $tab;
+$table['subtab']        = $subtab;
+$table['page']          = $page;
+$table['add_btn_name']  = false;
 $table['delete_button'] = false;
 
 if ( $page == 'hrm_employee') {

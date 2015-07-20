@@ -56,6 +56,7 @@ $table['table']      = 'hrm_personal_skill';
 $table['action']     = 'hrm_delete';
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
+$table['page']       = $page;
 
 echo hrm_Settings::getInstance()->table( $table );
 $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab ) . '&employee_id='. $employer_id;

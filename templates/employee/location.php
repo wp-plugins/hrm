@@ -56,13 +56,7 @@ foreach ( $results as $key => $value ) {
 		<div class="hrm-search-head">
 			<h3><?php echo 'Location ' . $value->name; ?></h3>
 		</div>
-		<?php
-			if ( isset( $value->name ) && !empty( $value->name ) ) {
-				?>
-				<div class="hrm-text-wrap"><strong class="hrm-text-label"><?php _e( 'Name', 'hrm' ); ?></strong><div class="hrm-text-info"><?php echo $value->name; ?></div><div class="hrm-clear"></div></div>
-				<?php
-			}
-		?>
+
 		<?php
 			if ( isset( $value->name ) && !empty( $value->name ) ) {
 				?>

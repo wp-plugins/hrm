@@ -11,8 +11,8 @@
         $total = 0;
     };
 
-    $add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-    $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+    $add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+    $delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 
     foreach ( $results as $key => $value) {
 
@@ -72,6 +72,7 @@
     $table['table_attr'] = array( 'class' => 'widefat' );
     $table['tab']        = $tab;
     $table['subtab']     = $subtab;
+    $table['page']       = $page;
 
     echo Hrm_Settings::getInstance()->table( $table );
     //table

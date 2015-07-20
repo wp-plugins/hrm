@@ -13,6 +13,39 @@ class Hrm_Db {
         $this->time();
         $this->employer();
         $this->worker_evaluation();
+        $this->client_partial_payment();
+    }
+
+    function client_partial_payment() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'hrm_client_partial_payment';
+        $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+          `id` bigint(20) NOT NULL AUTO_INCREMENT,
+          `client_id` bigint(20) NOT NULL,
+          `description` text NOT NULL,
+          `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          `currency` VARCHAR( 10 ) NOT NULL,
+          `project_id` BIGINT NOT NULL,
+          `amount` BIGINT NOT NULL,
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1;";
+
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        dbDelta( $sql );
+
+        $table_option['table_name'] = 'hrm_client_partial_payment';
+        $table_option['table_option'] = array(
+            'client_id'   => 'client_id',
+            'description' => 'description',
+            'date'        => 'date',
+            'currency'    => 'currency',
+            'project_id'  => 'project_id',
+            'amount'      => 'amount',
+        );
+
+        $table_option_name = 'hrm_client_partial_payment';
+
+        hrm_Settings::getInstance()->update_table_option( $table_option_name, $table_option );
     }
 
     function worker_evaluation() {

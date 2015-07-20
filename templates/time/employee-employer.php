@@ -5,7 +5,7 @@ $header_path = apply_filters( 'hrm_header_path', $header_path, 'time' );
 if ( file_exists( $header_path ) ) {
     require_once $header_path;
 }
-if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
+if ( ! hrm_user_can_access( $page, $tab, $subtab, 'view' ) ) {
     printf( '<h1>%s</h1>', __( 'You do no have permission to access this page', 'cpm' ) );
     return;
 }
@@ -92,8 +92,8 @@ if( $search_status ) {
 }
 
 
-$add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+$delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 
 $total_duration = 0;
 foreach ( $posts as $key => $post ) {
@@ -212,6 +212,7 @@ $table['table']       = '';
 $table['action']      = 'hrm_post_delete';
 $table['tab']         = $tab;
 $table['subtab']      = $subtab;
+$table['page']        = $page;
 $table['search']      = __( 'Search Mode', 'hrm' );
 $table['data_table']  = false;
 $table['search_mode'] = true;

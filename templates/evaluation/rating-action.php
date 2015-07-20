@@ -6,7 +6,7 @@ if ( file_exists( $header_path ) ) {
     require_once $header_path;
 }
 
-if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
+if ( ! hrm_user_can_access( $page, $tab, $subtab, 'view' ) ) {
     printf( '<h1>%s</h1>', __( 'You do no have permission to access this page', 'cpm' ) );
     return;
 }
@@ -141,12 +141,13 @@ $table['table']         = 'hrm_job_title_option';
 $table['action']        = 'hrm_delete';
 $table['tab']           = $tab;
 $table['subtab']        = $subtab;
+$table['page']          = $page;
 $table['add_btn_name']  = false;
 $table['delete_button'] = false;
-$table['data_table']   = true;
-$table['search_mode']  = true;
-$table['search']       = __( 'Search Mode', 'hrm' );
-$table['pagination']   = false;
+$table['data_table']    = true;
+$table['search_mode']   = true;
+$table['search']        = __( 'Search Mode', 'hrm' );
+$table['pagination']    = false;
 
 echo Hrm_Settings::getInstance()->table( $table );
 

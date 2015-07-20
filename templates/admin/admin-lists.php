@@ -7,8 +7,8 @@ $search_query = Hrm_Admin::getInstance()->get_employer();
 
 $results           = $search_query->get_results();
 $total             = $search_query->get_total();
-$add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+$delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 $user              = wp_get_current_user();
 $body              = array();
 $td_attr           = array();
@@ -39,7 +39,7 @@ foreach ( $results as $id => $user_obj) {
         $name_id = $user_obj->user_login;
     }
 
-    $employer_status = hrm_user_can_access( $tab, $subtab, 'admin_list_employer_status', true );
+    $employer_status = hrm_user_can_access( $page, $tab, $subtab, 'admin_list_employer_status' );
 
     if ( $employer_status ) {
         $admin_status_dropdown = array(
@@ -89,6 +89,7 @@ $table['action']     = 'hrm_user_delete';
 $table['table_attr'] = array( 'class' => 'widefat' );
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
+$table['page']       = $page;
 
 
 echo Hrm_settings::getInstance()->table( $table );

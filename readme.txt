@@ -80,6 +80,10 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
+= 0.9 =
+* client management system.
+* code fromat change
+
 = 0.8.1 =
 * fix chosen problem.
 * employee can apply there leave from their personal profile

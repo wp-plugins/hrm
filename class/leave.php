@@ -235,6 +235,7 @@ class Hrm_Leave {
 
         $holiday['description'] = array(
             'label' =>  __( 'Description', 'hrm' ),
+            'class' => 'hrm-leave-discription',
             'type'  => 'textarea',
             'value' => isset( $field_value['description'] ) ? $field_value['description'] : '',
         );

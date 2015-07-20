@@ -163,6 +163,7 @@ $field['table_option'] = 'hrm_personal_info';
 $field['id']           = isset( $results->id ) ? $results->id : '';
 $field['tab']          = $tab;
 $field['sub_tab']      = $subtab;
+$field['page']         = $page;
 
 echo hrm_Settings::getInstance()->visible_form_generator( $field );
 

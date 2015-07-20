@@ -11,6 +11,7 @@ $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
 ?>
 <div id="hrm-eployee-list"></div>
 <?php
+
     global $wp_roles;
 
     if ( !$wp_roles ) {
@@ -27,11 +28,17 @@ $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
 
     //$total             = $employers->total_users;
     //$employers         = $employers->results;
-    $add_permission    = hrm_user_can_access( $tab, null, 'add' ) ? true : false;
-    $delete_permission = hrm_user_can_access( $tab, null, 'delete' ) ? true : false;
-
+    $add_permission    = hrm_user_can_access( $page, $tab, null, 'add' ) ? true : false;
+    $delete_permission = hrm_user_can_access( $page, $tab, null, 'delete' ) ? true : false;
+    $hrm_menu = hrm_page();
+    foreach ( $menu[hrm_pim_page()] as $pim_tab => $pim_tab_item ) {
+        if ( array_key_exists( 'nested_tab', $pim_tab_item) && $pim_tab_item['nested_tab'] ) {
+            $pim_single_tab = $pim_tab;
+            break;
+        }
+    };
     foreach ( $employers as $key => $employer ) {
-        $admin_url = hrm_employee_profile_url( 'hrm_pim', 'personal', 'personal_info', $employer->ID );
+        $admin_url = hrm_employee_profile_url( hrm_pim_page(), $pim_single_tab, $employer->ID );
 
         if ( $delete_permission ) {
             $del_checkbox = '<input class="hrm-single-checked" name="hrm_check['.$employer->ID.']" value="" type="checkbox">';
@@ -80,7 +87,7 @@ $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
         $role_display_name = isset( $role_names[$role_display_name] ) ? $role_names[$role_display_name] : '';
 
         if ( $delete_permission ) {
-            $body[] = array(
+            $body[] = apply_filters( 'hrm_employess_list_row', array(
                 $del_checkbox,
                 $name_id,
                 get_user_meta( $employer->ID, 'first_name', true ),
@@ -89,9 +96,9 @@ $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
                 $status,
                 get_user_meta( $employer->ID, '_mob_number', true ),
                 hrm_get_date2mysql( get_user_meta( $employer->ID, '_joined_date', true ) ),
-            );
+            ), $employer );
         } else {
-            $body[] = array(
+            $body[] = apply_filters( 'hrm_employess_list_row', array(
                 $name_id,
                 get_user_meta( $employer->ID, 'last_name', true ),
                 get_user_meta( $employer->ID, 'first_name', true ),
@@ -99,7 +106,7 @@ $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
                 $status,
                 get_user_meta( $employer->ID, '_mob_number', true ),
                 hrm_get_date2mysql( get_user_meta( $employer->ID, '_joined_date', true ) ),
-            );
+            ), $employer );
         }
     }
 
@@ -133,6 +140,7 @@ $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
     $table['table_attr'] = array( 'class' => 'widefat' );
     $table['table']      = 'hrm_employee';
     $table['tab']        = $tab;
+    $table['page']       = $page;
     $table['action']     = 'employee_delete';
     $table['table_attr'] = array( 'class' => 'widefat' );
 

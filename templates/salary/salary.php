@@ -88,8 +88,8 @@
     unset( $results['total_row'] );
     unset( $pary_grades['total_row'] );
 
-    $add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-    $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+    $add_permission = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+    $delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
     $pay_grade_label = array();
     foreach ( $pary_grades as $key => $pary_grade ) {
         $pay_grade_label[$pary_grade->id] = $pary_grade->name;
@@ -203,17 +203,18 @@
         );
     }
 
-    $table['body']       = isset( $body ) ? $body : array();
-    $table['td_attr']    = isset( $td_attr ) ? $td_attr : array();
-    $table['table_attr'] = array( 'class' => 'widefat' );
-    $table['table']      = 'hrm_salary';
-    $table['action']     = 'hrm_delete';
-    $table['tab']        = $tab;
-    $table['subtab']     = $subtab;
+    $table['body']         = isset( $body ) ? $body : array();
+    $table['td_attr']      = isset( $td_attr ) ? $td_attr : array();
+    $table['table_attr']   = array( 'class' => 'widefat' );
+    $table['table']        = 'hrm_salary';
+    $table['action']       = 'hrm_delete';
+    $table['tab']          = $tab;
+    $table['subtab']       = $subtab;
+    $table['page']         = $page;
     $table['add_btn_name'] = __( 'Add', 'hrm' );
     $table['data_table']   = false;
     $table['search_mode']  = true;
-    $table['search']  = __( 'Search Mode', 'hrm' );
+    $table['search']       = __( 'Search Mode', 'hrm' );
 
 
 

@@ -114,6 +114,7 @@ $table['table']        = 'hrm_job_title_option';
 $table['action']       = 'delete_inbox_file';
 $table['tab']          = $tab;
 $table['subtab']       = $subtab;
+$table['page']         = $page;
 $table['add_btn_name'] = false;
 
 

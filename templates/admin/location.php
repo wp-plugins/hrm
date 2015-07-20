@@ -1,7 +1,7 @@
 <div class="hrm-update-notification"></div>
 
 <?php
-if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
+if ( ! hrm_user_can_access( $page, $tab, $subtab, 'view' ) ) {
 
     printf( '<h1>%s</h1>', __( 'You do no have permission to access this page', 'cpm' ) );
     return;
@@ -24,8 +24,8 @@ if( isset( $results['total_row'] ) ) {
         <div id="hrm-admin-location"></div>
 
         <?php
-        $add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-        $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+        $add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+        $delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
         $body              = array();
         $td_attr           = array();
 
@@ -83,6 +83,7 @@ if( isset( $results['total_row'] ) ) {
         $table['table_attr'] = array( 'class' => 'widefat' );
         $table['tab']        = $tab;
         $table['subtab']     = $subtab;
+        $table['page']       = $page;
         $table['search']     = __( 'Search Mode', 'hrm' );
 
         echo Hrm_Settings::getInstance()->table( $table );

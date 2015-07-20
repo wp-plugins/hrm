@@ -4,8 +4,8 @@
 <?php
 
 $results           = Hrm_Admin::getInstance()->get_projects( $tab, $subtab );
-$add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+$delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 
 foreach ( $results['posts'] as $key => $project_obj ) {
     if ( $project_obj->post_type != 'hrm_project' ) {
@@ -105,6 +105,7 @@ $table['action']     = 'delete_project';
 $table['table_attr'] = array( 'class' => 'widefat' );
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
+$table['page']       = $page;
 
 
 echo Hrm_Settings::getInstance()->table( $table );

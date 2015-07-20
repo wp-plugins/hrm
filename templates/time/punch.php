@@ -6,7 +6,8 @@ $header_path = apply_filters( 'hrm_header_path', $header_path, 'time' );
 if ( file_exists( $header_path ) ) {
     require_once $header_path;
 }
-if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
+
+if ( ! hrm_user_can_access( $page, $tab, $subtab, 'view' ) ) {
     printf( '<h1>%s</h1>', __( 'You do no have permission to access this page', 'cpm' ) );
     return;
 }
@@ -69,13 +70,13 @@ $total_pagination = $query->found_posts;
 
 <?php
 
-	$add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-    $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+	$add_permission = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+    $delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 
     $total_duration = 0;
     foreach ( $posts as $key => $post ) {
 
-        if ( $delete_permission && hrm_user_can_access( $tab, $subtab, 'punch_edit', true ) ) {
+        if ( $delete_permission && hrm_user_can_access( $page, $tab, $subtab, 'punch_edit', true ) ) {
             $del_checkbox = '<input class="hrm-single-checked" name="hrm_check['.$post->ID.']" value="" type="checkbox">';
             $delete_text  = '<a href="#" class="hrm-delete" data-id='.$post->ID.'>'.__( 'Delete', 'hrm' ).'</a>';
             $td_attr[][0] = 'class="hrm-table-checkbox"';
@@ -192,7 +193,7 @@ $total_pagination = $query->found_posts;
         );
     }
 
-    $table['body']  = isset( $body ) ? $body : array();
+    $table['body']         = isset( $body ) ? $body : array();
     $table['td_attr']      = isset( $td_attr ) ? $td_attr : array();
     $table['table_attr']   = array( 'class' => 'widefat' );
     $table['data_table']   = false;
@@ -203,6 +204,7 @@ $total_pagination = $query->found_posts;
     $table['add_btn_name'] = $punch_status;
     $table['tab']          = $tab;
     $table['subtab']       = $subtab;
+    $table['page']         = $page;
     $table['search']       = __( 'Search Mode', 'hrm' );
 
     echo Hrm_Settings::getInstance()->table( $table );

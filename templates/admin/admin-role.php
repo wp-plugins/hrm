@@ -14,8 +14,8 @@ if ( !$wp_roles ) {
 $role_names = $wp_roles->get_names();
 $wp_built_in_role = array( 'administrator', 'editor', 'author', 'contributor', 'subscriber', 'hrm_employee' );
 
-$add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+$delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 $current_user_role = hrm_current_user_role();
 $body              = array();
 $td_attr           = array();
@@ -72,6 +72,7 @@ $table['action']     = 'role_delete';
 $table['table_attr'] = array( 'class' => 'widefat' );
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
+$table['page']       = $page;
 $table['pagination'] = false;
 
 echo Hrm_Settings::getInstance()->table( $table );

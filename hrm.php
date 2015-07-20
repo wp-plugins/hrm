@@ -4,7 +4,7 @@
  * Plugin URI: http://mishubd.com/plugin/human-resource-management-hrm/
  * Description: Organization, Industries and Office management
  * Author: asaquzzaman
- * Version: 0.8.1
+ * Version: 0.9
  * Author URI: http://mishubd.com
  * License: GPL2
  * TextDomain: hrm
@@ -37,36 +37,88 @@
  */
 
 
-function hrm_autoload( $class ) {
-    $name = explode( '_', $class );
+class WP_Hrm {
 
-    if ( isset( $name[1] ) ) {
-        $class_name = strtolower( $name[1] );
-        $filename = dirname( __FILE__ ) . '/class/' . $class_name . '.php';
-        if ( file_exists( $filename ) ) {
-            require_once $filename;
+    /**
+     * @var The single instance of the class
+     * @since 0.1
+     */
+    protected static $_instance = null;
+
+    /**
+     * Main HRM Instance
+     *
+     * @since 0.9
+     * @static
+     * @see hrm()
+     * @return HRM - Main instance
+     */
+    public static function instance() {
+        if ( is_null( self::$_instance ) ) {
+            self::$_instance = new self();
         }
+        return self::$_instance;
     }
-}
-spl_autoload_register( 'hrm_autoload' );
-
-require_once dirname (__FILE__) . '/include/function.php';
-require_once dirname (__FILE__) . '/include/urls.php';
-require_once dirname (__FILE__) . '/include/page.php';
-
-class Wp_Hrm {
 
     function __construct() {
-        $this->version = '0.8.1';
-        $this->db_version = '0.2';
+        $this->initial();
 
-        $this->plugin_dir = dirname(__FILE__);
         $this->instantiate();
         add_action( 'plugins_loaded', array($this, 'load_textdomain') );
         add_action( 'admin_menu', array($this, 'admin_menu') );
         add_action( 'admin_notices', array($this, 'fornt_end') );
         register_activation_hook( __FILE__, array($this, 'install') );
         add_action( 'init', array( $this, 'init' ) );
+    }
+
+    function initial() {
+        $this->define_constants();
+        spl_autoload_register( array( __CLASS__, 'autoload' ) );
+
+        require_once dirname (__FILE__) . '/include/function.php';
+        require_once dirname (__FILE__) . '/include/urls.php';
+        require_once dirname (__FILE__) . '/include/page.php';
+    }
+
+    function autoload( $class ) {
+        $name = explode( '_', $class );
+
+        if ( isset( $name[1] ) ) {
+            $class_name = strtolower( $name[1] );
+            $filename = dirname( __FILE__ ) . '/class/' . $class_name . '.php';
+            if ( file_exists( $filename ) ) {
+                require_once $filename;
+            }
+        }
+    }
+
+    /**
+     * Define cpmrp Constants
+     *
+     * @since 1.1
+     * @return type
+     */
+    private function define_constants() {
+        $this->define( 'HRM_VERSION', '0.9' );
+        $this->define( 'HRM_DB_VERSION', '0.2' );
+        $this->define( 'HRM_PATH', dirname( __FILE__ ) );
+        $this->define( 'HRM_URL', plugins_url( '', __FILE__ ) );
+        $this->define( 'HRM_PERMISSION_PURCHASE_URL', 'http://mishubd.com/product/hrm-permission/' );
+    }
+
+    /**
+     * Define constant if not already set
+     *
+     * @since 1.1
+     *
+     * @param  string $name
+     * @param  string|bool $value
+     * @return type
+     */
+    private function define( $name, $value ) {
+        if ( ! defined( $name ) ) {
+            define( $name, $value );
+        }
     }
 
     function fornt_end() {
@@ -157,8 +209,8 @@ class Wp_Hrm {
         new Hrm_Update();
 
         update_option( 'hrm_admin', $logged_in_user_id );
-        update_option( 'hrm_version', $this->version );
-        update_option( 'hrm_db_version', $this->db_version );
+        update_option( 'hrm_version', HRM_VERSION );
+        update_option( 'hrm_db_version', HRM_DB_VERSION );
     }
 
     function pim_scripts() {
@@ -206,43 +258,69 @@ class Wp_Hrm {
         wp_enqueue_script( 'hrm-file', plugins_url( '/asset/js/file.js', __FILE__ ) );
     }
 
+
     function admin_menu() {
         $capability = 'read'; //minimum level: subscriber
-        if ( hrm_current_user_role() != 'hrm_employee' ) {
-            $menu           = add_menu_page( __( 'HRM', 'hrm' ), __( 'HRM', 'hrm' ), $capability, 'hrm_management', array($this, 'admin_page_handler'), ''  );
-            $admin_sub_menu = add_submenu_page( 'hrm_management', __( 'Admin', 'hrm' ), __( 'Admin', 'hrm' ), $capability, 'hrm_management', array($this, 'admin_page_handler') );
-            //$employer       = add_submenu_page( 'hrm_management', __( 'Employer', 'hrm' ), __( 'Employer', 'hrm' ), $capability, 'hrm_employer', array( $this, 'admin_page_handler' ) );
-            $pim            = add_submenu_page( 'hrm_management', __( 'Employee', 'hrm' ), __( 'Employee', 'hrm' ), $capability, 'hrm_pim', array( $this, 'admin_page_handler' ) );
-            $project        = add_submenu_page( 'hrm_management', __( 'Project', 'hrm' ), __( 'Project', 'hrm' ), $capability, 'hrm_project', array( $this, 'admin_page_handler' ) );
-            $leave          = add_submenu_page( 'hrm_management', __( 'Leave', 'hrm' ), __( 'Leave', 'hrm' ), $capability, 'hrm_leave', array( $this, 'admin_page_handler' ) );
-            $attendance     = add_submenu_page( 'hrm_management', __( 'Attendance', 'hrm' ), __( 'Attendance', 'hrm' ), $capability, 'hrm_time', array( $this, 'admin_page_handler' ) );
-            $evaluation     = add_submenu_page( 'hrm_management', __( 'Evaluation', 'hrm' ), __( 'Evaluation', 'hrm' ), $capability, 'hrm_evaluation', array( $this, 'admin_page_handler' ) );
-            $file           = add_submenu_page( 'hrm_management', __( 'File', 'hrm' ), __( 'File', 'hrm' ), $capability, 'hrm_file', array( $this, 'admin_page_handler' ) );
-            $my_info        = add_submenu_page( 'hrm_management', __( 'My INFO', 'hrm' ), __( 'My INFO', 'hrm' ), $capability, 'hrm_employee', array( $this, 'admin_page_handler' ) );
-            $salary         = add_submenu_page( 'hrm_management', __( 'Salary', 'hrm' ), __( 'Salary', 'hrm' ), $capability, 'hrm_salary', array( $this, 'admin_page_handler' ) );
-            $author         = add_submenu_page( 'hrm_management', __( 'Support', 'hrm' ), __( 'Support', 'hrm' ), $capability, 'hrm_author', array( $this, 'admin_page_handler' ) );
-
-            add_action( 'admin_print_styles-' . $admin_sub_menu, array($this, 'admin_scripts') );
-            add_action( 'admin_print_styles-' . $project, array($this, 'admin_scripts') );
-            add_action( 'admin_print_styles-' . $salary, array($this, 'admin_scripts') );
-            add_action( 'admin_print_styles-' . $pim, array( $this, 'pim_scripts') );
-            add_action( 'admin_print_styles-' . $leave, array( $this, 'leave_scripts' ) );
-            add_action( 'admin_print_styles-' . $attendance, array($this, 'attendance_scripts') );
-            add_action( 'admin_print_styles-' . $evaluation, array($this, 'evaluation_scripts') );
-            add_action( 'admin_print_styles-' . $author, array($this, 'author_scripts') );
-            add_action( 'admin_print_styles-' . $file, array($this, 'file_scripts') );
-            add_action( 'admin_print_styles-' . $my_info, array($this, 'pim_scripts') );
-
-        } else {
-            $user_id    = get_current_user_id();
-            $menu       = add_menu_page( __( 'HRM', 'hrm' ), __( 'HRM', 'hrm' ), $capability, 'hrm_employee', array($this, 'admin_page_handler') );
-            $menu       = add_submenu_page( 'hrm_employee', __( 'My Info', 'hrm' ), __( 'My Info', 'hrm' ), $capability, 'hrm_employee', array($this, 'admin_page_handler') );
-            $attendance = add_submenu_page( 'hrm_employee', __( 'Attendance', 'hrm' ), __( 'Attendance', 'hrm' ), $capability, 'hrm_time', array( $this, 'admin_page_handler' ) );
-            $file       = add_submenu_page( 'hrm_employee', __( 'File', 'hrm' ), __( 'File', 'hrm' ), $capability, 'hrm_file', array( $this, 'admin_page_handler' ) );
-            add_action( 'admin_print_styles-' . $attendance, array($this, 'attendance_scripts') );
-            add_action( 'admin_print_styles-' . $file, array($this, 'file_scripts') );
-            $this->admin_scripts();
+        $label      = hrm_menu_label();
+        $hrm_page_slug = hrm_page_slug();
+        if ( ! $hrm_page_slug ) {
+            return;
         }
+
+        $menu  = add_menu_page( __( 'HRM', 'hrm' ), __( 'HRM', 'hrm' ), $capability, $hrm_page_slug, array($this, 'admin_page_handler'), 'dashicons-groups'  );
+
+        foreach ( hrm_menu_label() as $page_slug => $page_label ) {
+            if ( hrm_user_can_access( $page_slug ) ) {
+                $style_slug[$page_slug] = add_submenu_page( $hrm_page_slug, $page_label, $page_label, $capability, $page_slug, array($this, 'admin_page_handler') );
+            }
+        }
+
+        if( isset( $style_slug[hrm_admin_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_admin_page()], array( $this, 'admin_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_pim_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_pim_page()], array( $this, 'pim_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_client_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_client_page()], array( $this, 'admin_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_project_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_project_page()], array( $this, 'admin_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_leave_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_leave_page()], array( $this, 'leave_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_time_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_time_page()], array( $this, 'attendance_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_evaluation_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_evaluation_page()], array( $this, 'evaluation_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_file_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_file_page()], array( $this, 'file_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_employee_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_employee_page()], array( $this, 'pim_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_salary_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_salary_page()], array( $this, 'admin_scripts') );
+        }
+
+        if( isset( $style_slug[hrm_permission_page()] ) ) {
+            add_action( 'admin_print_styles-' . $style_slug[hrm_permission_page()], array( $this, 'admin_scripts') );
+        }
+
+        do_action( 'hrm_admin_menu', $this, $style_slug );
+
     }
 
 
@@ -259,24 +337,29 @@ class Wp_Hrm {
             return;
         }
 
-        $menu       = hrm_page();
         $query_args = hrm_get_query_args();
         $page       = $query_args['page'];
         $tab        = $query_args['tab'];
         $subtab     = $query_args['subtab'];
 
-        if ( $page == 'hrm_author' ) {
-            require_once dirname (__FILE__) . '/templates/author/header.php';
-            return;
+        echo '<div class="hrm wrap" id="hrm">';
+        if ( $tab === false ) {
+            Hrm_Settings::getInstance()->show_page( $page );
+        } else {
+            Hrm_Settings::getInstance()->show_tab_page( $page, $tab, $subtab );
         }
 
-        echo '<div class="hrm wrap" id="hrm">';
-        Hrm_Settings::getInstance()->show_tab_page( $page, $tab, $subtab );
         echo '</div>';
     }
 }
 
-new Wp_Hrm();
+function hrm() {
+    return WP_Hrm::instance();
+}
+
+//hrm instance.
+hrm();
+
 
 
 

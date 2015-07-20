@@ -9,8 +9,8 @@ if( isset( $results['total_row'] ) ) {
     $total = 0;
 };
 
-$add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+$delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 
 foreach ( $results as $key => $value) {
 	$active = ( $value->active == 'yes' ) ? 'Enable' : 'Disable';
@@ -68,6 +68,7 @@ $table['table']      = 'hrm_job_category';
 $table['action']     = 'hrm_delete';
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
+$table['page']       = $page;
 
 echo Hrm_Settings::getInstance()->table( $table );
 

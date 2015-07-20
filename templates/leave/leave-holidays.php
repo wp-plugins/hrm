@@ -7,8 +7,8 @@ $results = Hrm_Settings::getInstance()->hrm_query( 'hrm_holiday' );
 
 $total = $results['total_row'];
 unset( $results['total_row'] );
-$add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+$delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 $body              = array();
 $td_attr           = array();
 
@@ -81,6 +81,7 @@ $table['table']      = 'hrm_holiday';
 $table['action']     = 'hrm_delete';
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
+$table['page']       = $page;
 
 echo hrm_Settings::getInstance()->table( $table );
 

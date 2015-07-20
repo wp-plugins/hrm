@@ -36,6 +36,12 @@
             $('#hrm').on( 'click', '.hrm-search-button', this.showHideSearchContent );
             $('#hrm').on( 'change', '.hrm-all-checked', this.allChecked );
             $('#hrm').on( 'change', '.hrm-single-checked', this.singleChecked );
+            $('#hrm').on( 'change', '.hrm-project-by-client', this.getClientProjects );
+            $('body').on( 'click', '.hrm-update-prtial-btn', this.updatePartial );
+            $('.hrm-payment-details-dialog').on('click', '.hrm-update-prtial-save-btn', this.partialEditSave);
+            $('.hrm-payment-details-dialog').on('click', '.hrm-update-prtial-cancel-btn', this.partialEditCancel);
+            $('.hrm-payment-details-dialog').on('click', '.hrm-update-prtial-delete-btn', this.partialDelete);
+            $('#hrm').on('click', '.hrm-permission-check-all', this.toggleCheckPermission);
 
             $('#hrm').on( 'before_send_edit', function( e, self, data ) {
                 if ( self.data('action') == 'get_role' ) {
@@ -168,6 +174,114 @@
                     hrmGeneral.datePickerLeaveRestricted();
                 }
 
+            });
+        },
+
+        partialDelete: function(e) {
+            e.preventDefault();
+            var self = $(this),
+                wrap = self.closest('.hrm-partial-wrap');
+                data = {
+                    action: 'partial_payment_delete',
+                    id: self.data('id'),
+                    table: self.data('table_option'),
+                    _wpnonce: hrm_ajax_data._wpnonce,
+                }
+
+            $.post( hrm_ajax_data.ajax_url, data, function( res ) {
+                if ( res.success ) {
+                    self.closest('.hrm-payment-details-dialog').html( res.data.content );
+                    $('#hrm-prarial-li-wrap-'+res.data.project_id).find('.hrm-paratial-client-summary').html(res.data.summary);
+                }
+            });
+        },
+
+        toggleCheckPermission: function(e) {
+            e.preventDefault();
+            var self = $(this),
+                status = self.hasClass('hrm-toggle');
+
+            self
+                .closest('.postbox')
+                .find('.hrm-permission-content')
+                .find('.hrm-permission-toggle-check')
+                .prop('checked', status);
+
+            if ( status ) {
+                self.removeClass('hrm-toggle');
+            } else {
+                self.addClass('hrm-toggle');
+            }
+        },
+
+        updatePartial: function(e) {
+            e.preventDefault();
+            var self = $(this),
+                wrap = self.closest('.hrm-partial-wrap');
+            wrap.find('.hrm-disabled-field').prop('disabled', false).removeClass( 'hrm-disable-field-css' );
+            wrap.find('.hrm-update-prtial-save-btn').show();
+            wrap.find('.hrm-update-prtial-cancel-btn').show();
+            self.hide();
+        },
+
+        partialEditSave: function(e) {
+            e.preventDefault();
+            var self = $(this),
+                wrap = self.closest('.hrm-partial-wrap');
+                data = {
+                    action: 'partial_payment_update',
+                    id: self.data('id'),
+                    table: self.data('table_option'),
+                    description: wrap.find( 'textarea[name="description"]' ).val(),
+                    date: wrap.find( 'input[name="date"]' ).val(),
+                    amount: wrap.find( 'input[name="amount"]' ).val(),
+                    _wpnonce: hrm_ajax_data._wpnonce,
+                }
+
+            $.post( hrm_ajax_data.ajax_url, data, function( res ) {
+                if ( res.success ) {
+                    self.closest('.hrm-payment-details-dialog').html( res.data.content );
+                    $('#hrm-prarial-li-wrap-'+res.data.project_id).find('.hrm-paratial-client-summary').html(res.data.summary);
+                }
+            });
+
+        },
+
+        partialEditCancel: function(e) {
+            e.preventDefault();
+            var self = $(this),
+                wrap = self.closest('.hrm-partial-wrap');
+                data = {
+                    action: 'partial_payment_cancel',
+                    id: self.data('id'),
+                    table: self.data('table_option'),
+                    _wpnonce: hrm_ajax_data._wpnonce,
+                }
+
+            $.post( hrm_ajax_data.ajax_url, data, function( res ) {
+                if ( res.success ) {
+                    self.closest('.hrm-payment-details-dialog').html( res.data.content );
+                }
+            });
+        },
+
+        getClientProjects: function() {
+            var self = $(this),
+                data = {
+                    client_id: self.val(),
+                    action: 'get_clients_project',
+                    _wpnonce: hrm_ajax_data._wpnonce,
+                };
+            if( self.val() === '' || self.val() === null ) {
+                $('.hrm-client-project-dropdown').remove();
+                return;
+            }
+
+            $.post( hrm_ajax_data.ajax_url, data, function( res ) {
+                if ( res.success ) {
+                    $('.hrm-client-project-dropdown').remove();
+                    self.closest('.hrm-form-field ').after(res.data.field);
+                }
             });
         },
 

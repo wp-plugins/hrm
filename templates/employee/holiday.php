@@ -18,8 +18,8 @@ if( isset( $_POST['type'] ) && ( $_POST['type'] == '_search' ) ) {
 
 $total = $results['total_row'];
 unset( $results['total_row'] );
-$add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$add_permission = hrm_user_can_access( $page,  $tab, $subtab, 'add' ) ? true : false;
+$delete_permission = hrm_user_can_access( $page,  $tab, $subtab, 'delete' ) ? true : false;
 foreach ( $results as $key => $value) {
     $value->length = ( $value->length == 'full' ) ? 'Full Day' : 'Half Day';
     $body[] = array(
@@ -42,7 +42,7 @@ $table['head'] = array(
     __('Description','hrm'),
     __('Full Day/Half Day','hrm')
 );
-$table['body'] = isset( $body ) ? $body : '';
+$table['body']          = isset( $body ) ? $body : '';
 $table['td_attr']       = isset( $td_attr ) ? $td_attr : '';
 $table['th_attr']       = array( 'class="check-column"' );
 $table['table_attr']    = array( 'class' => 'widefat' );
@@ -50,6 +50,7 @@ $table['table']         = 'hrm_holiday';
 $table['action']        = 'hrm_delete';
 $table['tab']           = $tab;
 $table['subtab']        = $subtab;
+$table['page']          = $page;
 $table['add_btn_name']  = false;
 $table['delete_button'] = false;
 

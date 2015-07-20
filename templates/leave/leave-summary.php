@@ -108,13 +108,12 @@ if ( $search_status ) {
         $holiday_index = array_merge( $holiday_index, maybe_unserialize( $holiday->index_holiday ) );
     }
 
-    $add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-    $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+    $add_permission = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+    $delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
     $body              = array();
     $td_attr           = array();
-    $leave_action_acess = hrm_user_can_access( $tab, $subtab, 'leave_summary_action', true );
 
-    if ( $leave_action_acess === 'leave_summary_action' || $leave_action_acess ) {
+    if ( hrm_user_can_access( $page, $tab, $subtab, 'leave_summary_action' ) ) {
         $action = true;
     } else {
         $action = false;
@@ -171,7 +170,6 @@ if ( $search_status ) {
 
         $table['search']    = __( 'Search Mode', 'hrm' );
         $table['search_mode']    = true;
-
         $table['delete_button'] = false;
         $table['td_attr']    = isset( $td_attr ) ? $td_attr : '';
         $table['th_attr']    = isset( $th_attr ) ? $th_attr : '';
@@ -180,6 +178,7 @@ if ( $search_status ) {
         $table['action']     = 'hrm_delete';
         $table['tab']        = $tab;
         $table['subtab']     = $subtab;
+        $table['page']     = $page;
         $table['data_table'] = false;
         $table['pagination'] = false;
         $table['body']       = isset( $body ) ? $body : array();
@@ -317,6 +316,7 @@ if ( $search_status ) {
             $table['action']     = 'hrm_delete';
             $table['tab']        = $tab;
             $table['subtab']     = $subtab;
+            $table['page']     = $page;
             $table['data_table'] = false;
             $table['body']       = isset( $body ) ? $body : '';
             $table['pagination'] = false;
@@ -407,8 +407,6 @@ jQuery(function($) {
 
         });
     });
-
-
 </script>
 
 

@@ -341,7 +341,7 @@ class Hrm_Time {
                     require_once $req_frm;
                 wp_send_json_success( array(
                     'content' => ob_get_clean(),
-                    'disable_puch_frm'         => true,
+                    'disable_puch_frm'   => true,
                     'success_msg' => __( 'Successfully update puch', 'hrm' ),
                 ));
             }

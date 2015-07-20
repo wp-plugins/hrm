@@ -11,8 +11,8 @@ if( isset( $pay_grade['total_row'] ) ) {
     $total = 0;
 };
 
-$add_permission    = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+$delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 
 foreach ( $pay_grade as $key => $value) {
 
@@ -65,6 +65,7 @@ $table['table']      = 'hrm_pay_grade';
 $table['action']     = 'hrm_delete';
 $table['tab']        = $tab;
 $table['subtab']     = $subtab;
+$table['page']       = $page;
 
 echo Hrm_Settings::getInstance()->table( $table );
 $file_path = urlencode(__FILE__);

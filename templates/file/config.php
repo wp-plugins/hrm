@@ -6,7 +6,7 @@ if ( file_exists( $header_path ) ) {
 	require_once $header_path;
 }
 
-if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
+if ( ! hrm_user_can_access( $page, $tab, $subtab, 'view' ) ) {
     printf( '<h1>%s</h1>', __( 'You do no have permission to access this page', 'cpm' ) );
     return;
 }
@@ -27,8 +27,8 @@ if ( !$wp_roles ) {
 $role_names = $wp_roles->get_names();
 $wp_built_in_role = array( 'administrator', 'editor', 'author', 'contributor', 'subscriber', 'hrm_employee' );
 
-$add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-$delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+$add_permission = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
+$delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
 $current_user_role = hrm_current_user_role();
 
 foreach ( $role_names as $name => $display_name) {
@@ -54,22 +54,23 @@ foreach ( $role_names as $name => $display_name) {
     );
 }
 
-$del_checkbox           = ( $delete_permission ) ? '<input type="checkbox">' : '';
-$table['head']          = array( $del_checkbox, 'User Role', 'Display Name' );
-$table['body']          = isset( $body ) ? $body : array();
+$del_checkbox             = ( $delete_permission ) ? '<input type="checkbox">' : '';
+$table['head']            = array( $del_checkbox, 'User Role', 'Display Name' );
+$table['body']            = isset( $body ) ? $body : array();
 
 
-$table['td_attr']       = isset( $td_attr ) ? $td_attr : '';
-$table['th_attr']       = array( 'class="check-column"' );
-$table['table_attr']    = array( 'class' => 'widefat' );
+$table['td_attr']         = isset( $td_attr ) ? $td_attr : '';
+$table['th_attr']         = array( 'class="check-column"' );
+$table['table_attr']      = array( 'class' => 'widefat' );
 
-$table['action']        = 'role_delete';
-$table['table_attr']    = array( 'class' => 'widefat' );
-$table['tab']           = $tab;
-$table['subtab']        = $subtab;
-$table['add_button']    = false;
+$table['action']          = 'role_delete';
+$table['table_attr']      = array( 'class' => 'widefat' );
+$table['tab']             = $tab;
+$table['subtab']          = $subtab;
+$table['page']            = $page;
+$table['add_button']      = false;
 //$table['delete_button'] = false;
-$table['pagination']    = false;
+$table['pagination']      = false;
 
 echo Hrm_Settings::getInstance()->table( $table );
 $file_path = urlencode(__FILE__);

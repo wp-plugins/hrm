@@ -20,6 +20,19 @@ class Hrm_Settings {
         return apply_filters( 'hrm_redirect_url', $url, $page, $tab, $subtab );
     }
 
+    function show_page( $page ) {
+
+        $menu = hrm_page();
+
+        $path = isset( $menu[$page]['file_path'] ) ? $menu[$page]['file_path'] : '';
+
+        if( file_exists( $path ) ) {
+            include_once $path;
+        } else {
+            _e('Page not found', 'hrm' );
+        }
+    }
+
     function show_tab_page( $page, $tab, $subtab, $nested_tab = '' ) {
         if ( !$tab ) {
             _e( 'Missing Tab Page!', 'hrm' );
@@ -29,15 +42,10 @@ class Hrm_Settings {
         $menu = hrm_page();
         $tab = empty( $nested_tab ) ? $tab : $nested_tab;
 
-        if ( ! hrm_user_can_access( $tab, null, 'view' ) ) {
-            printf( '<h1>%s</h1>', __( 'You do not have permission to access this page', 'cpm' ) );
-            return false;
-        }
-
         $path = isset( $menu[$page][$tab]['file_path'] ) ? $menu[$page][$tab]['file_path'] : '';
 
         if( file_exists( $path ) ) {
-            require_once $path;
+            include_once $path;
         } else {
             _e('Page not found', 'hrm' );
         }
@@ -56,32 +64,22 @@ class Hrm_Settings {
 
             $subtab = key( $menu[$page][$tab]['submenu'] );
 
-            if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
-                printf( '<h1>%s</h1>', __( 'You do not have permission to access this page', 'cpm' ) );
-                return false;
-            }
-
             $path = isset( $menu[$page][$tab]['submenu'][$subtab]['file_path'] ) ? $menu[$page][$tab]['submenu'][$subtab]['file_path'] : '';
             $path = apply_filters( 'hrm_subtab_path', $path, $page, $tab, $subtab );
 
             if( file_exists( $path ) ) {
-                require_once $path;
+                include_once $path;
             } else {
                 echo 'Page not found';
             }
         } else {
 
-            if ( ! hrm_user_can_access( $tab, $subtab, 'view' ) ) {
-                printf( '<h1>%s</h1>', __( 'You do not have permission to access this page', 'cpm' ) );
-                return;
-            }
-
             $path = isset( $menu[$page][$tab]['submenu'][$subtab]['file_path'] ) ? $menu[$page][$tab]['submenu'][$subtab]['file_path'] : '';
 
             $path = apply_filters( 'hrm_subtab_path', $path, $page, $tab, $subtab );
 
             if( file_exists( $path ) ) {
-                require_once $path;
+                include_once $path;
             } else {
                 echo 'Page not found';
             }
@@ -476,6 +474,8 @@ class Hrm_Settings {
         return ob_get_clean();
     }
 
+
+
     function get_serarch_form( $form, $heading = null ) {
         $form['action']       = isset( $form['action'] ) ? $form['action'] : '';
         $form['table_option'] = isset( $form['table_option'] ) ? $form['table_option'] : '';
@@ -568,14 +568,26 @@ class Hrm_Settings {
         $tab                  = isset( $form['tab'] ) ? $form['tab'] : null;
         $subtab               = isset( $form['subtab'] ) ? $form['subtab'] : null;
         $form['url']          = isset( $form['url'] ) ? $form['url'] : '';
-
+        $form_header          = isset( $form['header'] ) ? $form['header'] : false;
+        $form_wrap_class      = isset( $form['form_wrap_class'] ) ? $form['form_wrap_class'] : 'postbox';
+        $submit_disabled      = isset( $form['submit_btn_disabled'] ) ? $form['submit_btn_disabled'] : false;
+        $submit_value         = isset( $form['submit_btn_value'] ) ? $form['submit_btn_value'] : __( 'Submit', 'hrm' );
+        $cancel_href          = isset( $form['cancel_href'] ) ? $form['cancel_href'] : '#';
+        $cancel_text          = isset( $form['cancel_text'] ) ? $form['cancel_text'] : __( 'Cancel', 'hrm' );
+        $cancel_btn_class     = isset( $form['cancel_btn_class'] ) ? $form['cancel_btn_class'] : 'hrm-form-cancel';
         ob_start();
         ?>
 
-        <div id="hrm-hidden-form-warp" class="postbox" style="display: none;">
-            <div class="hrm-search-head">
+        <div id="hrm-hidden-form-warp" class="<?php echo $form_wrap_class;?>" style="display: none;">
+            <?php
+            if ( $form_header ) {
+                ?>
+                <div class="hrm-search-head">
                     <h3><?php echo $form['header']; ?></h3>
-            </div>
+                </div>
+                <?php
+            }
+            ?>
             <form id="hrm-hidden-form" action="" >
                 <input type="hidden" name="action" value="<?php echo esc_attr( $form['action'] ); ?>">
                 <input type="hidden" name="url" value="<?php echo $form['url']; ?>">
@@ -623,7 +635,7 @@ class Hrm_Settings {
                                     echo $this->descriptive_field( $field_obj );
                                     break;
                                 case 'html':
-                                    echo $field_obj['content'];
+                                     echo $field_obj['content'];
                                     break;
                                 case 'tinymce':
                                     echo $this->hrm_tinymce( $field_obj );
@@ -637,8 +649,19 @@ class Hrm_Settings {
 
                 </div>
                 <div class="hrm-action-wrap">
-                    <input type="submit" class="button hrm-submit-button button-primary" name="requst" value="Submit">
-                    <a href="#" class="button hrm-form-cancel"><?php _e( 'Cancel', 'hrm' ); ?></a>
+                    <?php
+                    if ( ! $submit_disabled ) {
+                        ?>
+                        <input type="submit" class="button hrm-submit-button button-primary" name="requst" value="<?php echo $submit_value; ?>">
+                        
+                        <?php
+                    } else {
+                        ?>
+                        <input type="submit" disabled="disabled" class="button hrm-submit-button button-primary" name="requst" value="<?php echo $submit_value; ?>">
+                        <?php
+                    }
+                    ?>
+                    <a target="_blank" href="<?php echo $cancel_href; ?>" class="button <?php echo $cancel_btn_class; ?>"><?php echo $cancel_text; ?></a>
                     <div class="hrm-spinner" style="display: none;"><?php _e( 'Saving....', 'hrm' ); ?></div>
                 </div>
             </form>
@@ -655,6 +678,7 @@ class Hrm_Settings {
         $form['subtab']       = isset( $form['subtab'] ) ? $form['subtab'] : null;
         $form['tab']          = isset( $form['tab'] ) ? $form['tab'] : null;
         $submit_btn           = isset( $form['submit_btn'] ) ? $form['submit_btn'] : true;
+        $page         = isset( $form['page'] ) ? $form['page'] : null;
         ob_start();
         ?>
         <div class="hrm-error-notification"></div>
@@ -717,7 +741,7 @@ class Hrm_Settings {
 
                     }
 
-                if ( hrm_user_can_access( $form['tab'], $form['subtab'], 'add' ) && $submit_btn ) {
+                if ( hrm_user_can_access( $page, $form['tab'], $form['subtab'], 'add' ) && $submit_btn ) {
                     ?>
                     <input type="submit" class="button hrm-submit-button button-primary" name="" value="Submit">
                     <div class="hrm-spinner" style="display: none;"><?php _e( 'Saving....', 'hrm' ); ?></div>
@@ -739,12 +763,14 @@ class Hrm_Settings {
         $form['subtab']       = isset( $form['subtab'] ) ? $form['subtab'] : null;
         $form['tab']          = isset( $form['tab'] ) ? $form['tab'] : null;
         $submit_btn           = isset( $form['submit_btn'] ) ? $form['submit_btn'] : true;
+        $class                = isset( $form['class'] ) ? $form['class'] : '';
+        $page                 = isset( $form['page'] ) ? $form['page'] : null;
         ob_start();
         ?>
         <div class="hrm-error-notification"></div>
-        <div id="hrm-visible-form-warp">
+        <div id="hrm-visible-form-warp" class="<?php echo $class; ?>">
             <div class="hrm-search-head">
-                <h2 id="hrm-searchLocationHeading"><?php echo $form['header']; ?></h2>
+                <h3><?php echo $form['header']; ?></h3>
             </div>
             <form id="hrm-visible-form" action="" method="post">
                 <input type="hidden" name="action" value="<?php echo esc_attr( $form['action'] ); ?>">
@@ -801,7 +827,7 @@ class Hrm_Settings {
 
                     }
 
-                if ( hrm_user_can_access( $form['tab'], $form['subtab'], 'add' ) && $submit_btn ) {
+                if ( hrm_user_can_access( $page, $form['tab'], $form['subtab'], 'add' ) && $submit_btn ) {
                     ?>
                     <div class="hrm-spinner" style="display: none;"><?php _e( 'Saving....', 'hrm' ); ?></div>
                     <?php
@@ -815,6 +841,7 @@ class Hrm_Settings {
     }
 
     function table( $table ) {
+        $table = apply_filters( 'hrm_table_data', $table );
         if( ! isset( $table['head'] ) || ! is_array( $table['head'] ) || ! count( $table['head'] ) ) {
             return;
         }
@@ -832,6 +859,7 @@ class Hrm_Settings {
 
         $searc_mode      = isset( $table['search_mode'] ) ?  $table['search_mode'] : false;
         $search          = isset( $table['search'] ) && $table['search'] ? $table['search'] : false;
+        $page            = isset( $table['page'] ) ? $table['page'] : null;
 
         if ( isset( $table['data_table'] ) && $table['data_table'] ) {
             $datatable = 'hrm-data-table';
@@ -841,8 +869,8 @@ class Hrm_Settings {
             $datatable = 'hrm-data-table';
         }
 
-        $insert_new = ( hrm_user_can_access( $tab, $subtab, 'add' ) &&  $add_btn_name ) ? true : false;
-        $event_delete = ( hrm_user_can_access( $tab, $subtab, 'delete' ) && $delet_button ) ? true : false;
+        $insert_new = ( hrm_user_can_access( $page, $tab, $subtab, 'add' ) &&  $add_btn_name ) ? true : false;
+        $event_delete = ( hrm_user_can_access( $page,$tab, $subtab, 'delete' ) && $delet_button ) ? true : false;
         ob_start();
         ?>
 

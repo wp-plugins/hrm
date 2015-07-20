@@ -260,11 +260,17 @@ label em {
   padding: 6px 0 0;
 }
 .hrm-search-head h3 {
-  border-bottom: 1px solid #eee;
   font-size: 14px;
   line-height: 1.4;
+  border-bottom: 1px solid #eee;
   margin: 0;
   padding: 8px 12px;
+}
+.hrm-premission-form-wrap .hrm-permission-content {
+  padding: 8px 12px;
+}
+.hrm-premission-form-wrap .hrm-permission-check-all {
+  float: right;
 }
 .hrm-search-content #hrm-search-form {
   padding: 10px;
@@ -733,4 +739,12 @@ label em {
 }
 .hrm-leave-details-dialog .widefat {
   border: none;
+}
+.hrm-disable-field-css {
+  resize: none !important;
+  border: none !important;
+}
+.hrm-partial-payment-date-field,
+.hrm-partial-payment-amount-field {
+  width: 60%;
 }

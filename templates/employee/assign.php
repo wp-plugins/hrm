@@ -99,11 +99,11 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
         $holiday_index = array_merge( $holiday_index, maybe_unserialize( $holiday->index_holiday ) );
     }
 
-    $add_permission = hrm_user_can_access( $tab, $subtab, 'add' ) ? true : false;
-    $delete_permission = hrm_user_can_access( $tab, $subtab, 'delete' ) ? true : false;
+    $add_permission = hrm_user_can_access($page,  $tab, $subtab, 'add' ) ? true : false;
+    $delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
     $body              = array();
     $td_attr           = array();
-    $leave_action_acess = hrm_user_can_access( $tab, $subtab, 'leave_summary_action', true );
+    $leave_action_acess = hrm_user_can_access( $page, $tab, $subtab, 'leave_summary_action', true );
 
     if ( $leave_action_acess === 'leave_summary_action' || $leave_action_acess ) {
         $action = true;
@@ -165,15 +165,16 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
         $table['search_mode']    = true;
 
         $table['delete_button'] = false;
-        $table['td_attr']    = isset( $td_attr ) ? $td_attr : '';
-        $table['th_attr']    = isset( $th_attr ) ? $th_attr : '';
-        $table['table_attr'] = array( 'class' => 'widefat' );
-        $table['table']      = 'hrm_leave';
-        $table['action']     = 'hrm_delete';
-        $table['tab']        = $tab;
-        $table['subtab']     = $subtab;
-        $table['data_table'] = false;
-        $table['pagination'] = false;
+        $table['td_attr']       = isset( $td_attr ) ? $td_attr : '';
+        $table['th_attr']       = isset( $th_attr ) ? $th_attr : '';
+        $table['table_attr']    = array( 'class' => 'widefat' );
+        $table['table']         = 'hrm_leave';
+        $table['action']        = 'hrm_delete';
+        $table['tab']           = $tab;
+        $table['subtab']        = $subtab;
+        $table['page']          = $page;
+        $table['data_table']    = false;
+        $table['pagination']    = false;
 
         $table['body']       = isset( $body ) ? $body : array();
         echo Hrm_Settings::getInstance()->table( $table );
@@ -310,6 +311,7 @@ if ( ( isset( $_GET['action_search'] ) && $_GET['action_search'] ) )  {
             $table['action']     = 'hrm_delete';
             $table['tab']        = $tab;
             $table['subtab']     = $subtab;
+            $table['page']       = $page;
             $table['data_table'] = false;
             $table['body']       = isset( $body ) ? $body : '';
             $table['pagination'] = false;
