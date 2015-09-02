@@ -39,12 +39,6 @@ function hrm_page( $exclude = true ) {
     $employee              = hrm_employee_page();
     $page[$employee]       = hrm_employee_page_items( $path, $employee, $page[$hrm_pim], $exclude );
 
-    foreach ( $page as $page_slug => $page_items ) {
-        if ( ! current_user_can( $page_slug ) && hrm_current_user_role() != 'administrator' ) {
-            unset( $page[$page_slug] );
-        }
-    }
-
     return apply_filters( 'hrm_menu_items', $page, $exclude );
 }
 
@@ -57,25 +51,9 @@ function hrm_employee_page_items( $path, $employee, $hrm_pim, $exclude ) {
     $emp['leave']             = $hrm_pim['leave'];
 
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_employee_page_items', $emp, $path, $employee, $hrm_pim );
+        return $emp;
     }
 
-    foreach ( $emp as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $emp[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $emp[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $emp[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $emp[$tab]['submenu'][$sub_tab] );
-            }
-        }
-    }
     return apply_filters( 'hrm_employee_page_items', $emp, $path, $employee, $hrm_pim );
 }
 
@@ -87,26 +65,11 @@ function hrm_salary_page_items( $path, $hrm_salary, $exclude ) {
         'file_slug' => 'salary/salary',
         'file_path' => $path . '/salary/salary.php',
     );
+
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_salary_page_items', $salary, $path, $hrm_salary );
+        return $salary;
     }
 
-    foreach ( $salary as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $salary[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $salary[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $salary[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $salary[$tab]['submenu'][$sub_tab] );
-            }
-        }
-    }
     return apply_filters( 'hrm_salary_page_items', $salary, $path, $hrm_salary );
 }
 
@@ -132,26 +95,10 @@ function hrm_project_page_items( $path, $hrm_project, $exclude ) {
     );
 
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_project_page_items', $project, $path, $hrm_project );
+        return $project;
     }
 
-    foreach ( $project as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $project[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $project[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $project[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $project[$tab]['submenu'][$sub_tab] );
-            }
-        }
-    }
-    return apply_filters( 'hrm_project_page_items', $project, $path, $hrm_project );
+    return apply_filters( 'hrm_project_page_items', $project, $path, $hrm_project ); 
 }
 
 function hrm_permission_page_items( $path, $permission ) {
@@ -178,6 +125,10 @@ function hrm_permission_page_items( $path, $permission ) {
         'file_path' => $path . '/permission/permission.php',
     );
 
+    if ( hrm_current_user_role() == 'administrator' ) {
+        return $access;    
+    }
+
     return apply_filters( 'hrm_permission_page_items', $access, $path, $permission );
 }
 
@@ -199,25 +150,9 @@ function hrm_client_page_items( $path, $hrm_client, $exclude ) {
     );
 
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_client_page_items', $client, $path, $hrm_client );
+        return $client;    
     }
 
-    foreach ( $client as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $client[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $client[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $client[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $client[$tab]['submenu'][$sub_tab] );
-            }
-        }
-    }
     return apply_filters( 'hrm_client_page_items', $client, $path, $hrm_client );
 }
 
@@ -238,25 +173,9 @@ function hrm_evaluation_page_items( $path, $hrm_evaluation, $exclude ) {
     );
 
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_evaluation_page_items', $evaluation, $path, $hrm_evaluation );
+        return $evaluation;
     }
 
-    foreach ( $evaluation as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $evaluation[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $evaluation[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $evaluation[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $evaluation[$tab]['submenu'][$sub_tab] );
-            }
-        }
-    }
     return apply_filters( 'hrm_evaluation_page_items', $evaluation, $path, $hrm_evaluation );
 }
 
@@ -286,24 +205,7 @@ function hrm_time_page_items( $path, $hrm_time, $exclude ) {
     );
 
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_time_page_items', $time, $path, $hrm_time );
-    }
-
-    foreach ( $time as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $time[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $time[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $time[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $time[$tab]['submenu'][$sub_tab] );
-            }
-        }
+        return $time;   
     }
 
     return apply_filters( 'hrm_time_page_items', $time, $path, $hrm_time );
@@ -350,26 +252,9 @@ function hrm_leave_page_items( $path, $hrm_leave ) {
     );
 
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_leave_page_items', $leave, $path, $hrm_leave );
+        return $leave;
     }
-
-    foreach ( $leave as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $leave[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $leave[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $leave[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $leave[$tab]['submenu'][$sub_tab] );
-            }
-        }
-    }
-
+    
     return apply_filters( 'hrm_leave_page_items', $leave, $path, $hrm_leave );
 }
 
@@ -397,24 +282,7 @@ function hrm_file_page_items( $path, $hrm_file, $exclude ) {
     );
 
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_file_page_items', $file, $path, $hrm_file );
-    }
-
-    foreach ( $file as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $file[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $file[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $file[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $file[$tab]['submenu'][$sub_tab] );
-            }
-        }
+        return $file;
     }
 
     return apply_filters( 'hrm_file_page_items', $file, $path, $hrm_file );
@@ -573,24 +441,7 @@ function hrm_pim_page_items( $path, $hrm_pim, $exclude ) {
     );
 
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_pim_page_items', $pim, $path, $hrm_pim );
-    }
-
-    foreach ( $pim as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $pim[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $pim[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $pim[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $pim[$tab]['submenu'][$sub_tab] );
-            }
-        }
+        return $pim;
     }
 
     return apply_filters( 'hrm_pim_page_items', $pim, $path, $hrm_pim );
@@ -683,24 +534,7 @@ function hrm_admin_page_items( $path, $hrm_management, $exclude ) {
     );
 
     if ( $exclude === false || hrm_current_user_role() == 'administrator' ) {
-        return apply_filters( 'hrm_admin_section_items', $admin, $path, $hrm_management );
-    }
-
-    foreach ( $admin as $tab => $tab_items ) {
-        if ( ! current_user_can( $tab . '_view' ) ) {
-            unset( $admin[$tab] );
-            continue;
-        }
-
-        if ( ! isset( $admin[$tab]['submenu'] ) ) {
-            continue;
-        }
-
-        foreach ( $admin[$tab]['submenu'] as $sub_tab => $sub_tab_items ) {
-            if ( ! current_user_can( $sub_tab . '_view' ) ) {
-                unset( $admin[$tab]['submenu'][$sub_tab] );
-            }
-        }
+        return $admin;
     }
 
     return apply_filters( 'hrm_admin_section_items', $admin, $path, $hrm_management );
@@ -767,16 +601,6 @@ function hrm_menu_label() {
         hrm_client_page()     => __( 'Client', 'hrm' ),
         hrm_permission_page() => __( 'Permission', 'hrm' )
     );
-
-    foreach ( $labels as $page_slug => $page_label ) {
-        if ( ! hrm_user_can_access( $page_slug ) ) {
-            unset( $labels[$page_slug] );
-        }
-    }
-
-    if ( hrm_current_user_role() != 'administrator' ) {
-        unset( $labels[hrm_permission_page()] );
-    }
 
     return apply_filters( 'hrm_menu_lable', $labels );
 }

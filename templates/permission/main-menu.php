@@ -26,7 +26,7 @@ if ( !$wp_roles ) {
 }
 
 $role_names = $wp_roles->get_names();
-$wp_built_in_role = array( 'administrator', 'editor', 'author', 'contributor', 'subscriber', 'hrm_employee' );
+$wp_built_in_role = array( 'administrator', 'editor', 'author', 'contributor', 'subscriber' );
 
 $add_permission    = hrm_user_can_access( $page, $tab, $subtab, 'add' ) ? true : false;
 $delete_permission = hrm_user_can_access( $page, $tab, $subtab, 'delete' ) ? true : false;
@@ -35,7 +35,7 @@ $body              = array();
 $td_attr           = array();
 foreach ( $role_names as $name => $display_name) {
 
-	if ( $current_user_role == $name || $name == 'hrm_employee'  ) {
+	if ( $current_user_role == $name ) {
 		continue;
 	}
 

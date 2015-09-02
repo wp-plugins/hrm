@@ -31,7 +31,9 @@ $url = hrm_Settings::getInstance()->get_current_page_url( $page, $tab, $subtab )
     $add_permission    = hrm_user_can_access( $page, $tab, null, 'add' ) ? true : false;
     $delete_permission = hrm_user_can_access( $page, $tab, null, 'delete' ) ? true : false;
     $hrm_menu = hrm_page();
-    foreach ( $menu[hrm_pim_page()] as $pim_tab => $pim_tab_item ) {
+
+    $menu_pim_page = isset( $menu[hrm_pim_page()] ) ? $menu[hrm_pim_page()] : array();
+    foreach ( $menu_pim_page as $pim_tab => $pim_tab_item ) {
         if ( array_key_exists( 'nested_tab', $pim_tab_item) && $pim_tab_item['nested_tab'] ) {
             $pim_single_tab = $pim_tab;
             break;

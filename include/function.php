@@ -9,17 +9,22 @@ function hrm_user_can_access( $page = null, $tab = null, $subtab = null, $access
     }
 
     $current_user = get_user_by( 'id', $user_id );
+
     $super_admin = get_option( 'hrm_admin', true );
+    $user_role = reset( $current_user->roles );
 
     if ( $user_id == $super_admin ) {
         return true;
     }
 
-    if ( reset( $current_user->roles ) == 'administrator' ) {
+    if ( $user_role == 'administrator' ) {
         return true;
     }
 
-    if ( ! user_can( $user_id, $page ) ) {
+    $get_role = get_role( $user_role );
+    $get_role_cap = $get_role->capabilities;
+
+    if ( ! array_key_exists( $page, $get_role_cap ) ) {
         return false;
     }
 

@@ -80,6 +80,13 @@ Browser Compatibility
     3. Leave management
 
 == Changelog ==
+==1.0==
+* Employee page not found problem fix
+* Permission management code separated by addon
+* Only administator can maintain update and permission tab
+* Fix many undefined index problem
+* Improved some permission management function
+
 = 0.9 =
 * client management system.
 * code fromat change
